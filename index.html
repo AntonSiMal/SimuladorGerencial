@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulador Gerencial - Campaña 5 Años</title>
+<style>
+  :root {
+    --bg: #121212; --card: #1e1e24; --text: #e0e0e0; --accent: #4caf50;
+    --warn: #ff9800; --danger: #f44336; --info: #2196f3; --gold: #ffd700;
+    --p: #2196f3; --c: #4caf50; --pr: #ffc107; --d: #ff5722; --t: #9c27b0;
+    --paypal: #0070ba; --paypal-hover: #005ea6;
+  }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
+  .container { max-width: 1100px; width: 100%; display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  .main-panel { display: flex; flex-direction: column; gap: 20px; }
+  .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+  h1, h2, h3, h4 { margin: 0 0 15px 0; }
+  .header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #2a2a35, #1e1e24); flex-wrap: wrap; gap: 10px;}
+  .status-badge { padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9em; color: white; }
+  .hand-display { display: flex; gap: 5px; flex-wrap: wrap; }
+  .hand-card { background: #332a00; border: 1px solid var(--gold); color: var(--gold); padding: 4px 8px; border-radius: 5px; font-size: 0.75em; font-weight: bold; }
+  .streak-display { font-size: 0.85em; color: var(--warn); font-weight: bold; margin-top: 5px; }
+  
+  .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .stat { background: #15151a; padding: 12px; border-radius: 8px; border-left: 5px solid; }
+  .stat-header { display: flex; justify-content: space-between; font-size: 0.9em; margin-bottom: 8px; font-weight: bold; }
+  .bar-bg { height: 12px; background: #333; border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; transition: width 0.6s ease, background 0.6s ease; border-radius: 6px; }
+  
+  .scenario { font-size: 1.05em; line-height: 1.6; margin-bottom: 20px; padding: 15px; background: #15151a; border-radius: 8px; border-left: 4px solid var(--info); }
+  .scenario-title { color: var(--info); font-weight: bold; font-size: 1.1em; display: block; margin-bottom: 8px; }
+  
+  .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .decision-card { background: #252530; border: 2px solid #333; border-radius: 10px; padding: 15px; cursor: pointer; transition: all 0.2s; }
+  .decision-card:hover { border-color: var(--accent); transform: translateX(5px); background: #2a2a35; }
+  .decision-card.selected { border-color: var(--accent); background: #1e3a1e; box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+  .card-label { font-weight: bold; font-size: 1.2em; color: var(--accent); margin-right: 10px; }
+  .card-text { font-size: 0.95em; line-height: 1.4; }
+  
+  .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.2s; width: 100%; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #45a049; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-danger:hover { background: #d32f2f; }
+  .btn-info { background: var(--info); color: white; }
+  .btn-info:hover { background: #1976d2; }
+  .btn-gold { background: var(--gold); color: #111; border: 1px solid #b89a00; }
+  .btn-gold:hover:not(:disabled) { background: #e6c200; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; background: #555; color: #999; border-color: #444; }
+  .btn-paypal { background: var(--paypal); color: white; margin-top: 10px; }
+  .btn-paypal:hover { background: var(--paypal-hover); }
+  .btn-wc { font-size: 0.85em; padding: 8px 12px; width: auto; margin: 5px; }
+  
+  .log-panel { background: var(--card); border-radius: 12px; padding: 15px; height: fit-content; max-height: 85vh; overflow-y: auto; position: sticky; top: 20px; }
+  .log-entry { background: #15151a; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85em; border-left: 3px solid var(--accent); }
+  .log-entry h4 { margin: 0 0 5px 0; color: var(--accent); font-size: 0.9em; }
+  .log-entry p { margin: 2px 0; color: #aaa; }
+  .log-wc { color: var(--gold); font-weight: bold; font-size: 0.8em; }
+  
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
+  .modal { background: var(--card); padding: 30px; border-radius: 15px; max-width: 600px; width: 90%; text-align: center; border-top: 5px solid var(--accent); max-height: 90vh; overflow-y: auto; }
+  .modal h2 { color: var(--accent); margin-bottom: 10px; }
+  .modal.danger { border-top-color: var(--danger); }
+  .modal.danger h2 { color: var(--danger); }
+  .modal.info { border-top-color: var(--info); }
+  .modal.info h2 { color: var(--info); }
+  .modal.warn { border-top-color: var(--warn); }
+  .modal.warn h2 { color: var(--warn); }
+  .modal.special { border-top-color: var(--gold); }
+  .modal.special h2 { color: var(--gold); }
+  
+  .effects { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
+  .effect-tag { padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9em; }
+  .pos { background: #1e3a1e; color: #8f8; border: 1px solid #4caf50; }
+  .neg { background: #3a1e1e; color: #f88; border: 1px solid #f44336; }
+  .neu { background: #333; color: #ccc; border: 1px solid #555; }
+
+  .special-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+  .wc-zone { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
+  .narrative-box { background: #15151a; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-style: italic; color: #ccc; line-height: 1.5; }
+  
+  .feedback-box { background: #15151a; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; border-left: 5px solid var(--warn); }
+  .feedback-box h4 { color: var(--warn); margin-bottom: 10px; }
+  .feedback-box ul { padding-left: 20px; color: #aaa; font-size: 0.9em; }
+  .feedback-box li { margin-bottom: 5px; }
+
+  .dice-icon { font-size: 4em; margin: 10px 0; display: inline-block; animation: rollDice 0.5s ease-out; }
+  @keyframes rollDice { 0% { transform: rotate(0deg) scale(0.5); } 100% { transform: rotate(360deg) scale(1); } }
+  
+  .donate-message { font-size: 0.9em; color: #aaa; margin-top: 20px; margin-bottom: 5px; font-style: italic; }
+  .donate-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--gold); }
+  .donate-section h4 { color: var(--gold); margin-bottom: 10px; }
+  
+  @media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+    .log-panel { position: static; max-height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="main-panel">
+    <div class="card header">
+      <div>
+        <h2>🏢 Simulador Gerencial (5 Años)</h2>
+        <div id="month-display">Año 1 | Mes 1 | Trimestre 1</div>
+        <div class="streak-display">🔥 Racha Actual: <span id="current-streak">0</span> meses | 🏆 Mejor Racha: <span id="best-streak">0</span> meses</div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+        <div id="status-badge" class="status-badge" style="background: var(--accent);">Estado: Óptimo</div>
+        <div style="font-size: 0.75em; color: var(--gold);">🃏 Comodines:</div>
+        <div id="hand-display" class="hand-display"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📊 Motor de Indicadores (KPIs)</h3>
+      <div class="dashboard" id="dashboard"></div>
+    </div>
+
+    <div class="card" id="game-zone">
+      <h3 id="phase-title">🎲 Fase 1: Análisis del Dilema</h3>
+      <div id="scenario-text" class="scenario">Cargando escenario...</div>
+      <div id="options-container" class="options"></div>
+      <button id="next-btn" class="btn btn-primary" style="display:none;" onclick="nextPhase()">Siguiente Mes ➔</button>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <h3> Bitácora Ejecutiva</h3>
+    <div id="log-container"></div>
+  </div>
+</div>
+
+<!-- Modal Decisión -->
+<div class="modal-overlay" id="modal-decision">
+  <div class="modal info">
+    <h2>💡 Impacto de tu Decisión</h2>
+    <p style="color: #ccc;">Has elegido: <b id="modal-decision-text" style="color: var(--info);"></b></p>
+    <div id="decision-effects" class="effects"></div>
+    <div class="wc-zone">
+      <h4 style="color: var(--gold); margin-bottom: 5px;">🃏 ¿Aplicar un Comodín de Liderazgo?</h4>
+      <div id="wildcard-buttons"></div>
+    </div>
+    <button class="btn btn-info" style="margin-top:20px;" onclick="closeDecisionModal()">Entendido, Tirar Dado del Entorno</button>
+  </div>
+</div>
+
+<!-- Modal Dado del Entorno -->
+<div class="modal-overlay" id="modal-dice">
+  <div class="modal info">
+    <h2>🎲 El Dado del Entorno</h2>
+    <div id="dice-icon-display" class="dice-icon">🎲</div>
+    <p id="dice-result" style="font-size: 1.5em; color: var(--info); margin: 10px 0; font-weight: bold;"></p>
+    <p id="dice-message" style="color: #ccc;"></p>
+    <button class="btn btn-info" id="dice-next-btn" style="margin-top:20px;">Continuar</button>
+  </div>
+</div>
+
+<!-- Modal Consecuencia -->
+<div class="modal-overlay" id="modal-consecuencia">
+  <div class="modal warn">
+    <h2>⚠️ Realidad Organizacional</h2>
+    <p id="cons-title" style="font-weight: bold; color: var(--warn); margin-bottom: 5px;"></p>
+    <div id="cons-narrative" class="narrative-box"></div>
+    <div id="cons-effects" class="effects"></div>
+    <button class="btn btn-primary" onclick="closeConsecuencia()">Asimilar Impacto</button>
+  </div>
+</div>
+
+<!-- Modal Trimestral -->
+<div class="modal-overlay" id="modal-trimestral">
+  <div class="modal">
+    <h2> Cierre de Trimestre</h2>
+    <p>Inyecta recursos de emergencia. Sacrifica <b>Presupuesto</b> para recuperar indicadores en crisis.</p>
+    <div id="trimestral-options"></div>
+    <button class="btn btn-primary" style="margin-top:20px;" onclick="closeTrimestral()">Continuar</button>
+  </div>
+</div>
+
+<!-- Modal PTU -->
+<div class="modal-overlay" id="modal-ptu">
+  <div class="modal special">
+    <h2>💰 Evento Anual: Reparto de Utilidades (PTU)</h2>
+    <p style="color: #ccc;">Es el mes 5. La ley exige repartir el 10% de las utilidades. ¿Cuál es tu estrategia?</p>
+    <div class="special-options" id="ptu-options">
+      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 0)">A) Pagar el mínimo legal estricto</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 1)">B) Pagar un bono extra del 5% por encima de la ley</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 2)">C) Diferir el pago con trucos contables (Riesgo legal)</button>
+    </div>
+    
+    <div class="donate-section">
+      <h4>🎁 ¿Quieres apoyar al desarrollador?</h4>
+      <p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu PTU es bienvenida para seguir mejorando este simulador</p>
+      <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">
+        💳 Dar PTU al desarrollador
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Aguinaldo -->
+<div class="modal-overlay" id="modal-aguinaldo">
+  <div class="modal special">
+    <h2> Evento Anual: Pago de Aguinaldo</h2>
+    <p style="color: #ccc;">Llegó el fin de año (Mes 12). Es momento de pagar el aguinaldo. ¿Cómo cerrarás el año fiscal?</p>
+    <div class="special-options" id="aguinaldo-options">
+      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 0)">A) Pagar los 15 días de ley (Mínimo)</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 1)">B) Pagar aguinaldo premium (30 días) por lealtad</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 2)">C) Pagar en especie (vales y despensas) para ahorrar flujo</button>
+    </div>
+    
+    <div class="donate-section">
+      <h4>🎁 ¿Quieres apoyar al desarrollador?</h4>
+      <p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu aguinaldo es muy apreciado para continuar el desarrollo</p>
+      <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">
+        💳 Dar Aguinaldo al desarrollador
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Game Over -->
+<div class="modal-overlay" id="modal-gameover">
+  <div class="modal danger">
+    <h2>💀 COLAPSO ORGANIZACIONAL</h2>
+    <p id="gameover-reason" style="font-size: 1.1em;"></p>
+    <div id="gameover-feedback" class="feedback-box"></div>
+    <button class="btn btn-danger" style="margin-top:20px;" onclick="location.reload()">Reintentar Campaña</button>
+    <p class="donate-message">¿Te gustó esta experiencia educativa? Apoya el desarrollo de este proyecto académico:</p>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">
+      💳 Donar vía PayPal
+    </a>
+  </div>
+</div>
+
+<!-- Modal Victoria -->
+<div class="modal-overlay" id="modal-victory">
+  <div class="modal">
+    <h2>🏆 Fin de la Década (5 Años)</h2>
+    <p id="victory-score" style="font-size: 1.2em;"></p>
+    <p id="victory-rank" style="font-size: 1.3em; font-weight: bold; margin: 20px 0; color: var(--accent);"></p>
+    <p style="color: var(--warn); font-weight: bold;">🔥 Tu Mejor Racha de Estabilidad: <span id="final-streak">0</span> meses consecutivos.</p>
+    <h3>Resumen de tu Legado:</h3>
+    <div id="final-log" style="text-align: left; max-height: 200px; overflow-y: auto; background: #15151a; padding: 10px; border-radius: 8px; font-size: 0.8em;"></div>
+    <button class="btn btn-primary" style="margin-top:20px;" onclick="location.reload()">Iniciar Nueva Campaña</button>
+    <p class="donate-message">¿Disfrutaste el simulador? Tu apoyo nos ayuda a seguir creando herramientas de aprendizaje innovadoras:</p>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">
+      💳 Donar vía PayPal
+    </a>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// DATA: 60 DILEMAS Y 60 CONSECUENCIAS
+// ==========================================
+const DILEMAS = [
+  ["El Operador Estrella Tóxico","Tu mejor operador cumple el 120% de la meta mensual, pero intimida sistemáticamente a los nuevos ingresos y se niega a seguir la metodología 5S en su estación de trabajo. Los demás operadores temen confrontarlo por su rendimiento.","Despedirlo aplicando el reglamento interno por faltas repetidas a la disciplina y al clima laboral, aunque eso signifique perder al mejor productor del mes.","Asignarle un mentor senior y diseñar un plan de mejora conductual con metas semanales, invirtiendo tiempo de supervisión para recuperar su actitud.","Mantenerlo en su puesto sin intervenir directamente por sus resultados, asumiendo el costo del deterioro del clima como un mal necesario para cumplir la meta."],
+  ["Solicitud de Aumento Fuera de Norma","Un empleado con buen desempeño y 5 años de antigüedad pide un aumento del 15% alegando cargas familiares recientes. Su solicitud está fuera de la política salarial vigente, pero su pérdida afectaría la operación.","Negarlo aplicando la política estrictamente para mantener la equidad interna, aunque eso signifique arriesgar su renuncia.","Negociar un bono por desempeño futuro atado a metas específicas, creando un precedente de meritocracia sin romper la estructura salarial.","Concederlo para retenerlo rompiendo el precedente, lo que podría generar una cascada de solicitudes similares de otros empleados."],
+  ["Resistencia a la Nueva Tecnología","Se implementa un nuevo software de control de producción. Los empleados veteranos (con más de 10 años) se niegan a usarlo, alegando que 'el método antiguo funciona bien' y que la curva de aprendizaje los hace sentir incompetentes.","Sancionar a los que no lo usen aplicando el reglamento, priorizando la estandarización sobre la comodidad del personal.","Invertir en capacitación lenta y acompañamiento personalizado, sacrificando productividad a corto plazo para ganar adopción a mediano plazo.","Exentar a los veteranos y usarlos como respaldo manual, creando un sistema dual que mantiene la paz pero duplica esfuerzos."],
+  ["Favoritismo en la Asignación de Turnos","Dos empleados clave (cada uno responsable del 30% de la producción) exigen los turnos de fin de semana (que pagan 50% más) por conflictos personales con sus compañeros de turno diurno, ignorando la rotación justa establecida.","Ceder para evitar conflictos inmediatos y garantizar la producción, aunque eso signifique romper la política de rotación equitativa.","Mantener la rotación estricta aplicando el reglamento, aunque eso signifique arriesgar que ambos empleados se nieguen a trabajar o renuncien.","Crear un sistema de subasta de turnos por antigüedad y desempeño, estableciendo reglas claras que premien el mérito sin ceder a presiones."],
+  ["Conflicto en la Línea de Ensamblaje","Dos operadores se gritan en la línea de producción, deteniendo el trabajo por 20 minutos. Ambos culpan al otro por un defecto recurrente en el producto. El supervisor no estaba presente y nadie quiere testificar.","Suspender a ambos por 3 días sin goce de sueldo aplicando el reglamento de forma estricta, enviando un mensaje de tolerancia cero al conflicto.","Mediar en el momento, escuchar ambas versiones y reasignarlos a áreas distintas, priorizando la paz laboral sobre el castigo.","Amonestarlos por escrito y obligarlos a resolver el conflicto juntos mediante un acuerdo firmado, usando el conflicto como oportunidad de crecimiento."],
+  ["Mantenimiento vs. Entrega Urgente","La máquina principal requiere mantenimiento preventivo hoy (según el plan anual), pero si se hace, se retrasa el pedido del cliente más importante, que aplicará una multa del 15% del valor del contrato.","Parar y hacer mantenimiento, asumiendo la multa del cliente pero previniendo una falla catastrófica que podría detener la planta por semanas.","Posponer mantenimiento y correr el riesgo de una falla inesperada, priorizando el cumplimiento inmediato al cliente sobre la salud del equipo a largo plazo.","Pagar horas extra dobles para recuperar el tiempo tras el paro, sacrificando el presupuesto y la fatiga del equipo para cumplir con ambos compromisos."],
+  ["El Cuello de Botella Humano","Solo un técnico sabe reparar un equipo crítico importado. Está saturado, trabajando 12 horas diarias, y retrasando toda la planta. Si renuncia, la operación se detiene por meses.","Contratar a un externo caro temporalmente para aliviar la carga, sacrificando presupuesto pero ganando tiempo para capacitar al equipo interno.","Obligar al técnico a capacitar a otros (bajando su producción temporalmente), invirtiendo en la redundancia de habilidades aunque eso signifique perder productividad hoy.","Ignorar el riesgo y dejar que el técnico trabaje al 150%, asumiendo que eventualmente se quemará o renunciará, pero maximizando la producción a corto plazo."],
+  ["Horas Extra vs. Fatiga del Equipo","Para cumplir la meta mensual, necesitas 40 horas extra. El equipo está agotado, los errores de calidad han subido un 5% y tres operadores han pedido días libres por estrés.","Exigir las horas extra obligatorias para cumplir la meta, asumiendo el deterioro del clima y el aumento de errores como costos inevitables.","Renegociar la fecha de entrega con el cliente, priorizando la salud del equipo y la calidad sobre el cumplimiento estricto del cronograma.","Subcontratar una parte del proceso a un tercero, sacrificando margen de ganancia pero manteniendo al equipo fresco y la calidad alta."],
+  ["Cambios de Diseño en Plena Producción","Ingeniería lanza un cambio de diseño a mitad de un lote grande de 5,000 piezas. Detener la línea cuesta $50,000 en tiempo perdido, pero seguir genera inventario obsoleto que deberá venderse con 40% de descuento.","Detener y aplicar el cambio inmediatamente, asumiendo el costo del paro pero evitando la obsolescencia y protegiendo la reputación de calidad.","Terminar el lote con el diseño viejo y venderlo con descuento, sacrificando margen pero manteniendo el flujo de producción sin interrupciones.","Hacer el cambio manualmente en el producto terminado (retrabajo), sacrificando tiempo, calidad y moral del equipo para evitar el paro de línea."],
+  ["La Meta Imposible","Dirección fija una meta de producción 20% mayor sin dar más recursos ni personal. Tu equipo está desmotivado y sabe que es matemáticamente imposible sin comprometer calidad o seguridad.","Aceptar la meta y exprimir al equipo con horas extra y presión, asumiendo el deterioro del clima y el riesgo de accidentes como costos del cumplimiento.","Presentar un contrapropósito técnico con datos, argumentando que la meta es inviable y proponiendo alternativas realistas, aunque eso signifique enfrentar la ira de dirección.","Fingir que se cumple y alterar los reportes, sacrificando la ética y la transparencia para mantener las apariencias y evitar el conflicto con dirección."],
+  ["Recorte en Capacitación","Finanzas exige recortar un 30% el presupuesto de capacitación anual para salvar la utilidad del trimestre. La capacitación es clave para la certificación ISO que se renovará en 6 meses.","Cancelar toda la capacitación, sacrificando el desarrollo del personal y arriesgando la certificación ISO, pero salvando la utilidad trimestral.","Cambiar cursos presenciales por e-learning gratuito de menor calidad, manteniendo algo de capacitación pero reduciendo su impacto real.","Negociar con Finanzas mantener el presupuesto usando fondos de contingencia, protegiendo la capacitación pero agotando las reservas para emergencias."],
+  ["Multa por Retraso vs. Envío Aéreo","Un error logístico retrasará un envío por tierra 5 días. El cliente aplicará una multa del 10% del valor del pedido. Enviar por avión cuesta el 25% del valor del pedido pero cumple a tiempo.","Aceptar la multa y enviar por tierra, sacrificando margen pero manteniendo el costo bajo, asumiendo que el cliente entenderá el retraso.","Pagar el envío aéreo, sacrificando un cuarto del valor del pedido pero cumpliendo a tiempo y protegiendo la relación comercial a largo plazo.","Negociar con el cliente un descuento a futuro (15%) en el próximo pedido, manteniendo el envío por tierra pero ofreciendo una compensación comercial."],
+  ["Compra a Granel vs. Flujo de Efectivo","Tu proveedor ofrece un 20% de descuento si compras el material de todo el año por adelantado, pero esto consumirá el 80% de tu flujo de caja, dejando a la empresa vulnerable ante imprevistos.","Comprar a granel, asegurando el descuento y la disponibilidad de material, pero descapitalizando la empresa y arriesgando la insolvencia ante emergencias.","Mantener compras mensuales al precio normal, preservando el flujo de caja pero pagando 20% más por el material durante todo el año.","Negociar un 10% de descuento pagando trimestralmente, encontrando un punto medio que preserve algo de flujo pero obtenga un descuento parcial."],
+  ["Inversión en Automatización","Tienes presupuesto para automatizar un proceso (reduce 5 puestos operativos) o para dar bonos de retención a la plantilla actual (30 personas). No alcanza para ambas cosas.","Automatizar y reubicar al personal en otras áreas (si es posible), modernizando la planta pero generando incertidumbre y resistencia al cambio.","Automatizar y despedir al personal excedente, maximizando la eficiencia pero destruyendo el clima laboral y la lealtad del equipo restante.","Dar los bonos y mantener el proceso manual, priorizando la moral del equipo pero perdiendo la oportunidad de modernización y eficiencia a largo plazo."],
+  ["Reducción de Costos en Insumos","Compras un lubricante para máquinas un 15% más barato, pero el fabricante no especifica si es biodegradable y no tiene certificaciones ambientales. El actual es costoso pero certificado.","Comprar el barato, ahorrando 15% en costos pero arriesgando multas ambientales y daño a la reputación si el producto no cumple normativas.","Mantener el costoso y certificado, protegiendo el cumplimiento ambiental y la reputación, pero pagando 15% más durante todo el año.","Pedir una muestra y probarlo antes de decidir, invirtiendo tiempo en validación pero obteniendo información clave antes de comprometer el presupuesto."],
+  ["El Accidente Menor No Reportado","Un operador se hace un corte leve en la mano. Te pide no reportarlo para no afectar el bono de seguridad del equipo (que todos esperan). El corte es superficial y ya está controlado.","No reportarlo para proteger el bono del equipo, priorizando la moral inmediata sobre el cumplimiento legal y la cultura de seguridad a largo plazo.","Reportarlo y aplicar el protocolo de seguridad, cumpliendo la ley y reforzando la cultura de reporte, aunque eso signifique perder el bono y enfrentar el enojo del equipo.","Curarlo en el momento y registrar como 'casi accidente', encontrando un punto medio que protege el bono pero documenta el incidente para análisis futuro."],
+  ["El Cliente Pide Saltarse una Prueba","Tu cliente más grande te pide que omitas una prueba de calidad destructiva porque 'urge' el producto, ofreciéndote firmar una exención de responsabilidad. La prueba cuesta $20,000 y tarda 2 días.","Omitir la prueba y confiar en el proceso, ahorrando tiempo y dinero pero arriesgando un defecto no detectado que podría dañar la reputación y generar demandas.","Negarte y arriesgar perder el pedido, protegiendo la integridad del producto y el cumplimiento normativo, aunque eso signifique enfrentar la ira del cliente.","Hacer la prueba a una muestra reducida (riesgo estadístico), encontrando un punto medio que reduce el costo y tiempo pero mantiene algo de validación."],
+  ["Fatiga en el Turno Nocturno","Notas que los operadores del turno nocturno cometen errores por fatiga, pero no hay presupuesto para contratar un relevo. Los errores están generando merma y reprocesos.","Implementar pausas activas obligatorias cada hora, sacrificando algo de productividad pero reduciendo errores y mejorando la salud del equipo.","Aumentar la iluminación y poner café gratis, una solución de bajo costo que mitiga la fatiga pero no la elimina, arriesgando que los errores continúen.","Rotar al personal diurno para cubrir algunas noches, distribuyendo la carga pero generando resentimiento y fatiga en ambos turnos."],
+  ["Proveedor con Desviaciones Leves","Tu proveedor principal de empaques tiene desviaciones de color leves. No afecta la función del producto, pero el cliente podría quejarse y dañar la percepción de calidad.","Rechazar el lote y parar la línea, protegiendo la calidad percibida pero sacrificando producción y generando un conflicto con el proveedor.","Aceptar el lote y pedir plan de acción correctivo, manteniendo la producción pero arriesgando quejas del cliente y deterioro de la reputación.","Mezclar el lote nuevo con inventario viejo para disimular, una solución creativa pero poco ética que arriesga la confianza del cliente si se descubre."],
+  ["EPP Incómodo vs. EPP Seguro","Los nuevos guantes de seguridad son ergonómicos pero reducen la sensibilidad táctil, bajando la productividad un 5%. Los viejos son inseguros pero permiten trabajar más rápido.","Exigir los nuevos guantes (seguridad primero), priorizando la protección del personal sobre la productividad, aunque eso signifique perder 5% de eficiencia.","Dejar elegir al operador, respetando la autonomía individual pero creando un estándar dual que complica la supervisión y arriesga accidentes.","Buscar un tercer proveedor más caro que cumpla ambos requisitos (seguridad y ergonomía), sacrificando presupuesto pero obteniendo la solución ideal."],
+  ["El Proveedor Único Sube Precios","Tu único proveedor de un componente crítico te notifica un aumento del 20% para el próximo mes. No hay proveedores alternativos calificados y el cambio tardaría 2 meses.","Aceptar el aumento para no parar, absorbiendo el costo y reduciendo el margen, pero manteniendo la operación estable y la relación con el proveedor.","Rechazar y buscar un proveedor alternativo (tardará 2 meses), arriesgando un paro temporal pero ganando poder de negociación y redundancia a largo plazo.","Amenazar con cancelar y negociar a un 10%, usando tácticas agresivas para reducir el impacto pero arriesgando dañar la relación comercial."],
+  ["Retraso en Aduanas","La materia prima está retenida en aduanas por un error documental. El cliente final exige la entrega para el viernes o cancelará el contrato. Tienes 3 días para resolver.","Pagar un despachante urgente (costo altísimo), sacrificando presupuesto pero garantizando la entrega y protegiendo el contrato.","Avisar al cliente del retraso y ofrecer descuento, siendo transparente pero arriesgando la cancelación del contrato y el daño a la relación comercial.","Tomar prestado material de la competencia (alianza temporal), una solución creativa que preserva la entrega pero genera una deuda con un competidor."],
+  ["Inventario Fantasma","El sistema dice que hay 1,000 piezas, pero en el almacén solo hay 800. Las ventas dependen de ese inventario para cumplir pedidos esta semana. Alguien firmó una salida no registrada.","Vender las 800 y cancelar el resto de pedidos, siendo transparente con los clientes pero perdiendo ventas y dañando la reputación de cumplimiento.","Ajustar el sistema y comprar de emergencia, sacrificando presupuesto para cubrir el faltante pero manteniendo el cumplimiento con los clientes.","Ocultar el error y esperar que el proveedor reponga rápido, una apuesta arriesgada que preserva las ventas pero arriesga el incumplimiento si el proveedor falla."],
+  ["Outsourcing vs. Flota Propia","Tus camiones propios se están averiando mucho, generando retrasos y costos de mantenimiento. Una empresa logística ofrece externalizar todo por un costo fijo mensual 15% mayor que tu costo actual.","Externalizar (Outsourcing), sacrificando control directo y pagando 15% más, pero eliminando los dolores de cabeza del mantenimiento y garantizando cumplimiento.","Vender los camiones y comprar nuevos, invirtiendo capital fuerte pero renovando la flota y manteniendo el control interno de la logística.","Mantener los propios y contratar un mecánico interno, invirtiendo en capacidad interna pero asumiendo el riesgo de que las averías continúen."],
+  ["Error de Etiquetado Masivo","Descubres que 5,000 productos ya están en el almacén del cliente con la etiqueta de ingredientes en otro idioma por un error de impresión. El cliente exige solución inmediata.","Ir a re-etiquetar todo con tu equipo (costo de viáticos y horas extra), sacrificando presupuesto pero corrigiendo el error y protegiendo la relación comercial.","Enviar un instructivo digital al cliente, una solución de bajo costo pero que traslada el problema al cliente y arriesga su insatisfacción.","Asumir la pérdida y destruir el lote, sacrificando el valor del producto pero evitando el riesgo de que el producto llegue al mercado con etiquetas incorrectas."],
+  ["Denuncia Anónima de Acoso","Recibes un buzón anónimo acusando a tu gerente de área de tratos humillantes. No hay pruebas físicas, pero el clima está tenso y varios empleados han pedido transferencia.","Ignorarlo por falta de pruebas formales, priorizando la estabilidad del gerente pero arriesgando que el acoso continúe y el clima se deteriore.","Iniciar una investigación de clima y entrevistas confidenciales, invirtiendo tiempo y recursos en validar la denuncia pero protegiendo al personal.","Cambiar al acusado de área 'para evitar problemas', una solución política que protege al acusado pero no aborda la raíz del problema y genera precedentes peligrosos."],
+  ["La Idea del Pasante vs. Burocracia","Un pasante propone una idea que ahorra un 10% en costos, pero requiere saltarse 3 niveles de aprobación jerárquica. La idea es brillante pero rompe el conducto regular.","Rechazarla por no seguir el conducto regular, protegiendo la jerarquía pero perdiendo una oportunidad de ahorro y desmotivando al talento joven.","Apadrinar la idea y presentarla tú a la dirección, usando tu influencia para saltar la burocracia y capitalizar la idea, aunque eso genere resentimiento en los niveles intermedios.","Decirle al pasante que la defienda él solo en el comité, empoderándolo pero arriesgando que la idea sea rechazada por falta de respaldo gerencial."],
+  ["Conflicto de Interés","Descubres que el encargado de compras está adjudicando contratos a una empresa que es propiedad de su cuñado. Los precios son competitivos, pero viola el código de ética.","No hacer nada, ya que los precios son buenos, priorizando el ahorro pero ignorando una violación ética que podría escalar y dañar la reputación.","Confrontarlo y exigir la declaración de conflicto, abordando el problema de frente pero arriesgando perder al encargado de compras y generar tensión.","Reportarlo anónimamente a auditoría interna, protegiendo tu posición pero delegando la responsabilidad y arriesgando que la investigación sea lenta o inefectiva."],
+  ["Uso de Redes Sociales en Horas Laborales","La productividad bajó un 8% este mes. Notas que el equipo pasa mucho tiempo en redes sociales, pero cumplen sus metas individuales. No hay quejas de clientes.","Bloquear el acceso a internet en la planta, recuperando el enfoque pero generando resentimiento y tratando a los empleados como niños.","Establecer políticas claras de uso de celular, creando reglas que respeten la autonomía pero establecen límites, aunque eso requiera supervisión adicional.","No intervenir, ya que cumplen sus objetivos, priorizando los resultados sobre el proceso pero arriesgando que la distracción escale y afecte la calidad."],
+  ["Rumores de Reestructuración","Circula el rumor de que la empresa va a despedir al 20% del personal. Tu equipo está nervioso, buscando otro empleo y la productividad ha caído. No hay información oficial.","Negar todo rotundamente para calmar los ánimos, protegiendo la moral inmediata pero arriesgando que la verdad salga a la luz y destruya tu credibilidad.","Ser transparente y decir que 'se están evaluando opciones', siendo honesto pero generando más incertidumbre y acelerando la fuga de talento.","Organizar una junta para escuchar sus preocupaciones sin dar cifras, validando sus emociones y manteniendo la comunicación abierta sin comprometer información confidencial."],
+  ["Cliente VIP Exige Saltar Control de Calidad","Tu cliente más grande pide saltar la inspección final para recibir el lote hoy, asumiendo el riesgo por escrito. La inspección tarda 1 día y es clave para detectar defectos.","Saltar la inspección y enviar, priorizando la relación comercial y el cumplimiento inmediato, pero arriesgando que un defecto llegue al cliente final.","Negarse y retrasar el envío 1 día, protegiendo la integridad del producto pero arriesgando que el cliente cancele el pedido o busque otro proveedor.","Hacer una inspección express (al 50%), encontrando un punto medio que reduce el tiempo pero mantiene algo de validación, aunque con menor rigor."],
+  ["Guerra de Presupuestos entre Áreas","Producción y Ventas pelean por el mismo fondo de contingencia ($100,000). Producción necesita mantenimiento urgente; Ventas necesita viáticos para cerrar un contrato clave. Ambos tienen argumentos válidos.","Darlo a Producción (Mantenimiento), priorizando la operación interna pero arriesgando perder el contrato de ventas que podría generar millones.","Darlo a Ventas (Viáticos y cenas), priorizando el ingreso comercial pero arriesgando una falla en producción que podría detener la planta.","Dividirlo 50/50 y que se arreglen, una solución salomónica que deja a ambos insatisfechos pero evita tomar una decisión impopular."],
+  ["El Regalo del Proveedor","Un proveedor clave te envía un reloj de lujo (valor $5,000) como 'regalo de fin de año'. Es costumbre en el sector, pero viola el código de ética de la empresa.","Quedárselo y no decir nada, beneficiándote personalmente pero violando el código de ética y arriesgando tu credibilidad si se descubre.","Devolverlo y citar el código de ética, protegiendo tu integridad pero arriesgando dañar la relación con el proveedor y perder futuros beneficios.","Donarlo a una rifa del equipo, una solución creativa que evita el beneficio personal pero mantiene la relación con el proveedor y genera buena voluntad."],
+  ["Licencia de Maternidad/Paternidad Larga","Tu único analista de programación se va 3 meses por licencia. No hay presupuesto para un temporal senior. Su trabajo es crítico para el sistema ERP.","Repartir su carga y pagar horas extra al equipo, sacrificando el presupuesto y la moral pero manteniendo la operación.","Contratar a un junior barato y capacitarlo, invirtiendo tiempo en formación pero arriesgando errores durante la curva de aprendizaje.","Hacer tú mismo su trabajo (Microgestión), sacrificando tu tiempo estratégico pero garantizando que el trabajo se haga correctamente."],
+  ["Fuga de Información Confidencial","Un empleado renunciado se llevó en un USB los manuales de procesos internos. Amenaza con venderlos a la competencia si no le pagas una 'compensación'.","Demandarlo (Gasto legal alto), protegiendo la propiedad intelectual pero sacrificando presupuesto y tiempo en un proceso legal incierto.","Negociar un acuerdo de confidencialidad, pagando algo pero evitando el litigio y protegiendo la información de forma rápida.","Ignorarlo y cambiar las contraseñas internas, asumiendo el riesgo pero evitando el costo legal y la confrontación."],
+  ["Promoción Interna vs. Talento Externo","Vacante de supervisor. Tienes a un operador leal (10 años) pero sin habilidades de liderazgo, o un externo caro pero experto en gestión de equipos.","Promover al operador leal, premiando la lealtad pero arriesgando que no tenga las habilidades para liderar y genere resentimiento en el equipo.","Contratar al externo caro, trayendo experiencia pero arriesgando el resentimiento del equipo interno y el costo de adaptación.","Hacer un concurso interno abierto, dando oportunidad a todos pero generando incertidumbre y posible resentimiento entre los que no sean seleccionados."],
+  ["Subida de Licencias de Software","El ERP y el software de diseño aumentan su suscripción anual un 40%. Sin ellos, la operación se detiene. El presupuesto no alcanza para cubrir el aumento.","Pagar y recortar otros gastos, asegurando la continuidad pero sacrificando otras áreas críticas como mantenimiento o capacitación.","Buscar alternativas Open Source (Curva lenta), ahorrando a largo plazo pero arriesgando la productividad durante la transición y la resistencia del equipo.","Negociar reducir usuarios (Riesgo de cuellos), bajando el costo pero arriesgando que algunos empleados no tengan acceso y se generen cuellos de botella."],
+  ["Queja en LinkedIn de un Ex-empleado","Un ex-colaborador publica un hilo viral criticando la cultura tóxica de tu planta. Tiene 10,000 seguidores y el post está ganando tracción. Afecta la contratación de talento.","Demandarlo por difamación, protegiendo la reputación pero gastando en abogados y generando más publicidad negativa.","Responder corporativamente con empatía, abordando las preocupaciones públicamente y mostrando transparencia, aunque eso signifique admitir fallas.","Ignorar y bloquear la cuenta, evitando la confrontación pero arriesgando que el post escale y dañe la marca empleadora."],
+  ["Protesta Ecológica en las Puertas","Activistas bloquean la entrada principal exigiendo cambios en tus emisiones. Retrasan los camiones y generan mala publicidad. La policía no actuará sin una orden judicial.","Llamar a la policía para desalojar, recuperando el acceso pero generando confrontación y más publicidad negativa.","Salir a negociar y escuchar sus demandas, mostrando apertura pero arriesgando ceder ante presiones y sentar un precedente.","Desviar los camiones por la bodega trasera, una solución logística que evita la confrontación pero incrementa costos y tiempos de entrega."],
+  ["Refacciones Falsificadas","Descubres que el almacén compró rodamientos 'alternativos' que resultaron ser falsificaciones chinas de mala calidad. Ya están instalados en 3 máquinas críticas.","Parar y tirar todo el lote, protegiendo la calidad pero sacrificando producción y tiempo para conseguir refacciones originales.","Usarlos hasta que fallen (Riesgo), maximizando la producción a corto plazo pero arriesgando fallas catastróficas y daños mayores.","Exigir reembolso al proveedor (Tarda meses), recuperando el dinero pero asumiendo el riesgo de las refacciones falsas durante el proceso."],
+  ["El Proyecto de Innovación vs. Operación Diaria","Tu mejor ingeniero quiere dedicar 1 mes a un proyecto de mejora que ahorrará $500,000 al año. Pero la operación diaria lo necesita ya para resolver problemas urgentes.","Dejarlo en el proyecto de innovación, sacrificando la operación a corto plazo pero ganando una mejora estructural a largo plazo.","Negarle el proyecto y mantenerlo en operación, priorizando el día a día pero perdiendo la oportunidad de innovación y ahorro.","Darle solo los viernes (Riesgo de burnout), encontrando un punto medio pero arriesgando que el ingeniero se agote y no termine ni el proyecto ni la operación."],
+  ["Brote de Enfermedad en Planta","15 operadores faltan por un virus estomacal. La línea está al 50% de capacidad. Los pedidos urgentes no pueden esperar.","Obligar a los sanos a hacer dobles turnos, sacrificando su salud y moral pero manteniendo la producción.","Cerrar líneas no críticas y concentrar personal, priorizando los pedidos clave pero incumpliendo con otros clientes.","Pagar horas extra triple a voluntarios, incentivando con dinero pero sacrificando el presupuesto y arriesgando que nadie acepte por miedo al contagio."],
+  ["Reestructuración Global (Layoff)","Corporativo ordena reducir la plantilla un 10% para salvar la rentabilidad anual. Tienes 1 semana para ejecutarlo.","Ejecutar despidos secos (Alto impacto), cumpliendo la orden pero destruyendo la moral del equipo restante y generando miedo.","Ofrecer retiros voluntarios incentivados, dando opción al personal pero arriesgando que no se alcance el 10% y tengas que hacer despidos forzosos después.","Reducir jornada laboral y sueldos temporalmente, evitando despidos pero generando insatisfacción y posible fuga de talento clave."],
+  ["El Sindicato Pide 'Cuota Extra'","El líder sindical ofrece paz laboral por 2 años si la empresa aumenta un 5% la cuota sindical opcional. Es ilegal, pero garantiza estabilidad.","Aceptar para evitar huelgas, comprando paz pero violando la ley y arriesgando sanciones si se descubre.","Negarme y preparar plan de contingencia, protegiendo el cumplimiento pero arriesgando una huelga que podría detener la planta.","Sobornar al líder por fuera (Ilegal), una solución corrupta que garantiza paz pero te hace vulnerable a extorsiones futuras."],
+  ["Garantía vs. Servicio Técnico Lento","La máquina principal falla. La garantía cubre todo, pero el técnico oficial tarda 3 semanas en llegar. Cada día de paro cuesta $20,000.","Esperar al técnico oficial (Paro parcial), cumpliendo la garantía pero sacrificando $420,000 en producción perdida.","Pagar a un técnico local (Pierdes garantía), recuperando la operación rápidamente pero asumiendo el costo del servicio y perdiendo la cobertura futura.","Intentar repararla con tu equipo (Riesgo), ahorrando dinero pero arriesgando dañar más el equipo y perder la garantía."],
+  ["Ventas Promete lo Imposible","El gerente de ventas cerró un trato con entrega en 3 días. Producción necesita 7 días mínimo. El contrato ya está firmado.","Acelerar línea y pagar horas extra masivas, cumpliendo el compromiso pero sacrificando presupuesto y la salud del equipo.","Hablar con el cliente y renegociar a 7 días, siendo honesto pero arriesgando que el cliente cancele y demande por incumplimiento.","Entregar un lote parcial en 3 días (Costo logístico), cumpliendo parcialmente pero generando costos adicionales de envío fraccionado."],
+  ["Denuncia de Discriminación","Un empleado acusa a su jefe de asignarle las peores tareas por su origen regional. No hay testigos, pero el empleado está documentando todo y amenaza con ir a la CONAPRED.","Suspender al jefe preventivamente, protegiendo al empleado pero arriesgando que la acusación sea falsa y pierdas a un gerente valioso.","Mediar y rotar al empleado de área, resolviendo el conflicto inmediato pero sin abordar la raíz del problema ni castigar al jefe.","Ignorar por falta de pruebas (Riesgo legal), evitando el conflicto interno pero arriesgando una demanda legal y daño reputacional."],
+  ["Inspección Sorpresa de la Secretaría","Llegan inspectores federales. Todo está bien, pero requieren que detengas la línea 4 horas para revisar documentos. Eso retrasa los pedidos del día.","Cooperar y detener la línea, cumpliendo la ley pero sacrificando producción y arriesgando multas por retraso a clientes.","Pedir prórroga legal (Genera fricción), intentando minimizar el impacto pero arriesgando que los inspectores se molesten y sean más estrictos.","Sobornar para agilizar (Delito), una solución corrupta que acelera el proceso pero te hace vulnerable a extorsiones y violas la ley."],
+  ["El Ingeniero Clave es Contrataban","Tu mejor talento recibe una oferta por el doble de su sueldo. No hay presupuesto para igualar. Si se va, el proyecto crítico se detiene.","Dejarlo ir y darle una carta de recomendación, aceptando la pérdida pero manteniendo una relación positiva que podría traer beneficios futuros.","Ofrecerle acciones o bonos a largo plazo (Deuda futura), reteniendo al talento pero comprometiendo finanzas futuras y creando precedentes.","Asignarle un proyecto 'estrella' para retarlo, motivándolo con un desafío profesional pero arriesgando que acepte la otra oferta de todos modos."],
+  ["Se Rompe el Molde Único","El único molde de tu producto más rentable se fractura. Fabricar uno nuevo cuesta un 30% del presupuesto mensual y tarda 3 semanas.","Fabricar nuevo (Quedas sin flujo), invirtiendo fuerte pero asegurando la continuidad del producto estrella a largo plazo.","Reparar con soldadura especial (Calidad dudosa), una solución rápida pero que arriesga defectos en el producto y quejas de clientes.","Subcontratar a la competencia (Revelas tu diseño), obteniendo producción inmediata pero compartiendo tu propiedad intelectual con un rival."],
+  ["Quejas del Comedor","Los empleados amenazan con no comer y salir de la planta si no se cambia al proveedor de la fonda, que es amigo del director. La calidad de la comida es mala.","Cambiar al proveedor (Enfado del Director), priorizando al personal pero arriesgando el conflicto con tu jefe y posible represalia.","Mantener al proveedor y mejorar menús, una solución intermedia que no contenta a nadie pero evita el conflicto con el director.","Hacer una encuesta anónima para decidir, democratizando la decisión pero arriesgando que el resultado sea cambiar al proveedor y enfadar al director."],
+  ["El Soborno en Licitación","Un proveedor te ofrece un 10% de 'comisión' personal si lo eliges en la licitación de fin de año. Son $50,000. Su propuesta es técnicamente aceptable.","Rechazar y reportarlo, protegiendo tu integridad pero perdiendo la oportunidad de dinero fácil y arriesgando que el proveedor se vengue.","Elegirlo pero sin tomar la comisión (Ético gris), beneficiando al proveedor sin beneficio personal, pero violando el proceso de licitación.","Tomar la comisión para el fondo de fiesta del área, una solución 'Robin Hood' que beneficia al equipo pero te hace cómplice de corrupción."],
+  ["Reloj Biométrico vs. Privacidad","La dirección instala lectores de huella para control de asistencia. Los empleados argumentan que es invasivo y riesgoso para su salud (preocupación por datos biométricos).","Obligar a usarlo (Disciplina), cumpliendo la directriz pero generando resentimiento y posible resistencia pasiva del personal.","Hacerlo opcional con tarjeta (Doble trabajo), respetando la autonomía pero duplicando el trabajo administrativo y arriesgando inconsistencias.","Retrasar la implementación y buscar alternativas, ganando tiempo para negociar pero arriesgando el enojo de la dirección por incumplimiento."],
+  ["Maquinaria vs. Bonos de Fin de Año","Tienes un excedente presupuestal de $200,000. ¿Lo usas para la máquina nueva que urge (aumenta 20% la productividad) o para el bono de productividad (mejora el clima)?","Comprar la máquina (Inversión), priorizando la eficiencia a largo plazo pero sacrificando la moral inmediata del equipo.","Dar el bono (Motivación), priorizando el clima laboral pero perdiendo la oportunidad de modernización y eficiencia.","Guardar el excedente para el próximo año (Austeridad), siendo conservador pero perdiendo oportunidades tanto de inversión como de motivación."],
+  ["Cliente Devuelve Lote 'Subjetivo'","Un cliente devuelve 10,000 piezas alegando que 'no se sienten como antes'. Técnicamente cumplen la norma, pero el cliente está insatisfecho y amenaza con irse.","Aceptar la devolución y perder el dinero, protegiendo la relación comercial pero sacrificando $150,000 en producto perfectamente bueno.","Negarse y exigir prueba de laboratorio, defendiendo tu producto pero arriesgando perder al cliente y generar un conflicto legal.","Ofrecer descuento del 50% para no perder al cliente, encontrando un punto medio que preserva la relación pero reduce el margen."],
+  ["Faltante Físico vs. Sistema","El ERP dice que hay acero, pero el almacén está vacío. Alguien firmó una salida fantasma. Necesitas el acero para producir hoy.","Iniciar auditoría forense (Paro parcial), investigando el faltante pero deteniendo la producción y arriesgando incumplir pedidos.","Comprar de emergencia (Costo alto), resolviendo el problema inmediato pero sacrificando presupuesto y sin abordar la causa raíz.","Cubrir el faltante con chatarra (Riesgo calidad), produciendo hoy pero arriesgando defectos y quejas de clientes."],
+  ["Guerra de Egos entre Gerentes","El gerente de Calidad y el de Producción se niegan a hablarse. Los equipos están replicando el conflicto y la colaboración se ha roto.","Despedir a uno de los dos (Injusto), resolviendo el conflicto pero generando miedo e injusticia percibida en el equipo.","Encerrarlos en una sala hasta que acuerden un SLA, forzando la resolución pero arriesgando que el resentimiento escale.","Ignorar y dejar que RRHH lo maneje, delegando la responsabilidad pero arriesgando que el conflicto escale y afecte la operación."],
+  ["Negocio Paralelo con Recursos de la Empresa","Descubres que un empleado usa la impresora 3D y material de la empresa los fines de semana para su emprendimiento personal. Es creativo, pero es robo de recursos.","Despedirlo por robo de recursos, aplicando el reglamento pero perdiendo a un empleado creativo y generando miedo en el equipo.","Proponerle un convenio de incubadora interna, capitalizando su emprendimiento pero creando un precedente que otros podrían querer replicar.","Confiscar su equipo y amonestarlo, deteniendo el abuso pero arriesgando que el empleado se resienta y busque venganza."],
+  ["Just in Time en Zona de Riesgo","La dirección exige implementar 'Just in Time' para bajar inventarios. Pero tus proveedores locales fallan mucho y un paro de proveedores detendría la planta.","Implementar a la fuerza (Riesgo de paro), cumpliendo la directriz pero arriesgando que una falla de proveedor detenga toda la operación.","Negociar un inventario de seguridad mínimo, encontrando un punto medio que reduce inventarios pero mantiene algo de colchón para emergencias.","Falsificar los reportes de inventario (Peligroso), aparentando cumplimiento pero arriesgando una auditoría que descubra el fraude."],
+  ["Accidente con Acuerdo por lo Civil","Un operador pierde un dedo. Su familia pide una suma de dinero por fuera para no ir a la STPS. Es más barato que el proceso legal, pero es ilegal.","Pagar por fuera (Ilegal y extorsión), resolviendo rápido pero violando la ley y arriesgando que la familia pida más dinero después.","Negarse y enfrentar el proceso legal formal, cumpliendo la ley pero arriesgando un proceso largo y costoso que podría generar mala publicidad.","Ofrecer un paquete de compensación corporativo real, siendo justo y legal pero sacrificando más dinero que el acuerdo por fuera."],
+  ["Reorganización del Taller","Mantenimiento pide parar 2 días completos para reorganizar el taller y ganar eficiencia a largo plazo (20% de mejora). Pero hay pedidos urgentes que no pueden esperar.","Autorizar el paro (Pierdes 2 días de meta), invirtiendo en eficiencia futura pero incumpliendo pedidos actuales y arriesgando multas.","Negarlo y pedir que lo hagan en fines de semana (H.E.), manteniendo la producción pero sacrificando presupuesto en horas extra y la moral del equipo.","Autorizar solo 1 día (Trabajo a medias), encontrando un punto medio pero arriesgando que la reorganización quede incompleta y no genere el 20% de mejora."],
+  ["El Proveedor Estratégico Quiebra","Tu proveedor más importante (60% de tu materia prima) declara bancarrota. Tienes inventario para 2 semanas. Necesitas un plan de contingencia inmediato.","Comprar a 3 proveedores pequeños (Costo y complejidad), diversificando pero incrementando costos logísticos y complejidad administrativa.","Absorber a un competidor pequeño (Inversión fuerte), ganando capacidad pero sacrificando capital y arriesgando la integración cultural.","Negociar con el sindicato de la quiebra para comprar sus activos, obteniendo infraestructura barata pero heredando pasivos laborales y legales."],
+  ["Ciberataque en Curso","Detectan actividad sospechosa en el servidor principal. Podría ser un intento de hacking o un falso positivo. Parar el sistema cuesta $100,000 en producción perdida.","Parar el sistema inmediatamente (Precaución), sacrificando producción pero protegiendo los datos y evitando un posible desastre.","Monitorear sin actuar (Riesgo), manteniendo la producción pero arriesgando que el ataque escale y cause daños mayores.","Contratar expertos externos (Costo alto), obteniendo diagnóstico profesional pero sacrificando presupuesto y tiempo."],
+  ["El Cliente Pide Exclusividad","Tu cliente más grande (40% de tus ventas) pide exclusividad: no puedes vender a su competencia en 2 años. Eso te hace dependiente de un solo cliente.","Aceptar la exclusividad, asegurando ingresos estables pero perdiendo diversificación y poder de negociación.","Negarse y arriesgar perder al cliente, manteniendo tu independencia pero arriesgando el 40% de tus ventas.","Negociar una exclusividad parcial (solo en cierta región), encontrando un punto medio que preserva algo de diversificación."],
+  ["Fuga de Talento a la Competencia","3 de tus mejores ingenieros reciben ofertas de la competencia. Si se van, se llevan conocimiento crítico y podrían ayudarte a desarrollar productos rivales.","Ofrecer contraofertas (Costo alto), reteniendo el talento pero incrementando la masa salarial y creando precedentes.","Dejarlos ir (Pérdida de conocimiento), aceptando la fuga pero arriesgando que la competencia gane ventaja competitiva.","Firmar acuerdos de no competencia (Legalidad dudosa), protegiendo tu conocimiento pero arriesgando demandas legales y mala reputación."],
+  ["Sanción por Contaminación","La autoridad ambiental te multa con $500,000 por emisiones excesivas. Puedes pagar, apelar (tarda 1 año) o invertir $800,000 en filtros para cumplir la norma.","Pagar la multa (Costo inmediato), resolviendo rápido pero sin abordar la causa raíz y arriesgando futuras multas.","Apelar (Riesgo legal), ganando tiempo pero arriesgando que la apelación falle y tengas que pagar más con intereses.","Invertir en filtros (Inversión verde), resolviendo el problema de raíz pero sacrificando presupuesto y requiriendo tiempo de instalación."],
+  ["El Hijo del Dueño Quiere Trabajar","El hijo del dueño (22 años, sin experiencia) quiere trabajar en tu área. Es simpático, pero su presencia podría generar resentimiento y complicar la gestión.","Aceptarlo y darle un puesto administrativo, complaciendo al dueño pero arriesgando la moral del equipo y la percepción de nepotismo.","Negarte citando la política de meritocracia, protegiendo la cultura pero arriesgando el enojo del dueño y posible represalia.","Crear un programa de trainee donde él entre como uno más, igualando las reglas pero arriesgando que el dueño espere trato especial."],
+  ["Crisis de Reputación en Redes","Un video muestra a un operador trabajando sin EPP. Se vuelve viral. Los clientes amenazan con cancelar pedidos si no tomas acción inmediata.","Despedir al operador (Ejemplar), enviando un mensaje de tolerancia cero pero generando miedo y posible demanda laboral.","Capacitar a todo el equipo (Inversión), abordando la causa raíz pero sacrificando tiempo y presupuesto.","Emitir un comunicado y mejorar la supervisión, mostrando acción pero arriesgando que el problema se repita si no hay cambios estructurales."],
+  ["El Sindicato Amenaza Huelga","El sindicato amenaza huelga en 48 horas si no se aumenta 8% el salario. La inflación real es 4%. Ceder sienta un precedente peligroso.","Ceder al 8%, evitando la huelga pero incrementando costos fijos y creando expectativas para futuras negociaciones.","Negociar al 4% (Inflación real), siendo justo pero arriesgando la huelga y el paro de producción.","Ofrecer bonos únicos en vez de aumento base, dando dinero sin incrementar costos fijos, pero el sindicato podría rechazarlo por 'migajas'."],
+  ["Falla en Sistema de Calidad","El sistema de calidad detecta un lote defectuoso que ya fue enviado al cliente. Puedes recall (costo alto) o esperar a que el cliente se queje.","Hacer recall voluntario (Costo alto), protegiendo al cliente y tu reputación pero sacrificando $300,000 en logística y reemplazo.","Esperar a que el cliente se queje, ahorrando dinero inmediato pero arriesgando que el defecto cause daños y una crisis mayor.","Contactar al cliente discretamente y ofrecer reemplazo gradual, manejando la situación sin alarmar pero asumiendo el costo del reemplazo."],
+  ["El Consultor Externo Propone Despidos","Un consultor caro recomienda despedir al 15% del personal para 'optimizar'. Tu instinto dice que es excesivo, pero los números respaldan su análisis.","Seguir la recomendación al pie de la letra, optimizando costos pero destruyendo la moral y arriesgando la fuga de talento clave.","Rechazar la recomendación, protegiendo al equipo pero arriesgando que los costos sigan subiendo y la empresa pierda competitividad.","Negociar una reducción del 5% con retiros voluntarios, encontrando un punto medio que optimiza sin destruir la moral."],
+  ["Cambio de Turno Forzoso","La dirección exige cambiar el turno nocturno a vespertino para 'ahorrar energía'. Los operadores nocturnos tienen arreglos de cuidado de hijos que les impiden el cambio.","Forzar el cambio, ahorrando energía pero generando resentimiento y posible renuncia masiva del turno nocturno.","Negarte citando el impacto en la vida personal, protegiendo al equipo pero arriesgando el enojo de la dirección.","Ofrecer incentivos económicos para el cambio, compensando el inconveniente pero incrementando costos y creando un precedente."],
+  ["El Cliente Pide Desarrollo a Medida","Tu cliente más grande pide un producto personalizado. El desarrollo cuesta $500,000 y tarda 6 meses. Si tiene éxito, genera $2M al año. Si falla, pierdes la inversión.","Invertir en el desarrollo, apostando por el éxito pero arriesgando $500,000 si el producto no cumple expectativas.","Negarte y enfocarte en productos estándar, siendo conservador pero perdiendo la oportunidad de crecimiento.","Negociar que el cliente pague el 50% del desarrollo, compartiendo el riesgo pero reduciendo tu margen si tiene éxito."],
+  ["Robo de Propiedad Intelectual","Descubres que un ex-empleado lanzó un producto idéntico al tuyo usando planos robados. Puedes demandar (costo alto) o ignorar.","Demandar (Costo alto), protegiendo tu IP pero gastando en abogados y arriesgando que el proceso dure años.","Ignorar y enfocarte en innovar, aceptando la pérdida pero manteniendo el enfoque en el futuro.","Negociar un acuerdo de licencias, monetizando la situación pero reconociendo al infractor como competidor legítimo."],
+  ["El Gobierno Ofrece Subsidio","El gobierno ofrece un subsidio del 30% para empresas que inviertan en tecnología verde. Requiere auditorías trimestrales y reportes detallados.","Aceptar el subsidio, obteniendo financiamiento pero sometiéndote a burocracia y pérdida de autonomía.","Rechazar el subsidio, manteniendo tu independencia pero perdiendo la oportunidad de financiamiento barato.","Negociar un subsidio parcial con menos condiciones, obteniendo algo de financiamiento sin tanta burocracia."],
+  ["Fusión con Competidor Pequeño","Te ofrecen comprar a un competidor pequeño por $2M. Tienen buena tecnología pero cultura tóxica. La integración sería compleja.","Comprar y absorber, ganando tecnología pero arriesgando choque cultural y fuga de talento.","Rechazar la compra, manteniendo tu cultura pero perdiendo la oportunidad de crecer.","Comprar y mantener como subsidiaria independiente, ganando tecnología sin mezclar culturas, pero perdiendo sinergias."],
+  ["El Cliente Pide Rebaja por Volumen","Tu cliente más grande pide 15% de descuento si duplica su volumen de compra. Tu margen actual es 12%. Aceptar sería vender a pérdida.","Aceptar la rebaja, asegurando volumen pero sacrificando margen y arriesgando la rentabilidad.","Negarte y arriesgar perder al cliente, protegiendo tu margen pero perdiendo el 40% de tus ventas.","Ofrecer 5% de descuento con compromisos de largo plazo, encontrando un punto medio que preserva algo de margen."],
+  ["Crisis de Suministro de Energía","La compañía eléctrica anuncia racionamiento: 4 horas sin luz diaria durante un mes. Tu producción depende de la electricidad.","Comprar generadores (Inversión alta), asegurando continuidad pero sacrificando presupuesto y requiriendo mantenimiento.","Reducir producción al 50%, adaptándote pero perdiendo ventas y arriesgando incumplir pedidos.","Negociar con otros clientes para turnarse la energía, una solución colaborativa pero compleja de coordinar."],
+  ["El Hijo del Dueño Comete un Error Grave","El hijo del dueño (que pusiste en un puesto administrativo) comete un error que cuesta $100,000. La política es despedir, pero es el hijo del dueño.","Despedirlo aplicando la política, siendo justo pero arriesgando el enojo del dueño y posible represalia.","Darle una segunda oportunidad, siendo compasivo pero violando la política y generando resentimiento en el equipo.","Sancionarlo económicamente y capacitarlo, encontrando un punto medio que castiga sin destruir."],
+  ["Cambio de Normativa Laboral","El gobierno aprueba una reforma que reduce la jornada a 40 horas sin reducir salario. Tu operación requiere 48 horas para ser rentable.","Adaptarte inmediatamente, cumpliendo la ley pero sacrificando rentabilidad y arriesgando la viabilidad del negocio.","Negociar con el sindicato turnos rotativos, encontrando una solución creativa pero compleja de implementar.","Impugnar la reforma legalmente, defendiendo tu posición pero arriesgando el costo legal y la percepción pública."],
+  ["El Cliente Pide Auditoría a tu Planta","Tu cliente más grande quiere auditar tu planta para verificar cumplimiento de estándares éticos y ambientales. Es invasivo pero es condición para seguir vendiendo.","Aceptar la auditoría, siendo transparente pero exponiendo tus procesos y arriesgando que encuentren fallas.","Negarte y arriesgar perder al cliente, protegiendo tu privacidad pero perdiendo el 40% de tus ventas.","Negociar una auditoría limitada a áreas específicas, encontrando un punto medio que muestra transparencia sin exponer todo."]
+];
+
+const CONSECUENCIAS = [
+  ["Crisis Global de Suministro","Un bloqueo logístico internacional (conflicto geopolítico en el Mar Rojo) retrasa la llegada de componentes críticos. Los inventarios de seguridad se agotan y la planta debe operar al 60% de capacidad mientras se buscan rutas alternas.",[-1,-1,-2,0,0]],
+  ["Boom de Demanda Inesperado","Un competidor directo cierra inesperadamente y sus clientes migran masivamente a tu producto. La capacidad instalada se ve rebasada, los operadores trabajan al límite y los tiempos de entrega se alargan, generando quejas.",[2,-2,2,-1,0]],
+  ["Campaña de Desprestigio","Un video mal editado sobre un proceso interno se vuelve viral en redes sociales. El departamento de comunicación y RRHH debe gestionar la crisis, los clientes preguntan y la reputación de la marca se deteriora rápidamente.",[-1,-2,-1,0,-1]],
+  ["Nuevo Arancel","El gobierno publica un decreto que encarece un 15% la materia prima que importas de Asia. Los costos se disparan, el margen se reduce y debes decidir si absorber el costo o trasladarlo al cliente (arriesgando perder ventas).",[0,0,-2,0,0]],
+  ["Normatividad Ambiental","Se publica una nueva ley de emisiones de carbono que exige filtrar los procesos de la planta para evitar multas de hasta $2M. Debes invertir en tecnología verde o enfrentar sanciones legales y daño reputacional.",[-1,0,-2,1,0]],
+  ["Alianza Estratégica","Se firma un acuerdo con un competidor para compartir rutas de distribución y reducir costos logísticos un 20%. La colaboración mejora la eficiencia pero requiere coordinación y cede algo de control operativo.",[1,1,2,0,1]],
+  ["Ciberataque Mitigado","El departamento de TI detecta y frena un intento de secuestro de datos (ransomware), pero los sistemas operativos estuvieron caídos 12 horas. La producción se detuvo, los pedidos se retrasaron y la confianza en la seguridad digital se resquebraja.",[-2,-1,-1,1,0]],
+  ["Obsolescencia de Maquinaria","El equipo de mantenimiento reporta que una máquina clave ya no tiene refacciones en el mercado local; hay que importarlas con 4 semanas de espera. La operación depende de esta máquina y el riesgo de paro es inminente.",[-1,0,-2,0,0]],
+  ["Implementación Forzosa de ERP","Corporativo exige la migración a un nuevo sistema ERP en 3 meses. La curva de aprendizaje detiene la operación diaria, los errores de captura aumentan y el personal está frustrado con la nueva tecnología.",[-2,-1,-1,1,1]],
+  ["Ineficiencia Energética","Una auditoría revela que los compresores de aire tienen fugas, elevando el recibo de luz un 20%. El costo operativo se dispara y debes decidir si invertir en reparación (costo inmediato) o seguir pagando el sobrecosto.",[0,0,-2,-1,0]],
+  ["Robo Hormiga","Se descubre un faltante de herramienta menor y consumibles por $50,000 en 3 meses. Se implementa un control de acceso estricto que ralentiza la operación y genera resentimiento en el personal que se siente tratado como sospechoso.",[-1,-2,-1,2,0]],
+  ["Automatización Exitosa","El equipo de ingeniería logra programar un brazo robótico que alivia la carga de la estación más lenta. La productividad sube, los operadores pueden enfocarse en tareas de mayor valor y el clima mejora al ver innovación.",[2,1,1,0,2]],
+  ["Rumor de Fusión","Circula un fuerte rumor de que la matriz venderá la planta. La incertidumbre paraliza las decisiones diarias, los mejores talentos actualizan sus CVs y la productividad cae mientras todos esperan noticias oficiales.",[-1,-2,0,-1,-2]],
+  ["Programa de Bienestar","Se implementa con éxito un programa de salud mental y gimnasio en las instalaciones. El ausentismo baja, la moral sube y los empleados se sienten valorados, aunque el costo operativo del programa es significativo.",[1,2,-1,0,1]],
+  ["Renuncia de Líder","El supervisor del turno más productivo renuncia para emprender. Su equipo queda desmotivado y sin guía, la productividad del turno cae 30% y debes promover a alguien sin suficiente experiencia (riesgo operativo).",[-2,-1,0,-1,-2]],
+  ["Conflicto Generacional","Los operadores veteranos chocan con los nuevos ingenieros por el uso de tablets vs. libretas manuales. La brecha tecnológica genera fricción, los procesos se duplican y la colaboración interdepartamental se deteriora.",[-1,-2,0,-1,0]],
+  ["Auditoría de Clima","Una consultora externa aplica encuestas anónimas de clima laboral. Los resultados son públicos y revelan áreas de oportunidad críticas en liderazgo y comunicación. Debes crear planes de acción visibles o arriesgar más deterioro.",[0,1,-1,1,1]],
+  ["Día de la Familia","Se realiza un evento de fin de año donde los empleados conviven con sus familias fuera de la planta. El sentido de pertenencia se fortalece, las relaciones mejoran y el clima laboral experimenta un boost temporal significativo.",[0,2,-1,0,1]],
+  ["Auditoría Fiscal","La autoridad fiscal (SAT) detecta errores en la facturación de un proveedor. Se genera una multa de $300,000 y recálculo de impuestos. La confianza en el departamento de compras se resquebraja y debes implementar controles más estrictos.",[0,0,-2,-2,0]],
+  ["Fluctuación del Dólar","El dólar se dispara un 15% en un mes. Los costos de los insumos importados se disparan, el margen se reduce y debes decidir si absorber el costo, trasladarlo al cliente (arriesgando ventas) o buscar proveedores locales.",[0,0,-2,0,0]],
+  ["Demanda PI","Un competidor alega que el diseño de tu empaque infringe su patente y exige retirar los empaques del mercado. La crisis legal consume horas de la gerencia, los costos de rediseño son altos y la reputación se afecta.",[-2,-1,-2,-1,0]],
+  ["Recuperación de Seguro","La aseguradora dictamina a favor la póliza por una falla eléctrica ocurrida meses atrás. Entra liquidez de $500,000 que permite invertir en mejoras pendientes, pagar deudas o fortalecer el fondo de contingencia.",[0,1,2,0,0]],
+  ["Cliente Moroso","Tu cliente más grande declara problemas de flujo de efectivo y retrasa el pago de la última factura ($1.5M) por 90 días. La tesorería se tensiona, debes negociar con proveedores y se congela la contratación de personal nuevo.",[-1,0,-2,0,0]],
+  ["Renegociación de Deuda","El departamento financiero logra bajar la tasa de interés del crédito de nómina del 18% al 12%. El ahorro mensual es de $80,000, lo que mejora la disposición del personal hacia la empresa y libera presupuesto.",[0,1,1,0,0]],
+  ["Inspección STPS","Inspectores de trabajo llegan a la planta sin aviso. Encuentran un extintor caducado y un pasillo obstruido. Se genera una multa de $150,000, llamado de atención formal y debes implementar un plan correctivo inmediato.",[-1,-1,-1,-2,0]],
+  ["Retiro de Producto","Control de Calidad detecta una desviación menor en un lote y decide retirarlo del mercado por precaución. Protege la marca, pero genera retrabajo masivo, costos logísticos y la pérdida de $400,000 en producto.",[-2,0,-2,2,1]],
+  ["Denuncia Ética","Se reporta un posible conflicto de interés en licitaciones. Se inicia una investigación interna confidencial que genera tensión en la gerencia media, distracción de los líderes y posible daño reputacional si se filtra.",[-1,-2,0,1,-1]],
+  ["Accidente Casi Cero","Un operador resbala por un derrame de aceite, pero no resulta herido. Se detiene la línea para limpiar y capacitar. El incidente refuerza la cultura de reporte sin castigo, pero genera 4 horas de producción perdida.",[-1,1,-1,2,0]],
+  ["Certificación ISO","La auditoría de renovación del sistema de gestión de calidad se aprueba sin no conformidades mayores. Habilita a la empresa para licitaciones internacionales, mejora la reputación y fortalece la disciplina de procesos.",[1,1,1,2,1]],
+  ["Merma No Registrada","Un inventario ciego revela que el 5% de la materia prima se está perdiendo en el proceso sin estar documentado. Evidencia falta de control en los procesos operativos y genera una pérdida silenciosa de $200,000 al mes.",[-1,0,-2,-2,0]],
+  ["Huelga de Transportistas","Un paro nacional de camiones de carga detiene las exportaciones e importaciones por 5 días. Los inventarios se agotan, los clientes presionan y debes decidir si parar la planta o buscar rutas alternas (costosas).",[-2,0,-2,0,-1]],
+  ["Tasas de Interés Altas","El banco central sube tasas de interés al 12%. Los créditos de capital de trabajo se encarecen, el costo financiero sube y debes renegociar deudas o postergar inversiones planeadas, afectando la competitividad.",[0,-1,-2,0,-1]],
+  ["Desastre Natural en Proveedor","Un huracán afecta la región de tu proveedor principal de empaques. La planta proveedora está dañada y no podrá surtir por 2 meses. Debes activar proveedores alternos (más caros) o rediseñar el empaque.",[-1,0,-2,1,0]],
+  ["Ley de Protección de Datos","Nueva regulación obliga a invertir en ciberseguridad y auditoría de nómina para cumplir con la ley de datos personales. El costo de cumplimiento es $400,000, pero evita multas de hasta $5M y protege la reputación.",[0,0,-2,2,0]],
+  ["Competencia Disruptiva","La competencia lanza un producto sustituto con tecnología superior que obliga a bajar precios un 15% para mantener cuota de mercado. El margen se reduce y debes decidir si invertir en I+D o aceptar la erosión.",[0,-1,-1,-1,-1]],
+  ["Caída de Servidores","Falla en la nube corporativa deja sin acceso a correos, ERP y sistemas por 24 horas. La operación se paraliza, los pedidos se retrasan y el equipo de TI trabaja contra reloj para restaurar los servicios.",[-2,-1,0,1,0]],
+  ["Subsidio a la Capacitación","El gobierno lanza un fondo perdido para entrenamiento tecnológico. Tu empresa puede acceder a $300,000 para capacitar al personal en nuevas tecnologías, mejorando habilidades y clima sin costo directo.",[1,1,2,0,2]],
+  ["Meme Viral","Una red social se burla de los procesos de tu sector con un meme que se vuelve viral. Genera mala imagen, los clientes preguntan y debes decidir si responder con humor, ignorar o lanzar una campaña de clarificación.",[-1,-2,0,-1,-1]],
+  ["Fraude en Filial","Se descubre un desfalco de $2M en otra planta de la matriz. Se congelan presupuestos en todas las filiales, los proyectos se detienen y la desconfianza hacia los gerentes aumenta significativamente.",[0,-2,-2,1,-1]],
+  ["Paro Sindical Nacional","El sindicato convoca 24 horas de huelga en todo el sector manufacturero. La planta debe parar, los pedidos se retrasan y debes negociar con el sindicato local para minimizar el impacto y evitar adhesión.",[-2,-1,-1,2,0]],
+  ["Sismo de Baja Intensidad","Un terremoto leve (5.2 grados) asusta a la plantilla y activa protocolos de evacuación. Se detiene la producción por 3 horas para revisar estructuras, se genera ansiedad y debes comunicar que todo está bien.",[-1,1,0,1,0]],
+  ["Cambio de KPIs","La matriz cambia el sistema de bonos de trimestral a semestral. Los empleados se sienten traicionados, la motivación cae y los mejores talentos empiezan a buscar ofertas que mantengan la frecuencia de pago.",[0,-2,1,-1,-2]],
+  ["Fuga de Agua Industrial","Se rompe la tubería principal de la zona industrial. La planta opera al 40% por 2 días mientras reparan. Los pedidos se retrasan, los clientes presionan y debes priorizar qué líneas mantener activas.",[-2,0,-1,1,0]],
+  ["Demanda Laboral","Un ex-empleado demanda por despido injustificado. Se provisionan fondos por $250,000, el clima se tensiona (otros empleados piensan en demandar) y debes fortalecer los procesos de documentación de despidos.",[0,-1,-2,-1,0]],
+  ["Encarecimiento del Acero","El precio global de los metales se duplica por tensiones geopolíticas. Tu materia prima principal sube 100%, el margen desaparece y debes decidir si absorber el costo, subir precios o buscar materiales alternos.",[0,0,-2,0,-1]],
+  ["Apagón Programado","La compañía eléctrica corta el suministro 8 horas por mantenimiento de red. Debes programar paros, reorganizar turnos y arriesgar que algunos equipos se dañen por el corte abrupto de energía.",[-2,0,0,1,0]],
+  ["Recomendación de Influencer","Un creador de contenido local menciona tu producto por error en un video viral. Las ventas suben 30% en una semana, los inventarios se tensionan y debes decidir si capitalizar el momento o volver a la normalidad.",[2,1,2,0,1]],
+  ["Reforma Laboral","Se aprueba una ley que reduce la jornada semanal de 48 a 40 horas sin reducir salario. Debes reestructurar turnos, contratar más personal o automatizar procesos para mantener la producción con menos horas.",[-1,-1,-2,2,0]],
+  ["Falla de Climatización","El sistema de aire acondicionado de la nave falla en pleno verano (40°C). La productividad cae 25%, los operadores se quejan y debes invertir en reparación urgente o arriesgar golpes de calor y demandas.",[-1,-2,0,1,-1]],
+  ["Bancarrota de Proveedor","Tu proveedor de herramientas declara insolvencia. Pierdes el anticipo de $150,000 y debes buscar proveedores alternos urgentemente, arriesgando retrasos y costos mayores por la urgencia.",[0,0,-2,0,-1]],
+  ["Inconsistencias en Viáticos","La auditoría externa encuentra gastos no comprobables de un gerente por $80,000. Se inicia una investigación, el clima se tensiona y debes decidir si sancionar, despedir o dar oportunidad de reembolso.",[0,-1,-1,-2,-1]],
+  ["Audio Filtrado del CEO","Se hace público un audio donde la directiva llama 'prescindibles' a los operarios. El clima se destruye, los sindicatos amenazan con huelga y debes gestionar la crisis de comunicación y reparar el daño.",[-1,-2,0,-1,-2]],
+  ["Multa por Uso de Suelo","El ayuntamiento cambia la zonificación industrial a mixta y te multa por el ruido de los camiones nocturnos. Debes pagar $200,000 o reorganizar horarios de envío, afectando la logística y costos.",[0,0,-2,-1,0]],
+  ["Renegociación de Contrato","El cliente principal cambia de dueño y la nueva gerencia exige bajar precios un 10% para mantener el contrato. Tu margen actual es 8%, así que aceptar sería vender a pérdida o muy cerca.",[0,-1,-2,1,-1]],
+  ["Renuncia Silenciosa","Los empleados adoptan la tendencia 'renuncia silenciosa': hacen solo lo mínimo, sin iniciativa ni horas extra. La productividad cae silenciosamente 15% y la innovación se detiene sin que nadie renuncie formalmente.",[-2,-1,0,-1,-2]],
+  ["Falla de Internet","El proveedor de fibra óptica sufre una falla masiva de 12 horas en la zona. Los sistemas en la nube son inaccesibles, los pedidos no se procesan y debes operar manualmente con papel y lápiz.",[-2,0,0,1,0]],
+  ["Aumento de Primas","La aseguradora sube las primas de riesgo de trabajo un 30% por la siniestralidad del sector. El costo fijo aumenta $120,000 anuales y debes decidir si absorberlo, buscar otra aseguradora o mejorar seguridad.",[0,0,-2,1,0]],
+  ["Visita Guiada Bloqueante","Un grupo de 50 estudiantes visita la planta y bloquea accidentalmente la línea principal por 2 horas. La producción se retrasa, los operadores se distraen y debes reforzar los protocolos de visitas.",[-1,1,0,1,0]],
+  ["Defecto Oculto en Materia Prima","Se descubre que un lote de resina tiene una vida útil menor a la esperada (6 meses en vez de 12). Los productos terminados podrían fallar en campo, generando garantías y daño reputacional.",[-1,0,-2,-1,0]],
+  ["Perdón Fiscal","El gobierno permite regularizar deudas fiscales antiguas con un descuento del 50%. Tu empresa puede ahorrar $400,000 regularizando, mejorando el flujo y la disciplina fiscal significativamente.",[0,1,2,2,0]]
+];
+
+const SPECIAL_EVENTS = {
+  ptu: [[-1, -2, 0, 1, -1], [-3, 2, 0, 0, 2], [2, -3, -2, -2, -1]],
+  aguinaldo: [[-2, 0, 0, 1, 0], [-4, 3, 0, 0, 3], [-1, -2, 0, -1, -1]]
+};
+
+const WILDCARDS = [
+  { id: 'negociacion', name: '🗣️ Negociación', desc: 'Mitiga hasta -2 en Clima (C) o Talento (T).', apply: (eff) => { if(eff[1] < 0) eff[1] = Math.min(0, eff[1]+2); if(eff[4] < 0) eff[4] = Math.min(0, eff[4]+2); } },
+  { id: 'vision', name: '📊 Visión Financiera', desc: 'Mitiga hasta -2 en Presupuesto (Pr).', apply: (eff) => { if(eff[2] < 0) eff[2] = Math.min(0, eff[2]+2); } },
+  { id: 'etica', name: '🛡️ Ética Corporativa', desc: 'Anula penalizaciones de Disciplina (D).', apply: (eff) => { if(eff[3] < 0) eff[3] = 0; } },
+  { id: 'resolucion', name: '🧠 Resolución de Problemas', desc: 'Convierte una penalización de Productividad (P) en neutra.', apply: (eff) => { if(eff[0] < 0) eff[0] = 0; } },
+  { id: 'comunicacion', name: '🤝 Comunicación Asertiva', desc: 'Mitiga -1 en cualquier indicador afectado negativamente.', apply: (eff) => { for(let i=0; i<5; i++) if(eff[i]<0) eff[i] += 1; } }
+];
+
+let state = {
+  month: 1,
+  stats: { P: 10, C: 10, Pr: 10, D: 10, T: 10 },
+  lowestPoints: { P: 10, C: 10, Pr: 10, D: 10, T: 10 },
+  currentStreak: 0,
+  bestStreak: 0,
+  currentDilema: null,
+  currentOptions: [],
+  selectedOptText: "",
+  selectedOptEffects: [],
+  log: [],
+  deckD: [],
+  deckC: [],
+  hand: [],
+  ptuPaid: false,
+  aguinaldoPaid: false
+};
+
+const STAT_NAMES = { P: "Productividad", C: "Clima", Pr: "Presupuesto", D: "Disciplina", T: "Talento" };
+const STAT_COLORS = { P: "var(--p)", C: "var(--c)", Pr: "var(--pr)", D: "var(--d)", T: "var(--t)" };
+
+function initGame() {
+  state.deckD = shuffle([...Array(DILEMAS.length).keys()]);
+  state.deckC = shuffle([...Array(CONSECUENCIAS.length).keys()]);
+  dealWildcards();
+  renderDashboard();
+  drawDilema();
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function dealWildcards() {
+  state.hand = [];
+  let available = [...WILDCARDS];
+  for (let i = 0; i < 3; i++) {
+    const randIdx = Math.floor(Math.random() * available.length);
+    state.hand.push(available[randIdx]);
+    available.splice(randIdx, 1);
+  }
+  renderHandUI();
+}
+
+function renderHandUI() {
+  const handUI = document.getElementById('hand-display');
+  if (state.hand.length === 0) {
+    handUI.innerHTML = '<span style="color:#666; font-size:0.8em;">Sin comodines</span>';
+  } else {
+    handUI.innerHTML = state.hand.map(wc => `<span class="hand-card" title="${wc.desc}">${wc.name}</span>`).join('');
+  }
+}
+
+function getCalendarData() {
+  const currentYear = Math.ceil(state.month / 12);
+  const currentMonthInYear = ((state.month - 1) % 12) + 1;
+  const currentQuarter = Math.ceil(currentMonthInYear / 3);
+  return { currentYear, currentMonthInYear, currentQuarter };
+}
+
+function renderDashboard() {
+  const db = document.getElementById('dashboard');
+  db.innerHTML = '';
+  let overallStatus = "Óptimo";
+  let statusColor = "var(--accent)";
+
+  for (let key in state.stats) {
+    const val = state.stats[key];
+    if (val <= 0) { statusColor = "black"; overallStatus = "COLAPSO"; }
+    else if (val <= 4) { statusColor = "var(--danger)"; overallStatus = "Crítico"; }
+    else if (val <= 8) { if(statusColor !== "var(--danger)") { statusColor = "var(--warn)"; overallStatus = "Estable"; } }
+
+    const div = document.createElement('div');
+    div.className = 'stat';
+    div.style.borderColor = STAT_COLORS[key];
+    div.innerHTML = `
+      <div class="stat-header"><span>${STAT_NAMES[key]} (${key})</span><span>${val}/10</span></div>
+      <div class="bar-bg"><div class="bar-fill" style="width: ${val*10}%; background: ${val<=4?'var(--danger)':val<=8?'var(--warn)':'var(--accent)'}"></div></div>
+    `;
+    db.appendChild(div);
+  }
+  
+  const badge = document.getElementById('status-badge');
+  badge.innerText = `Estado: ${overallStatus}`;
+  badge.style.background = statusColor;
+  if(overallStatus === "COLAPSO") badge.style.color = "white";
+
+  const { currentYear, currentMonthInYear, currentQuarter } = getCalendarData();
+  document.getElementById('month-display').innerText = `Año ${currentYear} | Mes ${currentMonthInYear} | Trimestre ${currentQuarter} (Ronda ${state.month}/60)`;
+  
+  document.getElementById('current-streak').innerText = state.currentStreak;
+  document.getElementById('best-streak').innerText = state.bestStreak;
+}
+
+function drawDilema() {
+  if (state.month > 60) { endGame(); return; }
+  
+  document.getElementById('phase-title').innerText = "🎲 Fase 1: Análisis del Dilema";
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('options-container').style.display = 'flex';
+
+  const idx = state.deckD.pop();
+  state.currentDilema = DILEMAS[idx];
+  const d = state.currentDilema;
+
+  let optsArray = [d[2], d[3], d[4]];
+  for (let i = optsArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [optsArray[i], optsArray[j]] = [optsArray[j], optsArray[i]];
+  }
+  state.currentOptions = optsArray;
+
+  document.getElementById('scenario-text').innerHTML = `<span class="scenario-title">📌 ${d[0]}</span>${d[1]}`;
+  
+  const opts = document.getElementById('options-container');
+  opts.innerHTML = '';
+  const labels = ['A', 'B', 'C'];
+  
+  for (let i = 0; i < 3; i++) {
+    const optText = state.currentOptions[i];
+    const card = document.createElement('div');
+    card.className = 'decision-card';
+    card.innerHTML = `<span class="card-label">${labels[i]}.</span><span class="card-text">${optText}</span>`;
+    card.onclick = () => selectOption(optText, card);
+    opts.appendChild(card);
+  }
+}
+
+function selectOption(optText, cardElement) {
+  document.querySelectorAll('.decision-card').forEach(c => c.classList.remove('selected'));
+  cardElement.classList.add('selected');
+  
+  state.selectedOptText = optText;
+  const optIndex = state.currentOptions.indexOf(optText);
+  const baseEffects = generateEffects(optIndex);
+  state.selectedOptEffects = [...baseEffects];
+
+  const { currentYear, currentMonthInYear } = getCalendarData();
+  state.log.push({
+    time: `Año ${currentYear} - Mes ${currentMonthInYear}`,
+    title: state.currentDilema[0],
+    decision: state.selectedOptText.substring(0, 80) + (state.selectedOptText.length > 80 ? '...' : ''),
+    wildcard: null,
+    effects: state.selectedOptEffects
+  });
+  renderLog();
+
+  document.getElementById('modal-decision-text').innerText = state.selectedOptText.substring(0, 100) + (state.selectedOptText.length > 100 ? '...' : '');
+  renderEffects('decision-effects', state.selectedOptEffects);
+  renderWildcards();
+  document.getElementById('modal-decision').style.display = 'flex';
+}
+
+function generateEffects(optIndex) {
+  const effects = [0, 0, 0, 0, 0];
+  if (optIndex === 0) {
+    effects[0] = Math.random() > 0.5 ? 1 : -1; effects[1] = Math.random() > 0.5 ? 1 : -1;
+    effects[2] = Math.random() > 0.5 ? -1 : 0; effects[3] = Math.random() > 0.5 ? 1 : 0; effects[4] = Math.random() > 0.5 ? 1 : -1;
+  } else if (optIndex === 1) {
+    effects[0] = Math.random() > 0.5 ? 1 : 0; effects[1] = Math.random() > 0.5 ? 1 : 0;
+    effects[2] = Math.random() > 0.5 ? -1 : -2; effects[3] = 0; effects[4] = Math.random() > 0.5 ? 1 : 0;
+  } else {
+    effects[0] = Math.random() > 0.5 ? 2 : 1; effects[1] = Math.random() > 0.5 ? -2 : -1;
+    effects[2] = Math.random() > 0.5 ? 1 : -1; effects[3] = Math.random() > 0.5 ? -1 : -2; effects[4] = Math.random() > 0.5 ? -1 : -2;
+  }
+  return effects;
+}
+
+function renderWildcards() {
+  const container = document.getElementById('wildcard-buttons');
+  container.innerHTML = '';
+  if (state.hand.length === 0) {
+    container.innerHTML = '<p style="color:#666; font-size:0.8em;">No te quedan comodines de liderazgo este año.</p>';
+    return;
+  }
+  state.hand.forEach((wc, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-gold btn-wc';
+    btn.innerText = wc.name;
+    btn.title = wc.desc;
+    btn.onclick = () => applyWildcard(index);
+    container.appendChild(btn);
+  });
+}
+
+function applyWildcard(index) {
+  const wc = state.hand[index];
+  wc.apply(state.selectedOptEffects);
+  state.hand.splice(index, 1);
+
+  state.log[state.log.length - 1].wildcard = wc.name;
+  state.log[state.log.length - 1].effects = state.selectedOptEffects;
+
+  renderEffects('decision-effects', state.selectedOptEffects);
+  renderWildcards();
+  renderHandUI();
+  renderLog();
+}
+
+function closeDecisionModal() {
+  document.getElementById('modal-decision').style.display = 'none';
+  applyEffects(state.selectedOptEffects);
+  rollEnvironmentDice();
+}
+
+function rollEnvironmentDice() {
+  const roll = Math.floor(Math.random() * 6) + 1;
+  const isEven = roll % 2 === 0;
+
+  const diceModal = document.getElementById('modal-dice');
+  document.getElementById('dice-icon-display').innerText = '🎲';
+  document.getElementById('dice-result').innerText = `Salió un ${roll} (${isEven ? 'Par' : 'Impar'})`;
+
+  if (isEven) {
+    document.getElementById('dice-message').innerText = "¡El entorno es volátil! Una consecuencia oculta afecta a la empresa.";
+    document.getElementById('dice-next-btn').innerText = "Revelar Consecuencia";
+    document.getElementById('dice-next-btn').onclick = () => {
+      diceModal.style.display = 'none';
+      drawConsecuencia();
+    };
+  } else {
+    document.getElementById('dice-message').innerText = "El entorno se mantiene estable este mes. No hay imprevistos externos.";
+    document.getElementById('dice-next-btn').innerText = "Continuar";
+    document.getElementById('dice-next-btn').onclick = () => {
+      diceModal.style.display = 'none';
+      proceedToEndOfMonth();
+    };
+  }
+  diceModal.style.display = 'flex';
+}
+
+function drawConsecuencia() {
+  if (state.deckC.length === 0) {
+    proceedToEndOfMonth();
+    return;
+  }
+  const idx = state.deckC.pop();
+  const c = CONSECUENCIAS[idx];
+  
+  document.getElementById('cons-title').innerText = c[0];
+  document.getElementById('cons-narrative').innerText = c[1];
+  renderEffects('cons-effects', c[2]);
+  document.getElementById('modal-consecuencia').style.display = 'flex';
+  
+  applyEffects(c[2]);
+}
+
+function renderEffects(containerId, effects) {
+  const effDiv = document.getElementById(containerId);
+  effDiv.innerHTML = '';
+  const keys = ['P', 'C', 'Pr', 'D', 'T'];
+  
+  effects.forEach((val, i) => {
+    const span = document.createElement('span');
+    if (val > 0) span.className = 'effect-tag pos';
+    else if (val < 0) span.className = 'effect-tag neg';
+    else span.className = 'effect-tag neu';
+    
+    span.innerText = `${keys[i]} ${val > 0 ? '+' : ''}${val}`;
+    effDiv.appendChild(span);
+  });
+}
+
+function closeConsecuencia() {
+  document.getElementById('modal-consecuencia').style.display = 'none';
+  proceedToEndOfMonth();
+}
+
+function proceedToEndOfMonth() {
+  updateLowestPoints();
+  checkStreak();
+
+  for (let key in state.stats) {
+    if (state.stats[key] <= 0) { triggerGameOver(key); return; }
+  }
+
+  const { currentMonthInYear } = getCalendarData();
+
+  if (currentMonthInYear === 5 && !state.ptuPaid) showPTU();
+  else if (currentMonthInYear === 12 && !state.aguinaldoPaid) showAguinaldo();
+  else if (currentMonthInYear % 3 === 0) showTrimestral();
+  else showNextButton();
+}
+
+function showNextButton() {
+  document.getElementById('phase-title').innerText = "✅ Mes Completado";
+  document.getElementById('scenario-text').innerHTML = "Has sobrevivido al mes. Prepara tu estrategia para el siguiente.";
+  document.getElementById('options-container').style.display = 'none';
+  document.getElementById('next-btn').style.display = 'block';
+}
+
+function nextPhase() {
+  state.month++;
+  const { currentMonthInYear } = getCalendarData();
+  
+  if (currentMonthInYear === 1) {
+    state.ptuPaid = false;
+    state.aguinaldoPaid = false;
+    dealWildcards();
+  }
+  drawDilema();
+}
+
+function applyEffects(effects) {
+  const keys = ['P', 'C', 'Pr', 'D', 'T'];
+  effects.forEach((val, i) => {
+    state.stats[keys[i]] = Math.max(0, Math.min(10, state.stats[keys[i]] + val));
+  });
+  renderDashboard();
+}
+
+function updateLowestPoints() {
+  for (let k in state.stats) {
+    if (state.stats[k] < state.lowestPoints[k]) {
+      state.lowestPoints[k] = state.stats[k];
+    }
+  }
+}
+
+function checkStreak() {
+  let allStable = true;
+  for (let k in state.stats) {
+    if (state.stats[k] < 5) allStable = false;
+  }
+  
+  if (allStable) {
+    state.currentStreak++;
+    if (state.currentStreak > state.bestStreak) {
+      state.bestStreak = state.currentStreak;
+    }
+  } else {
+    state.currentStreak = 0;
+  }
+  renderDashboard();
+}
+
+function showPTU() { document.getElementById('modal-ptu').style.display = 'flex'; }
+function showAguinaldo() { document.getElementById('modal-aguinaldo').style.display = 'flex'; }
+
+function applySpecialEvent(type, optIdx) {
+  const modalId = type === 'ptu' ? 'modal-ptu' : 'modal-aguinaldo';
+  const buttons = document.getElementById(modalId).querySelectorAll('.btn-gold');
+  buttons.forEach(btn => btn.disabled = true);
+
+  const effects = SPECIAL_EVENTS[type][optIdx];
+  applyEffects(effects);
+  
+  const { currentYear, currentMonthInYear } = getCalendarData();
+  state.log.push({
+    time: `Año ${currentYear} - Mes ${currentMonthInYear}`,
+    title: type === 'ptu' ? "💰 Reparto de Utilidades (PTU)" : "🎄 Pago de Aguinaldo",
+    decision: `Opción ${['A','B','C'][optIdx]}`,
+    wildcard: null,
+    effects: effects
+  });
+  renderLog();
+
+  if (type === 'ptu') state.ptuPaid = true;
+  if (type === 'aguinaldo') state.aguinaldoPaid = true;
+
+  for (let key in state.stats) {
+    if (state.stats[key] <= 0) {
+      document.getElementById(modalId).style.display = 'none';
+      triggerGameOver(key);
+      return;
+    }
+  }
+
+  if (type === 'ptu') {
+    document.getElementById('modal-ptu').style.display = 'none';
+    showNextButton();
+  } else if (type === 'aguinaldo') {
+    document.getElementById('modal-aguinaldo').style.display = 'none';
+    showTrimestral(); 
+  }
+}
+
+function showTrimestral() {
+  const opts = document.getElementById('trimestral-options');
+  opts.innerHTML = '<p><i>Selecciona indicadores en Crítico (1-4) para recuperar (+2). Cuestan -2 de Presupuesto cada uno.</i></p>';
+  
+  const keys = ['P', 'C', 'Pr', 'D', 'T'];
+  keys.forEach(k => {
+    if (k !== 'Pr' && state.stats[k] <= 4 && state.stats.Pr >= 2) {
+      const btn = document.createElement('button');
+      btn.className = 'btn btn-primary';
+      btn.style.margin = '5px';
+      btn.style.width = 'auto';
+      btn.style.padding = '10px 15px';
+      btn.innerText = `Inyectar recursos a ${STAT_NAMES[k]} (Costo: -2 Pr)`;
+      btn.onclick = () => {
+        state.stats.Pr -= 2;
+        state.stats[k] = Math.min(10, state.stats[k] + 2);
+        renderDashboard();
+        btn.disabled = true;
+        btn.innerText = `✅ ${STAT_NAMES[k]} Recuperado`;
+        btn.style.background = '#555';
+      };
+      opts.appendChild(btn);
+    }
+  });
+  
+  if (opts.children.length === 1) {
+    opts.innerHTML += '<p style="color: var(--accent); margin-top:15px;">No hay indicadores en crisis o no tienes presupuesto. ¡Excelente gestión!</p>';
+  }
+  
+  document.getElementById('modal-trimestral').style.display = 'flex';
+}
+
+function closeTrimestral() {
+  document.getElementById('modal-trimestral').style.display = 'none';
+  showNextButton();
+}
+
+function triggerGameOver(key) {
+  const { currentYear, currentMonthInYear } = getCalendarData();
+  const reasons = {
+    P: "La Productividad cayó a 0. La planta es operativamente inviable.",
+    C: "El Clima Laboral llegó a 0. Huelga general y sabotaje interno.",
+    Pr: "El Presupuesto es 0. Insolvencia técnica y embargo de cuentas.",
+    D: "La Disciplina es 0. Clausura inmediata por autoridades (STPS/SAT).",
+    T: "El Talento es 0. Fuga masiva de cerebros, la operación colapsa."
+  };
+  document.getElementById('gameover-reason').innerText = `La empresa colapsó en el Año ${currentYear}, Mes ${currentMonthInYear}.<br><br><b>${reasons[key]}</b>`;
+  document.getElementById('gameover-feedback').innerHTML = generateFeedback(key);
+  document.getElementById('modal-gameover').style.display = 'flex';
+}
+
+function generateFeedback(failedKey) {
+  let feedback = `<h4>💡 Diagnóstico y Área de Oportunidad:</h4>`;
+  const advice = {
+    P: "Tu Productividad cayó a 0. La planta se detuvo. Parece que el desgaste operativo, la falta de mantenimiento o la fatiga del equipo fueron letales. <br><b>Enfoque:</b> No sacrifiques la capacidad instalada por ganancias a corto plazo. Usa el comodín de 'Resolución de Problemas' para proteger tu operación.",
+    C: "Tu Clima Laboral colapsó (Huelga/Sabotaje). El equipo no soportó más la presión. <br><b>Enfoque:</b> Prioriza el bienestar. Usa comodines de 'Negociación' y 'Comunicación Asertiva'. Evita las opciones que intimiden, agoten o ignoren las necesidades humanas del personal.",
+    Pr: "Insolvencia Total. El Presupuesto llegó a 0. <br><b>Enfoque:</b> Falló tu planeación financiera a largo plazo. No guardaste flujo para los eventos anuales obligatorios (PTU/Aguinaldo) o gastaste en soluciones reactivas. Usa el comodín de 'Visión Financiera' para blindar tu caja.",
+    D: "Clausura por autoridades. La Disciplina fue 0. <br><b>Enfoque:</b> Ignoraste normativas, seguridad o ética. Las multas y los riesgos legales te destruyeron. Usa el comodín de 'Ética Corporativa' y nunca subestimes los protocolos de seguridad y cumplimiento.",
+    T: "Fuga de Talento. Tu Talento llegó a 0. <br><b>Enfoque:</b> No supiste retener a tu gente. Las decisiones frías, la falta de reconocimiento o los entornos tóxicos destruyeron tu capital humano. Usa 'Negociación' para proteger a tu equipo."
+  };
+  feedback += `<p style="color:#ccc;">${advice[failedKey]}</p>`;
+
+  feedback += `<h4 style="margin-top:20px;">📉 Análisis de Vulnerabilidad (Puntos más bajos alcanzados):</h4>`;
+  feedback += `<ul>`;
+  for(let k in state.lowestPoints) {
+    let color = state.lowestPoints[k] <= 4 ? "var(--danger)" : "var(--accent)";
+    feedback += `<li><b>${STAT_NAMES[k]}:</b> <span style="color:${color}; font-weight:bold;">${state.lowestPoints[k]}/10</span></li>`;
+  }
+  feedback += `</ul>`;
+
+  feedback += `<p style="margin-top:15px; color:var(--warn); font-weight:bold;">🔥 Tu mejor racha de estabilidad fue de ${state.bestStreak} meses consecutivos sin entrar en zona crítica.</p>`;
+
+  return feedback;
+}
+
+function endGame() {
+  let total = 0;
+  for (let k in state.stats) total += state.stats[k];
+  
+  let rank = "";
+  if (total >= 45) rank = "🏆 CEO Legendario (La empresa es un referente en la industria tras 5 años)";
+  else if (total >= 35) rank = "✅ Director Competente (La empresa se mantuvo sólida y rentable)";
+  else if (total >= 25) rank = "⚠️ Gerente en Observación (La junta directiva evalúa tu relevo)";
+  else rank = "❌ Despedido (La empresa no sobrevivió a la década)";
+
+  document.getElementById('victory-score').innerText = `Salud Final de la Empresa: ${total} / 50`;
+  document.getElementById('victory-rank').innerText = rank;
+  document.getElementById('final-streak').innerText = state.bestStreak;
+  
+  const finalLog = document.getElementById('final-log');
+  finalLog.innerHTML = state.log.map(l => `
+    <div style="margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom:5px;">
+      <b>${l.time}: ${l.title}</b><br>
+      <span style="color: var(--accent);">Decisión:</span> ${l.decision}<br>
+      ${l.wildcard ? `<span class="log-wc">🃏 Habilidad Aplicada:</span> ${l.wildcard}<br>` : ''}
+    </div>
+  `).join('');
+
+  document.getElementById('modal-victory').style.display = 'flex';
+}
+
+function renderLog() {
+  const container = document.getElementById('log-container');
+  container.innerHTML = state.log.map(l => `
+    <div class="log-entry">
+      <h4>${l.time}: ${l.title}</h4>
+      <p><b>Decisión:</b> ${l.decision}</p>
+      ${l.wildcard ? `<p class="log-wc">🃏 ${l.wildcard}</p>` : ''}
+    </div>
+  `).reverse().join('');
+}
+
+initGame();
+</script>
+</body>
+</html>
