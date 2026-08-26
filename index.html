@@ -269,7 +269,18 @@ let state = { month: 1, stats: { P: 10, C: 10, Pr: 10, D: 10, T: 10 }, lowestPoi
 const STAT_NAMES = { P: "Productividad", C: "Clima", Pr: "Presupuesto", D: "Disciplina", T: "Talento" };
 const STAT_COLORS = { P: "var(--p)", C: "var(--c)", Pr: "var(--pr)", D: "var(--d)", T: "var(--t)" };
 
-function saveGame() { try { localStorage.setItem('simGerencial_save', JSON.stringify({ state, timestamp: new Date().toISOString() })); alert('✅ Partida guardada correctamente'); } catch (e) { alert('❌ Error al guardar: ' + e.message); } }
+// ==========================================
+// FUNCIONES DE PERSISTENCIA LOCAL (SIN ALERTA DE ÉXITO)
+// ==========================================
+function saveGame() { 
+  try { 
+    localStorage.setItem('simGerencial_save', JSON.stringify({ state, timestamp: new Date().toISOString() })); 
+    // Guardado silencioso (sin alert)
+  } catch (e) { 
+    alert('❌ Error al guardar: ' + e.message); 
+  } 
+}
+
 function loadGame() { try { const d = localStorage.getItem('simGerencial_save'); if (d) { state = JSON.parse(d).state; return true; } return false; } catch (e) { return false; } }
 function clearSave() { localStorage.removeItem('simGerencial_save'); }
 function saveHighScore(score, rank, bestStreak) { try { let hs = JSON.parse(localStorage.getItem('simGerencial_hs') || '[]'); hs.push({ score, rank, bestStreak, date: new Date().toLocaleDateString('es-MX') }); hs.sort((a, b) => b.score - a.score); localStorage.setItem('simGerencial_hs', JSON.stringify(hs.slice(0, 10))); } catch (e) {} }
