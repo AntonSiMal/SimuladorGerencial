@@ -3,90 +3,466 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador Gerencial - Campaña 5 Años (Con Sistema de Riesgo Ético)</title>
+<title>Simulador Gerencial - Campaña 5 Años</title>
 <style>
-  :root { --bg: #121212; --card: #1e1e24; --text: #e0e0e0; --accent: #4caf50; --warn: #ff9800; --danger: #f44336; --info: #2196f3; --gold: #ffd700; --p: #2196f3; --c: #4caf50; --pr: #ffc107; --d: #ff5722; --t: #9c27b0; --risk-low: #4caf50; --risk-med: #ff9800; --risk-high: #ff5722; --risk-crit: #9c27b0; --paypal: #0070ba; --paypal-hover: #005ea6; }
-  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; }
-  .container { max-width: 1100px; width: 100%; display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  :root { 
+    --bg: #121212; --card: #1e1e24; --text: #e0e0e0; --accent: #4caf50; 
+    --warn: #ff9800; --danger: #f44336; --info: #2196f3; --gold: #ffd700; 
+    --p: #2196f3; --c: #4caf50; --pr: #ffc107; --d: #ff5722; --t: #9c27b0; 
+    --risk-low: #4caf50; --risk-med: #ff9800; --risk-high: #ff5722; --risk-crit: #9c27b0; 
+    --paypal: #0070ba; --paypal-hover: #005ea6;
+    --crisis-red: #8b0000; --crisis-glow: #ff0000;
+  }
+  
+  * { box-sizing: border-box; }
+  
+  body { 
+    font-family: 'Segoe UI', system-ui, sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    margin: 0; 
+    padding: 20px; 
+    display: flex; 
+    justify-content: center;
+    transition: background 0.5s;
+  }
+  
+  body.crisis-mode {
+    animation: crisisPulse 0.5s ease-in-out 4;
+  }
+  
+  @keyframes crisisPulse {
+    0%, 100% { background: var(--bg); }
+    50% { background: var(--crisis-red); }
+  }
+  
+  .shake {
+    animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
+  }
+  
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+    40%, 60% { transform: translate3d(8px, 0, 0); }
+  }
+  
+  .container { 
+    max-width: 1100px; 
+    width: 100%; 
+    display: grid; 
+    grid-template-columns: 1fr 300px; 
+    gap: 20px; 
+  }
+  
   .main-panel { display: flex; flex-direction: column; gap: 20px; }
-  .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+  
+  .card { 
+    background: var(--card); 
+    border-radius: 12px; 
+    padding: 20px; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+  }
+  
   h1, h2, h3, h4 { margin: 0 0 15px 0; }
-  .header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #2a2a35, #1e1e24); flex-wrap: wrap; gap: 10px;}
-  .status-badge { padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9em; color: white; }
+  
+  .header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    background: linear-gradient(90deg, #2a2a35, #1e1e24); 
+    flex-wrap: wrap; 
+    gap: 10px;
+  }
+  
+  .status-badge { 
+    padding: 6px 16px; 
+    border-radius: 20px; 
+    font-weight: bold; 
+    font-size: 0.9em; 
+    color: white; 
+  }
+  
   .hand-display { display: flex; gap: 5px; flex-wrap: wrap; }
-  .hand-card { background: #332a00; border: 1px solid var(--gold); color: var(--gold); padding: 4px 8px; border-radius: 5px; font-size: 0.75em; font-weight: bold; }
+  
+  .hand-card { 
+    background: #332a00; 
+    border: 1px solid var(--gold); 
+    color: var(--gold); 
+    padding: 4px 8px; 
+    border-radius: 5px; 
+    font-size: 0.75em; 
+    font-weight: bold; 
+  }
+  
   .streak-display { font-size: 0.85em; color: var(--warn); font-weight: bold; margin-top: 5px; }
   .risk-display { font-size: 0.85em; font-weight: bold; margin-top: 5px; }
+  .crisis-counter { font-size: 0.85em; color: var(--crisis-glow); font-weight: bold; margin-top: 5px; }
+  
   .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .stat { background: #15151a; padding: 12px; border-radius: 8px; border-left: 5px solid; }
-  .stat-header { display: flex; justify-content: space-between; font-size: 0.9em; margin-bottom: 8px; font-weight: bold; }
+  
+  .stat { 
+    background: #15151a; 
+    padding: 12px; 
+    border-radius: 8px; 
+    border-left: 5px solid;
+    transition: all 0.3s;
+  }
+  
+  .stat-header { 
+    display: flex; 
+    justify-content: space-between; 
+    font-size: 0.9em; 
+    margin-bottom: 8px; 
+    font-weight: bold; 
+  }
+  
   .bar-bg { height: 12px; background: #333; border-radius: 6px; overflow: hidden; }
-  .bar-fill { height: 100%; transition: width 0.6s ease, background 0.6s ease; border-radius: 6px; }
-  .scenario { font-size: 1.05em; line-height: 1.6; margin-bottom: 20px; padding: 15px; background: #15151a; border-radius: 8px; border-left: 4px solid var(--info); }
-  .scenario-title { color: var(--info); font-weight: bold; font-size: 1.1em; display: block; margin-bottom: 8px; }
+  
+  .bar-fill { 
+    height: 100%; 
+    transition: width 0.6s ease, background 0.6s ease; 
+    border-radius: 6px; 
+  }
+  
+  .scenario { 
+    font-size: 1.05em; 
+    line-height: 1.6; 
+    margin-bottom: 20px; 
+    padding: 15px; 
+    background: #15151a; 
+    border-radius: 8px; 
+    border-left: 4px solid var(--info); 
+  }
+  
+  .scenario-title { 
+    color: var(--info); 
+    font-weight: bold; 
+    font-size: 1.1em; 
+    display: block; 
+    margin-bottom: 8px; 
+  }
+  
   .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-  .decision-card { background: #252530; border: 2px solid #333; border-radius: 10px; padding: 15px; cursor: pointer; transition: all 0.2s; }
-  .decision-card:hover { border-color: var(--accent); transform: translateX(5px); background: #2a2a35; }
-  .decision-card.selected { border-color: var(--accent); background: #1e3a1e; box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
-  .card-label { font-weight: bold; font-size: 1.2em; color: var(--accent); margin-right: 10px; }
+  
+  .decision-card { 
+    background: #252530; 
+    border: 2px solid #333; 
+    border-radius: 10px; 
+    padding: 15px; 
+    cursor: pointer; 
+    transition: all 0.2s; 
+  }
+  
+  .decision-card:hover { 
+    border-color: var(--accent); 
+    transform: translateX(5px); 
+    background: #2a2a35; 
+  }
+  
+  .decision-card.selected { 
+    border-color: var(--accent); 
+    background: #1e3a1e; 
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); 
+  }
+  
+  .card-label { 
+    font-weight: bold; 
+    font-size: 1.2em; 
+    color: var(--accent); 
+    margin-right: 10px; 
+  }
+  
   .card-text { font-size: 0.95em; line-height: 1.4; }
-  .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.2s; width: 100%; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-sizing: border-box; }
-  .btn-primary { background: var(--accent); color: white; } .btn-primary:hover { background: #45a049; }
-  .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { background: #d32f2f; }
-  .btn-info { background: var(--info); color: white; } .btn-info:hover { background: #1976d2; }
+  
+  .btn { 
+    padding: 12px; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-size: 1em; 
+    font-weight: bold; 
+    transition: all 0.2s; 
+    width: 100%; 
+    text-decoration: none; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 8px; 
+  }
+  
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #45a049; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-danger:hover { background: #d32f2f; }
+  .btn-info { background: var(--info); color: white; }
+  .btn-info:hover { background: #1976d2; }
   .btn-gold { background: var(--gold); color: #111; border: 1px solid #b89a00; }
   .btn-gold:hover:not(:disabled) { background: #e6c200; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; background: #555; color: #999; border-color: #444; }
-  .btn-paypal { background: var(--paypal); color: white; margin-top: 10px; } .btn-paypal:hover { background: var(--paypal-hover); }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; background: #555; color: #999; }
+  .btn-paypal { background: var(--paypal); color: white; margin-top: 10px; }
+  .btn-paypal:hover { background: var(--paypal-hover); }
   .btn-wc { font-size: 0.85em; padding: 8px 12px; width: auto; margin: 5px; }
   .btn-small { padding: 8px 12px; font-size: 0.85em; width: auto; }
+  
   .save-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
   .save-controls .btn { flex: 1; min-width: 120px; }
-  .log-panel { background: var(--card); border-radius: 12px; padding: 15px; height: fit-content; max-height: 85vh; overflow-y: auto; position: sticky; top: 20px; }
-  .log-entry { background: #15151a; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85em; border-left: 3px solid var(--accent); }
+  
+  .log-panel { 
+    background: var(--card); 
+    border-radius: 12px; 
+    padding: 15px; 
+    height: fit-content; 
+    max-height: 85vh; 
+    overflow-y: auto; 
+    position: sticky; 
+    top: 20px; 
+  }
+  
+  .log-entry { 
+    background: #15151a; 
+    padding: 10px; 
+    border-radius: 8px; 
+    margin-bottom: 10px; 
+    font-size: 0.85em; 
+    border-left: 3px solid var(--accent); 
+  }
+  
+  .log-entry.crisis-log {
+    border-left: 3px solid var(--crisis-glow);
+    background: #2a0000;
+  }
+  
   .log-entry h4 { margin: 0 0 5px 0; color: var(--accent); font-size: 0.9em; }
   .log-entry p { margin: 2px 0; color: #aaa; }
   .log-wc { color: var(--gold); font-weight: bold; font-size: 0.8em; }
   .log-risk { color: var(--risk-high); font-weight: bold; font-size: 0.8em; }
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
-  .modal { background: var(--card); padding: 30px; border-radius: 15px; max-width: 600px; width: 90%; text-align: center; border-top: 5px solid var(--accent); max-height: 90vh; overflow-y: auto; }
+  .log-crisis { color: var(--crisis-glow); font-weight: bold; font-size: 0.9em; }
+  
+  .modal-overlay { 
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.85); 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 100; 
+  }
+  
+  .modal { 
+    background: var(--card); 
+    padding: 30px; 
+    border-radius: 15px; 
+    max-width: 600px; 
+    width: 90%; 
+    text-align: center; 
+    border-top: 5px solid var(--accent); 
+    max-height: 90vh; 
+    overflow-y: auto; 
+  }
+  
   .modal h2 { color: var(--accent); margin-bottom: 10px; }
-  .modal.danger { border-top-color: var(--danger); } .modal.danger h2 { color: var(--danger); }
-  .modal.info { border-top-color: var(--info); } .modal.info h2 { color: var(--info); }
-  .modal.warn { border-top-color: var(--warn); } .modal.warn h2 { color: var(--warn); }
-  .modal.special { border-top-color: var(--gold); } .modal.special h2 { color: var(--gold); }
-  .modal.risk { border-top-color: var(--risk-crit); } .modal.risk h2 { color: var(--risk-crit); }
+  .modal.danger { border-top-color: var(--danger); }
+  .modal.danger h2 { color: var(--danger); }
+  .modal.info { border-top-color: var(--info); }
+  .modal.info h2 { color: var(--info); }
+  .modal.warn { border-top-color: var(--warn); }
+  .modal.warn h2 { color: var(--warn); }
+  .modal.special { border-top-color: var(--gold); }
+  .modal.special h2 { color: var(--gold); }
+  .modal.risk { border-top-color: var(--risk-crit); }
+  .modal.risk h2 { color: var(--risk-crit); }
+  
+  .modal.crisis-modal {
+    border-top-color: var(--crisis-glow);
+    background: linear-gradient(180deg, #1a0000 0%, #2a0000 100%);
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+    animation: crisisGlow 1s ease-in-out infinite alternate;
+  }
+  
+  .modal.crisis-modal h2 {
+    color: var(--crisis-glow);
+    font-size: 1.8em;
+    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    animation: textPulse 1s ease-in-out infinite alternate;
+  }
+  
+  @keyframes crisisGlow {
+    from { box-shadow: 0 0 30px rgba(255, 0, 0, 0.3); }
+    to { box-shadow: 0 0 60px rgba(255, 0, 0, 0.7); }
+  }
+  
+  @keyframes textPulse {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+  }
+  
+  .crisis-icon {
+    font-size: 4em;
+    margin: 10px 0;
+    animation: iconShake 0.5s ease-in-out infinite;
+  }
+  
+  @keyframes iconShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-5deg); }
+    75% { transform: rotate(5deg); }
+  }
+  
+  .crisis-penalties {
+    background: rgba(139, 0, 0, 0.3);
+    border: 2px solid var(--crisis-glow);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    text-align: left;
+  }
+  
+  .crisis-penalties h4 {
+    color: var(--crisis-glow);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  
+  .penalty-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    margin: 3px 0;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    color: #ff8888;
+    font-weight: bold;
+  }
+  
+  .fired-director {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid var(--crisis-glow);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+    text-align: center;
+  }
+  
+  .fired-director h4 {
+    color: var(--crisis-glow);
+    margin: 0 0 10px 0;
+  }
+  
+  .fired-director .director-name {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: white;
+    margin: 10px 0;
+  }
+  
+  .fired-director .director-reason {
+    font-size: 0.9em;
+    color: #ffaaaa;
+    font-style: italic;
+  }
+  
   .effects { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
-  .effect-tag { padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9em; }
+  
+  .effect-tag { 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    font-weight: bold; 
+    font-size: 0.9em; 
+  }
+  
   .pos { background: #1e3a1e; color: #8f8; border: 1px solid #4caf50; }
   .neg { background: #3a1e1e; color: #f88; border: 1px solid #f44336; }
   .neu { background: #333; color: #ccc; border: 1px solid #555; }
   .risk-tag { background: #3a1e3a; color: #f8f; border: 1px solid #9c27b0; }
+  .crisis-tag { background: #4a0000; color: #ff4444; border: 2px solid var(--crisis-glow); font-size: 1.1em; }
+  
   .special-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
   .wc-zone { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
-  .narrative-box { background: #15151a; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-style: italic; color: #ccc; line-height: 1.5; }
-  .feedback-box { background: #15151a; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; border-left: 5px solid var(--warn); }
+  
+  .narrative-box { 
+    background: #15151a; 
+    padding: 15px; 
+    border-radius: 8px; 
+    margin: 15px 0; 
+    text-align: left; 
+    font-style: italic; 
+    color: #ccc; 
+    line-height: 1.5; 
+  }
+  
+  .feedback-box { 
+    background: #15151a; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-top: 20px; 
+    text-align: left; 
+    border-left: 5px solid var(--warn); 
+  }
+  
   .feedback-box h4 { color: var(--warn); margin-bottom: 10px; }
   .feedback-box ul { padding-left: 20px; color: #aaa; font-size: 0.9em; }
   .feedback-box li { margin-bottom: 5px; }
-  .ceo-profile { background: #15151a; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; border: 2px solid var(--gold); }
+  
+  .ceo-profile { 
+    background: #15151a; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-top: 20px; 
+    text-align: center; 
+    border: 2px solid var(--gold); 
+  }
+  
   .ceo-profile h3 { color: var(--gold); margin-bottom: 10px; }
   .ceo-profile .ceo-type { font-size: 1.3em; font-weight: bold; margin: 10px 0; }
-  .dice-icon { font-size: 4em; margin: 10px 0; display: inline-block; animation: rollDice 0.5s ease-out; }
-  @keyframes rollDice { 0% { transform: rotate(0deg) scale(0.5); } 100% { transform: rotate(360deg) scale(1); } }
+  
+  .dice-icon { 
+    font-size: 4em; 
+    margin: 10px 0; 
+    display: inline-block; 
+    animation: rollDice 0.5s ease-out; 
+  }
+  
+  @keyframes rollDice { 
+    0% { transform: rotate(0deg) scale(0.5); } 
+    100% { transform: rotate(360deg) scale(1); } 
+  }
+  
   .donate-message { font-size: 0.9em; color: #aaa; margin-top: 20px; margin-bottom: 5px; font-style: italic; }
   .donate-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--gold); }
   .donate-section h4 { color: var(--gold); margin-bottom: 10px; }
-  .visitor-counter { position: fixed; bottom: 10px; right: 10px; background: rgba(30, 30, 36, 0.9); padding: 8px 12px; border-radius: 8px; font-size: 0.85em; color: var(--gold); z-index: 1000; border: 1px solid var(--gold); opacity: 0.8; transition: opacity 0.3s; }
+  
+  .visitor-counter { 
+    position: fixed; 
+    bottom: 10px; right: 10px; 
+    background: rgba(30, 30, 36, 0.9); 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    font-size: 0.85em; 
+    color: var(--gold); 
+    z-index: 1000; 
+    border: 1px solid var(--gold); 
+    opacity: 0.8; 
+    transition: opacity 0.3s; 
+  }
+  
   .visitor-counter:hover { opacity: 1; }
+  
   .highscore-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
   .highscore-table th, .highscore-table td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
   .highscore-table th { color: var(--gold); font-weight: bold; }
   .highscore-table td { color: #ccc; }
-  @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .log-panel { position: static; max-height: 300px; } .visitor-counter { bottom: 5px; right: 5px; font-size: 0.75em; padding: 6px 10px; } }
+  
+  @media (max-width: 768px) { 
+    .container { grid-template-columns: 1fr; } 
+    .log-panel { position: static; max-height: 300px; } 
+    .visitor-counter { bottom: 5px; right: 5px; font-size: 0.75em; padding: 6px 10px; } 
+  }
 </style>
 </head>
 <body>
+
 <div class="container">
   <div class="main-panel">
     <div class="card header">
@@ -95,6 +471,7 @@
         <div id="month-display">Año 1 | Mes 1 | Trimestre 1</div>
         <div class="streak-display">🔥 Racha Actual: <span id="current-streak">0</span> meses | 🏆 Mejor Racha: <span id="best-streak">0</span> meses</div>
         <div class="risk-display">⚖️ Riesgo Corporativo: <span id="risk-level">🟢 Bajo</span></div>
+        <div class="crisis-counter">🚨 Crisis Acumuladas: <span id="crisis-count">0</span></div>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
         <div id="status-badge" class="status-badge" style="background: var(--accent);">Estado: Óptimo</div>
@@ -124,19 +501,148 @@
 </div>
 <div class="visitor-counter"><script type="text/javascript" src="https://contador.websiteout.com/js/7/8/0/0"></script></div>
 
-<div class="modal-overlay" id="modal-decision"><div class="modal info"><h2>💡 Impacto de tu Decisión</h2><p style="color: #ccc;">Has elegido: <b id="modal-decision-text" style="color: var(--info);"></b></p><div id="decision-effects" class="effects"></div><div class="wc-zone"><h4 style="color: var(--gold); margin-bottom: 5px;">🃏 ¿Aplicar un Comodín de Liderazgo?</h4><div id="wildcard-buttons"></div></div><button class="btn btn-info" style="margin-top:20px;" onclick="closeDecisionModal()">Entendido, Tirar Dado del Entorno</button></div></div>
-<div class="modal-overlay" id="modal-dice"><div class="modal info"><h2>🎲 El Dado del Entorno</h2><div id="dice-icon-display" class="dice-icon">🎲</div><p id="dice-result" style="font-size: 1.5em; color: var(--info); margin: 10px 0; font-weight: bold;"></p><p id="dice-message" style="color: #ccc;"></p><button class="btn btn-info" id="dice-next-btn" style="margin-top:20px;">Continuar</button></div></div>
-<div class="modal-overlay" id="modal-consecuencia"><div class="modal warn"><h2>⚠️ Realidad Organizacional</h2><p id="cons-title" style="font-weight: bold; color: var(--warn); margin-bottom: 5px;"></p><div id="cons-narrative" class="narrative-box"></div><div id="cons-effects" class="effects"></div><button class="btn btn-primary" onclick="advanceToNextMonth()">Siguiente Mes ➔</button></div></div>
-<div class="modal-overlay" id="modal-risk-detonation"><div class="modal risk"><h2>🚨 Riesgo Materializado</h2><p id="risk-title" style="font-weight: bold; color: var(--risk-crit); margin-bottom: 5px;"></p><div id="risk-narrative" class="narrative-box"></div><div id="risk-effects" class="effects"></div><p style="color: #aaa; font-size: 0.9em; margin-top: 15px;">Las decisiones cuestionables del pasado finalmente te alcanzaron.</p><button class="btn btn-danger" style="margin-top:20px;" onclick="advanceToNextMonth()">Siguiente Mes ➔</button></div></div>
-<div class="modal-overlay" id="modal-trimestral"><div class="modal"><h2>📅 Cierre de Trimestre</h2><p>Inyecta recursos de emergencia. Sacrifica <b>Presupuesto</b> para recuperar indicadores en crisis.</p><div id="trimestral-options"></div><button class="btn btn-primary" style="margin-top:20px;" onclick="closeTrimestralAndAdvance()">Siguiente Mes ➔</button></div></div>
-<div class="modal-overlay" id="modal-ptu"><div class="modal special"><h2>💰 Evento Anual: Reparto de Utilidades (PTU)</h2><p style="color: #ccc;">Es el mes 5. La ley exige repartir el 10% de las utilidades. ¿Cuál es tu estrategia?</p><div class="special-options" id="ptu-options"><button class="btn btn-gold" onclick="applySpecialEvent('ptu', 0)">A) Pagar el mínimo legal estricto</button><button class="btn btn-gold" onclick="applySpecialEvent('ptu', 1)">B) Pagar un bono extra del 5% por encima de la ley</button><button class="btn btn-gold" onclick="applySpecialEvent('ptu', 2)">C) Diferir el pago con trucos contables (Riesgo legal)</button></div><div class="donate-section"><h4>🎁 ¿Quieres apoyar al desarrollador?</h4><p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu PTU es bienvenida para seguir mejorando este simulador</p><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar PTU al desarrollador</a></div></div></div>
-<div class="modal-overlay" id="modal-aguinaldo"><div class="modal special"><h2>🎄 Evento Anual: Pago de Aguinaldo</h2><p style="color: #ccc;">Llegó el fin de año (Mes 12). Es momento de pagar el aguinaldo. ¿Cómo cerrarás el año fiscal?</p><div class="special-options" id="aguinaldo-options"><button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 0)">A) Pagar los 15 días de ley (Mínimo)</button><button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 1)">B) Pagar aguinaldo premium (30 días) por lealtad</button><button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 2)">C) Pagar en especie (vales y despensas) para ahorrar flujo</button></div><div class="donate-section"><h4>🎁 ¿Quieres apoyar al desarrollador?</h4><p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu aguinaldo es muy apreciado para continuar el desarrollo</p><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar Aguinaldo al desarrollador</a></div></div></div>
-<div class="modal-overlay" id="modal-gameover"><div class="modal danger"><h2>💀 COLAPSO ORGANIZACIONAL</h2><p id="gameover-reason" style="font-size: 1.1em;"></p><div id="gameover-feedback" class="feedback-box"></div><button class="btn btn-danger" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button><p class="donate-message">¿Te gustó esta experiencia educativa? Apoya el desarrollo de este proyecto académico:</p><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar vía PayPal</a></div></div>
-<div class="modal-overlay" id="modal-victory"><div class="modal"><h2>🏆 Fin de la Década (5 Años)</h2><p id="victory-score" style="font-size: 1.2em;"></p><p id="victory-rank" style="font-size: 1.3em; font-weight: bold; margin: 20px 0; color: var(--accent);"></p><p style="color: var(--warn); font-weight: bold;">🔥 Tu Mejor Racha de Estabilidad: <span id="final-streak">0</span> meses consecutivos.</p><div id="ceo-profile-display"></div><h3>Resumen de tu Legado:</h3><div id="final-log" style="text-align: left; max-height: 200px; overflow-y: auto; background: #15151a; padding: 10px; border-radius: 8px; font-size: 0.8em;"></div><button class="btn btn-primary" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button><p class="donate-message">¿Disfrutaste el simulador? Tu apoyo nos ayuda a seguir creando herramientas de aprendizaje innovadoras:</p><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar vía PayPal</a></div></div>
-<div class="modal-overlay" id="modal-highscores"><div class="modal"><h2>🏆 Mejores Puntuaciones</h2><div id="highscores-content"></div><button class="btn btn-primary" style="margin-top:20px;" onclick="closeHighScores()">Cerrar</button></div></div>
-<div class="modal-overlay" id="modal-confirm"><div class="modal"><h2 id="confirm-title">Confirmar</h2><p id="confirm-message" style="color: #ccc; margin: 20px 0;"></p><div style="display: flex; gap: 10px; margin-top: 20px;"><button class="btn btn-danger" id="confirm-yes">Sí</button><button class="btn btn-primary" id="confirm-no">No</button></div></div></div>
+<!-- Modales -->
+<div class="modal-overlay" id="modal-decision">
+  <div class="modal info">
+    <h2>💡 Impacto de tu Decisión</h2>
+    <p style="color: #ccc;">Has elegido: <b id="modal-decision-text" style="color: var(--info);"></b></p>
+    <div id="decision-effects" class="effects"></div>
+    <div class="wc-zone">
+      <h4 style="color: var(--gold); margin-bottom: 5px;">🃏 ¿Aplicar un Comodín de Liderazgo?</h4>
+      <div id="wildcard-buttons"></div>
+    </div>
+    <button class="btn btn-info" style="margin-top:20px;" onclick="closeDecisionModal()">Entendido, Tirar Dado del Entorno</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-dice">
+  <div class="modal info">
+    <h2>🎲 El Dado del Entorno</h2>
+    <div id="dice-icon-display" class="dice-icon">🎲</div>
+    <p id="dice-result" style="font-size: 1.5em; color: var(--info); margin: 10px 0; font-weight: bold;"></p>
+    <p id="dice-message" style="color: #ccc;"></p>
+    <button class="btn btn-info" id="dice-next-btn" style="margin-top:20px;">Continuar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-consecuencia">
+  <div class="modal warn">
+    <h2>⚠️ Realidad Organizacional</h2>
+    <p id="cons-title" style="font-weight: bold; color: var(--warn); margin-bottom: 5px;"></p>
+    <div id="cons-narrative" class="narrative-box"></div>
+    <div id="cons-effects" class="effects"></div>
+    <button class="btn btn-primary" onclick="closeConsecuencia()">Siguiente Mes ➔</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-crisis">
+  <div class="modal crisis-modal" id="crisis-modal-content">
+    <div class="crisis-icon">🚨</div>
+    <h2>¡CRISIS CORPORATIVA DETONADA!</h2>
+    <p id="crisis-title" style="font-size: 1.2em; color: #ff8888; font-weight: bold; margin: 10px 0;"></p>
+    <div id="crisis-narrative" class="narrative-box" style="background: rgba(0,0,0,0.5); color: #ffcccc;"></div>
+    <div class="crisis-penalties">
+      <h4>💥 PENALIZACIONES MASIVAS APLICADAS</h4>
+      <div id="crisis-penalties-list"></div>
+    </div>
+    <div id="fired-director-container"></div>
+    <button class="btn btn-danger" style="margin-top:20px;" onclick="closeCrisisModal()">Asumir Consecuencias</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-trimestral">
+  <div class="modal">
+    <h2>📅 Cierre de Trimestre</h2>
+    <p>Inyecta recursos de emergencia. Sacrifica <b>Presupuesto</b> para recuperar indicadores en crisis.</p>
+    <div id="trimestral-options"></div>
+    <button class="btn btn-primary" style="margin-top:20px;" onclick="closeTrimestralAndAdvance()">Siguiente Mes ➔</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-ptu">
+  <div class="modal special">
+    <h2>💰 Evento Anual: Reparto de Utilidades (PTU)</h2>
+    <p style="color: #ccc;">Es el mes 5. La ley exige repartir el 10% de las utilidades. ¿Cuál es tu estrategia?</p>
+    <div class="special-options" id="ptu-options">
+      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 0)">A) Pagar el mínimo legal estricto</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 1)">B) Pagar un bono extra del 5% por encima de la ley</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 2)">C) Diferir el pago con trucos contables (Riesgo legal)</button>
+    </div>
+    <div class="donate-section">
+      <h4>🎁 ¿Quieres apoyar al desarrollador?</h4>
+      <p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu PTU es bienvenida para seguir mejorando este simulador</p>
+      <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar PTU al desarrollador</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-aguinaldo">
+  <div class="modal special">
+    <h2>🎄 Evento Anual: Pago de Aguinaldo</h2>
+    <p style="color: #ccc;">Llegó el fin de año (Mes 12). Es momento de pagar el aguinaldo. ¿Cómo cerrarás el año fiscal?</p>
+    <div class="special-options" id="aguinaldo-options">
+      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 0)">A) Pagar los 15 días de ley (Mínimo)</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 1)">B) Pagar aguinaldo premium (30 días) por lealtad</button>
+      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 2)">C) Pagar en especie (vales y despensas) para ahorrar flujo</button>
+    </div>
+    <div class="donate-section">
+      <h4>🎁 ¿Quieres apoyar al desarrollador?</h4>
+      <p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu aguinaldo es muy apreciado para continuar el desarrollo</p>
+      <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar Aguinaldo al desarrollador</a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-gameover">
+  <div class="modal danger">
+    <h2>💀 COLAPSO ORGANIZACIONAL</h2>
+    <p id="gameover-reason" style="font-size: 1.1em;"></p>
+    <div id="gameover-feedback" class="feedback-box"></div>
+    <button class="btn btn-danger" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button>
+    <p class="donate-message">¿Te gustó esta experiencia educativa? Apoya el desarrollo de este proyecto académico:</p>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar vía PayPal</a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-victory">
+  <div class="modal">
+    <h2>🏆 Fin de la Década (5 Años)</h2>
+    <p id="victory-score" style="font-size: 1.2em;"></p>
+    <p id="victory-rank" style="font-size: 1.3em; font-weight: bold; margin: 20px 0; color: var(--accent);"></p>
+    <p style="color: var(--warn); font-weight: bold;">🔥 Tu Mejor Racha de Estabilidad: <span id="final-streak">0</span> meses consecutivos.</p>
+    <div id="ceo-profile-display"></div>
+    <h3>Resumen de tu Legado:</h3>
+    <div id="final-log" style="text-align: left; max-height: 200px; overflow-y: auto; background: #15151a; padding: 10px; border-radius: 8px; font-size: 0.8em;"></div>
+    <button class="btn btn-primary" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button>
+    <p class="donate-message">¿Disfrutaste el simulador? Tu apoyo nos ayuda a seguir creando herramientas de aprendizaje innovadoras:</p>
+    <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar vía PayPal</a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-highscores">
+  <div class="modal">
+    <h2>🏆 Mejores Puntuaciones</h2>
+    <div id="highscores-content"></div>
+    <button class="btn btn-primary" style="margin-top:20px;" onclick="closeHighScores()">Cerrar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal">
+    <h2 id="confirm-title">Confirmar</h2>
+    <p id="confirm-message" style="color: #ccc; margin: 20px 0;"></p>
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button class="btn btn-danger" id="confirm-yes">Sí</button>
+      <button class="btn btn-primary" id="confirm-no">No</button>
+    </div>
+  </div>
+</div>
 
 <script>
+// ==========================================
+// DATOS DEL JUEGO (60 DILEMAS, 60 CONSECUENCIAS, 8 CRISIS)
+// ==========================================
+
 const DILEMAS = [
   ["El Operador Estrella Tóxico","Tu mejor operador cumple el 120% de la meta mensual, pero intimida sistemáticamente a los nuevos ingresos y se niega a seguir la metodología 5S en su estación de trabajo. Los demás operadores temen confrontarlo por su rendimiento.",["Despedirlo aplicando el reglamento interno por faltas repetidas a la disciplina, asumiendo el costo de liquidación y reclutamiento.",[-2,2,-1,2,-1],0],["Asignarle un mentor senior y diseñar un plan de mejora conductual con metas semanales, invirtiendo tiempo de supervisión para recuperar su actitud.",[1,1,-1,0,2],0],["Mantenerlo en su puesto sin intervenir directamente por sus resultados, asumiendo el costo del deterioro del clima como un mal necesario para cumplir la meta.",[2,-2,0,-2,0],5]],
   ["Solicitud de Aumento Fuera de Norma","Un empleado con buen desempeño y 5 años de antigüedad pide un aumento del 15% alegando cargas familiares recientes. Su solicitud está fuera de la política salarial vigente, pero su pérdida afectaría la operación.",["Negarlo aplicando la política estrictamente para mantener la equidad interna, aunque eso signifique arriesgar su renuncia.",[0,-1,0,1,-1],0],["Negociar un bono por desempeño futuro atado a metas específicas, creando un precedente de meritocracia sin romper la estructura salarial.",[1,1,-1,1,1],0],["Concederlo para retenerlo rompiendo el precedente, lo que podría generar una cascada de solicitudes similares de otros empleados.",[1,2,-2,-2,0],3]],
@@ -199,17 +705,6 @@ const DILEMAS = [
   ["Just in Time en Zona de Riesgo","La dirección exige implementar 'Just in Time' para bajar inventarios. Pero tus proveedores locales fallan mucho y un paro de proveedores detendría la planta.",["Implementar a la fuerza (Riesgo de paro), cumpliendo la directriz pero arriesgando que una falla de proveedor detenga toda la operación.",[1,-1,0,-1,-1],5],["Negociar un inventario de seguridad mínimo, encontrando un punto medio que reduce inventarios pero mantiene algo de colchón para emergencias.",[0,1,-1,1,0],0],["Falsificar los reportes de inventario (Peligroso), aparentando cumplimiento pero arriesgando una auditoría que descubra el fraude.",[2,0,1,-2,-2],15]],
   ["Accidente con Acuerdo por lo Civil","Un operador pierde un dedo. Su familia pide una suma de dinero por fuera para no ir a la STPS. Es más barato que el proceso legal, pero es ilegal.",["Pagar por fuera (Ilegal y extorsión), resolviendo rápido pero violando la ley y arriesgando que la familia pida más dinero después.",[0,-1,-2,-2,-1],20],["Negarse y enfrentar el proceso legal formal, cumpliendo la ley pero arriesgando un proceso largo y costoso que podría generar mala publicidad.",[-1,0,-1,2,0],0],["Ofrecer un paquete de compensación corporativo real, siendo justo y legal pero sacrificando más dinero que el acuerdo por fuera.",[0,1,-2,1,1],0]],
   ["Reorganización del Taller","Mantenimiento pide parar 2 días completos para reorganizar el taller y ganar eficiencia a largo plazo (20% de mejora). Pero hay pedidos urgentes que no pueden esperar.",["Autorizar el paro (Pierdes 2 días de meta), invirtiendo en eficiencia futura pero incumpliendo pedidos actuales y arriesgando multas.",[-2,1,-1,1,1],0],["Negarlo y pedir que lo hagan en fines de semana (H.E.), manteniendo la producción pero sacrificando presupuesto en horas extra y la moral del equipo.",[1,-2,-2,0,-1],0],["Autorizar solo 1 día (Trabajo a medias), encontrando un punto medio pero arriesgando que la reorganización quede incompleta y no genere el 20% de mejora.",[-1,0,-1,1,0],0]]
-];
-
-const CONSECUENCIAS_RIESGO = [
-  ["Auditoría Interna Detecta Irregularidades","Una auditoría sorpresa de corporativo descubre inconsistencias en tus reportes financieros de los últimos meses. Se abre una investigación formal y se congelan bonos.",[-2,-1,-2,-2,0]],
-  ["Demanda Laboral por Acoso","Un ex-empleado presenta una demanda formal ante la CONAPRED por acoso no atendido. El caso se hace público y la empresa enfrenta multas millonarias.",[-1,-2,-2,-2,-2]],
-  ["Cliente Detecta Defecto en Producción","Un cliente mayor detecta un defecto que habías omitido. Exige reposición inmediata de 5,000 unidades y amenaza con cancelar el contrato y demandar por daños.",[-2,-1,-2,-1,-2]],
-  ["Inspección STPS con Multa Mayor","La STPS realiza una inspección profunda y descubre accidentes no reportados. Multa de $800,000 y suspensión temporal de operaciones.",[-2,-2,-2,-2,0]],
-  ["Fuga Masiva de Talento","Se filtra internamente información sobre prácticas cuestionables. 8 empleados clave renuncian en una semana, llevándose conocimiento crítico a la competencia.",[-2,-2,-1,-1,-2]],
-  ["Escándalo en Redes Sociales","Un empleado publica en LinkedIn las prácticas poco éticas de la empresa. El post se vuelve viral y los clientes cancelan pedidos.",[-1,-2,-2,-2,-2]],
-  ["Proveedor Revela Prácticas Ilegales","Un proveedor con el que tuviste tratos especiales decide cooperar con autoridades y revela detalles de los acuerdos. Se abre una investigación fiscal.",[-1,-1,-2,-2,-1]],
-  ["Sabotaje Interno","Un empleado descontento sabotea la línea de producción. Se pierden $500,000 en producto y se detiene la operación por 3 días.",[-2,-2,-2,-1,-1]]
 ];
 
 const CONSECUENCIAS = [
@@ -275,7 +770,70 @@ const CONSECUENCIAS = [
   ["Perdón Fiscal","El gobierno permite regularizar deudas fiscales antiguas con un descuento del 50%. Tu empresa puede ahorrar $400,000 regularizando, mejorando el flujo y la disciplina fiscal significativamente.",[0,1,2,2,0],0]
 ];
 
-const SPECIAL_EVENTS = { ptu: [[-1, -2, 0, 1, -1, 0], [-3, 2, 0, 0, 2, 0], [2, -3, -2, -2, -1, 15]], aguinaldo: [[-2, 0, 0, 1, 0, 0], [-4, 3, 0, 0, 3, 0], [-1, -2, 0, -1, -1, 10]] };
+const CONSECUENCIAS_RIESGO = [
+  {
+    title: "🚨 ESCÁNDALO DE CORRUPCIÓN DESTAPADO",
+    narrative: "La auditoría interna descubre un esquema de sobornos sistemático en el departamento de compras. Las autoridades inician una investigación penal. El Director de Compras es arrestado y la empresa enfrenta multas millonarias. La reputación está destruida.",
+    penalties: { P: -3, C: -4, Pr: -5, D: -5, T: -3 },
+    fired: { position: "Director de Compras", reason: "Arrestado por corrupción y sobornos" },
+    severity: "catastrophic"
+  },
+  {
+    title: "💥 DEMANDA COLECTIVA DE EMPLEADOS",
+    narrative: "50 empleados presentan una demanda colectiva por acoso laboral, horas extra no pagadas y condiciones inseguras. Los medios de comunicación cubren el caso. La empresa enfrenta una crisis de reputación y costos legales millonarios.",
+    penalties: { P: -2, C: -5, Pr: -4, D: -4, T: -4 },
+    fired: { position: "Director de Recursos Humanos", reason: "Negligencia en protección de empleados" },
+    severity: "catastrophic"
+  },
+  {
+    title: "🔥 ACCIDENTE INDUSTRIAL FATAL",
+    narrative: "Un accidente en la línea de producción resulta en la muerte de un operador. Las autoridades clausuran la planta por 2 semanas. La investigación revela múltiples violaciones de seguridad. La empresa enfrenta cargos penales.",
+    penalties: { P: -5, C: -4, Pr: -5, D: -5, T: -3 },
+    fired: { position: "Director de Operaciones", reason: "Negligencia en seguridad industrial" },
+    severity: "catastrophic"
+  },
+  {
+    title: "💸 FRAUDE FINANCIERO DETECTADO",
+    narrative: "La auditoría externa descubre que los estados financieros de los últimos 3 años fueron manipulados. La bolsa de valores suspende las acciones. Los inversionistas demandan a la empresa. El Director Financiero es destituido.",
+    penalties: { P: -3, C: -3, Pr: -5, D: -5, T: -2 },
+    fired: { position: "Director Financiero", reason: "Fraude financiero y manipulación de estados financieros" },
+    severity: "catastrophic"
+  },
+  {
+    title: "🌐 CRISIS DE REPUTACIÓN EN REDES",
+    narrative: "Un video de un directivo haciendo comentarios discriminatorios se vuelve viral. Los clientes cancelan contratos masivamente. Los empleados renuncian en masa. La empresa pierde el 40% de sus ingresos en un mes.",
+    penalties: { P: -4, C: -5, Pr: -4, D: -4, T: -5 },
+    fired: { position: "Director General", reason: "Daño irreparable a la reputación corporativa" },
+    severity: "catastrophic"
+  },
+  {
+    title: "⚖️ SANCIÓN REGULADORA MASIVA",
+    narrative: "Las autoridades ambientales imponen una multa de $10 millones por violaciones repetidas a las normas de emisiones. La planta debe detener operaciones hasta cumplir con las regulaciones. El Director de Operaciones es destituido.",
+    penalties: { P: -4, C: -2, Pr: -5, D: -5, T: -2 },
+    fired: { position: "Director de Operaciones", reason: "Incumplimiento repetido de normativas ambientales" },
+    severity: "severe"
+  },
+  {
+    title: "🏭 SABOTAJE INDUSTRIAL",
+    narrative: "Un empleado descontento sabotea la línea de producción principal, causando daños por $5 millones. La producción se detiene por 3 semanas. Se descubre que el sabotaje fue posible por negligencia en los controles de seguridad.",
+    penalties: { P: -5, C: -3, Pr: -4, D: -4, T: -3 },
+    fired: { position: "Gerente de Seguridad Industrial", reason: "Negligencia en controles de seguridad" },
+    severity: "severe"
+  },
+  {
+    title: "💼 FUGA MASIVA DE TALENTO",
+    narrative: "15 ejecutivos clave renuncian simultáneamente para unirse a la competencia. Se llevan consigo clientes, proyectos y conocimiento crítico. La empresa pierde el 60% de su capacidad operativa en un mes.",
+    penalties: { P: -4, C: -4, Pr: -3, D: -3, T: -5 },
+    fired: { position: "Director de Recursos Humanos", reason: "Incapacidad para retener talento clave" },
+    severity: "severe"
+  }
+];
+
+const SPECIAL_EVENTS = { 
+  ptu: [[-1, -2, 0, 1, -1, 0], [-3, 2, 0, 0, 2, 0], [2, -3, -2, -2, -1, 15]], 
+  aguinaldo: [[-2, 0, 0, 1, 0, 0], [-4, 3, 0, 0, 3, 0], [-1, -2, 0, -1, -1, 10]] 
+};
+
 const WILDCARDS = [
   { id: 'negociacion', name: '🗣️ Negociación', desc: 'Mitiga hasta -2 en Clima (C) o Talento (T).', apply: (eff) => { if(eff[1] < 0) eff[1] = Math.min(0, eff[1]+2); if(eff[4] < 0) eff[4] = Math.min(0, eff[4]+2); } },
   { id: 'vision', name: '📊 Visión Financiera', desc: 'Mitiga hasta -2 en Presupuesto (Pr).', apply: (eff) => { if(eff[2] < 0) eff[2] = Math.min(0, eff[2]+2); } },
@@ -284,12 +842,16 @@ const WILDCARDS = [
   { id: 'comunicacion', name: '🤝 Comunicación Asertiva', desc: 'Mitiga -1 en cualquier indicador afectado negativamente.', apply: (eff) => { for(let i=0; i<5; i++) if(eff[i]<0) eff[i] += 1; } }
 ];
 
+// ==========================================
+// ESTADO DEL JUEGO
+// ==========================================
 function getInitialState() {
   return {
     month: 1, 
     stats: { P: 10, C: 10, Pr: 10, D: 10, T: 10 }, 
     risk: 0, 
-    unethicalDecisions: 0, 
+    unethicalDecisions: 0,
+    crisisCount: 0,
     lowestPoints: { P: 10, C: 10, Pr: 10, D: 10, T: 10 }, 
     currentStreak: 0, 
     bestStreak: 0, 
@@ -311,6 +873,9 @@ let state = getInitialState();
 const STAT_NAMES = { P: "Productividad", C: "Clima", Pr: "Presupuesto", D: "Disciplina", T: "Talento" };
 const STAT_COLORS = { P: "var(--p)", C: "var(--c)", Pr: "var(--pr)", D: "var(--d)", T: "var(--t)" };
 
+// ==========================================
+// FUNCIONES AUXILIARES
+// ==========================================
 function getRiskLevel() {
   if (state.risk < 20) return { text: '🟢 Bajo', color: 'var(--risk-low)' };
   if (state.risk < 45) return { text: '🟡 Creciente', color: 'var(--risk-med)' };
@@ -327,6 +892,9 @@ function getCEOProfile(score, risk, unethicalDecisions) {
   return { type: '📉 Gerente en Crisis', desc: 'Los resultados no fueron suficientes. Se requiere un cambio de estrategia y liderazgo.', color: 'var(--danger)' };
 }
 
+// ==========================================
+// FUNCIONES DE PERSISTENCIA
+// ==========================================
 function saveGame() { 
   try { 
     localStorage.setItem('simGerencial_save', JSON.stringify({ state, timestamp: new Date().toISOString() })); 
@@ -343,6 +911,7 @@ function loadGame() {
       state = data.state;
       if (state.risk === undefined) state.risk = 0;
       if (state.unethicalDecisions === undefined) state.unethicalDecisions = 0;
+      if (state.crisisCount === undefined) state.crisisCount = 0;
       return true; 
     } 
     return false; 
@@ -381,10 +950,10 @@ function confirmNewGame() {
   }); 
 }
 
-function saveHighScore(score, rank, bestStreak, risk, ceoType) { 
+function saveHighScore(score, rank, bestStreak, risk, ceoType, crisisCount) { 
   try { 
     let hs = JSON.parse(localStorage.getItem('simGerencial_hs') || '[]'); 
-    hs.push({ score, rank, bestStreak, risk, ceoType, date: new Date().toLocaleDateString('es-MX') }); 
+    hs.push({ score, rank, bestStreak, risk, ceoType, crisisCount, date: new Date().toLocaleDateString('es-MX') }); 
     hs.sort((a, b) => b.score - a.score); 
     localStorage.setItem('simGerencial_hs', JSON.stringify(hs.slice(0, 10))); 
   } catch (e) {
@@ -398,9 +967,9 @@ function showHighScores() {
   if (hs.length === 0) { 
     c.innerHTML = '<p style="color: #aaa;">Aún no hay puntuaciones registradas. ¡Completa una campaña para aparecer aquí!</p>'; 
   } else { 
-    let h = '<table class="highscore-table"><thead><tr><th>#</th><th>Punt.</th><th>Riesgo</th><th>Perfil CEO</th><th>Racha</th><th>Fecha</th></tr></thead><tbody>'; 
+    let h = '<table class="highscore-table"><thead><tr><th>#</th><th>Punt.</th><th>Riesgo</th><th>Crisis</th><th>Perfil CEO</th><th>Racha</th><th>Fecha</th></tr></thead><tbody>'; 
     hs.forEach((s, i) => { 
-      h += `<tr><td>${i + 1}</td><td style="color: var(--gold); font-weight: bold;">${s.score}/50</td><td>${s.risk || 0}</td><td style="font-size: 0.8em;">${s.ceoType || '-'}</td><td>🔥 ${s.bestStreak}</td><td>${s.date}</td></tr>`; 
+      h += `<tr><td>${i + 1}</td><td style="color: var(--gold); font-weight: bold;">${s.score}/50</td><td>${s.risk || 0}</td><td style="color: var(--crisis-glow);">${s.crisisCount || 0}</td><td style="font-size: 0.8em;">${s.ceoType || '-'}</td><td>🔥 ${s.bestStreak}</td><td>${s.date}</td></tr>`; 
     }); 
     h += '</tbody></table>'; 
     c.innerHTML = h; 
@@ -423,6 +992,9 @@ function showConfirm(t, m, y) {
   }; 
 }
 
+// ==========================================
+// FUNCIONES DE INICIALIZACIÓN
+// ==========================================
 function initGame() { 
   if (loadGame()) { 
     console.log('Partida cargada desde LocalStorage');
@@ -467,6 +1039,9 @@ function getCalendarData() {
   }; 
 }
 
+// ==========================================
+// FUNCIONES DE RENDERIZADO
+// ==========================================
 function renderDashboard() { 
   const db = document.getElementById('dashboard'); 
   db.innerHTML = ''; 
@@ -490,6 +1065,8 @@ function renderDashboard() {
   const rl = getRiskLevel();
   document.getElementById('risk-level').innerText = rl.text;
   document.getElementById('risk-level').style.color = rl.color;
+  
+  document.getElementById('crisis-count').innerText = state.crisisCount;
   
   const cd = getCalendarData(); 
   document.getElementById('month-display').innerText = `Año ${cd.currentYear} | Mes ${cd.currentMonthInYear} | Trimestre ${cd.currentQuarter} (Ronda ${state.month}/60)`; 
@@ -612,7 +1189,7 @@ function rollEnvironmentDice() {
 
 function drawConsecuencia() { 
   if (state.risk >= 45 && Math.random() < 0.4) {
-    drawRiskDetonation();
+    triggerCrisisDetonation();
     return;
   }
   
@@ -629,15 +1206,71 @@ function drawConsecuencia() {
   applyEffects(c[2]); 
 }
 
-function drawRiskDetonation() {
-  const idx = Math.floor(Math.random() * CONSECUENCIAS_RIESGO.length);
-  const c = CONSECUENCIAS_RIESGO[idx];
-  document.getElementById('risk-title').innerText = c[0];
-  document.getElementById('risk-narrative').innerText = c[1];
-  renderEffects('risk-effects', c[2]);
-  document.getElementById('modal-risk-detonation').style.display = 'flex';
-  applyEffects(c[2]);
-  state.risk = Math.max(0, state.risk - 30);
+function triggerCrisisDetonation() {
+  const crisisIdx = Math.floor(Math.random() * CONSECUENCIAS_RIESGO.length);
+  const crisis = CONSECUENCIAS_RIESGO[crisisIdx];
+  
+  state.crisisCount++;
+  
+  const penalties = crisis.penalties;
+  applyEffects([penalties.P, penalties.C, penalties.Pr, penalties.D, penalties.T]);
+  
+  state.risk = Math.max(0, state.risk - 40);
+  
+  const cd = getCalendarData();
+  state.log.push({
+    time: `Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,
+    title: crisis.title,
+    decision: crisis.fired.position + " DESTITUIDO",
+    wildcard: null,
+    effects: [penalties.P, penalties.C, penalties.Pr, penalties.D, penalties.T],
+    risk: 0,
+    isCrisis: true
+  });
+  renderLog();
+  
+  showCrisisModal(crisis);
+  
+  document.body.classList.add('crisis-mode');
+  document.querySelector('.container').classList.add('shake');
+  
+  setTimeout(() => {
+    document.body.classList.remove('crisis-mode');
+    document.querySelector('.container').classList.remove('shake');
+  }, 2500);
+}
+
+function showCrisisModal(crisis) {
+  document.getElementById('crisis-title').innerText = crisis.title;
+  document.getElementById('crisis-narrative').innerText = crisis.narrative;
+  
+  const penaltiesList = document.getElementById('crisis-penalties-list');
+  const penalties = crisis.penalties;
+  const keys = ['P', 'C', 'Pr', 'D', 'T'];
+  let penaltiesHTML = '';
+  keys.forEach((k, i) => {
+    const val = [penalties.P, penalties.C, penalties.Pr, penalties.D, penalties.T][i];
+    if (val !== 0) {
+      penaltiesHTML += `<div class="penalty-item"><span>${STAT_NAMES[k]}</span><span style="color: #ff4444;">${val}</span></div>`;
+    }
+  });
+  penaltiesList.innerHTML = penaltiesHTML;
+  
+  const firedContainer = document.getElementById('fired-director-container');
+  firedContainer.innerHTML = `
+    <div class="fired-director">
+      <h4>🔥 DIRECTIVO DESTITUIDO</h4>
+      <div class="director-name">${crisis.fired.position}</div>
+      <div class="director-reason">"${crisis.fired.reason}"</div>
+    </div>
+  `;
+  
+  document.getElementById('modal-crisis').style.display = 'flex';
+}
+
+function closeCrisisModal() {
+  document.getElementById('modal-crisis').style.display = 'none';
+  advanceToNextMonth();
 }
 
 function renderEffects(ci, ef, risk) { 
@@ -661,11 +1294,75 @@ function renderEffects(ci, ef, risk) {
   }
 }
 
-function advanceToNextMonth() {
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    modal.style.display = 'none';
+function closeConsecuencia() { 
+  document.getElementById('modal-consecuencia').style.display = 'none'; 
+  advanceToNextMonth(); 
+}
+
+// ==========================================
+// FUNCIONES DE EVENTOS ESPECIALES (PTU Y AGUINALDO) - CORREGIDAS
+// ==========================================
+
+function showPTU() {
+  // IMPORTANTE: Resetear estado de los botones ANTES de mostrar el modal
+  const ptuModal = document.getElementById('modal-ptu');
+  const ptuButtons = ptuModal.querySelectorAll('.btn-gold');
+  ptuButtons.forEach(btn => {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+    btn.style.background = ''; // Resetear color de fondo
   });
+  ptuModal.style.display = 'flex';
+}
+
+function showAguinaldo() {
+  // IMPORTANTE: Resetear estado de los botones ANTES de mostrar el modal
+  const aguinaldoModal = document.getElementById('modal-aguinaldo');
+  const aguinaldoButtons = aguinaldoModal.querySelectorAll('.btn-gold');
+  aguinaldoButtons.forEach(btn => {
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+    btn.style.background = ''; // Resetear color de fondo
+  });
+  aguinaldoModal.style.display = 'flex';
+}
+
+function applySpecialEvent(t, oi) { 
+  const mi = t === 'ptu' ? 'modal-ptu' : 'modal-aguinaldo'; 
   
+  // Aplicar efectos
+  const ef = SPECIAL_EVENTS[t][oi]; 
+  applyEffects(ef.slice(0, 5)); 
+  
+  // Acumular riesgo si aplica
+  const riskGain = ef[5] || 0;
+  if (riskGain > 0) {
+    state.risk = Math.min(100, state.risk + riskGain);
+    state.unethicalDecisions++;
+  }
+  
+  // Registrar en bitácora
+  const cd = getCalendarData(); 
+  state.log.push({ 
+    time: `Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`, 
+    title: t === 'ptu' ? "💰 Reparto de Utilidades (PTU)" : "🎄 Pago de Aguinaldo", 
+    decision: `Opción ${['A','B','C'][oi]}`, 
+    wildcard: null, 
+    effects: ef.slice(0,5), 
+    risk: riskGain 
+  }); 
+  renderLog(); 
+  
+  // Marcar como pagado
+  if (t === 'ptu') state.ptuPaid = true; 
+  if (t === 'aguinaldo') state.aguinaldoPaid = true; 
+  
+  // Cerrar modal
+  document.getElementById(mi).style.display = 'none';
+  
+  // Verificar game over
   for (let k in state.stats) { 
     if (state.stats[k] <= 0) { 
       triggerGameOver(k); 
@@ -673,6 +1370,33 @@ function advanceToNextMonth() {
     } 
   } 
   
+  // Continuar según el tipo de evento
+  if (t === 'aguinaldo') {
+    showTrimestral();
+  } else {
+    nextPhase();
+  }
+}
+
+// ==========================================
+// FUNCIÓN DE AVANCE AL SIGUIENTE MES
+// ==========================================
+
+function advanceToNextMonth() {
+  // Cerrar todos los modales abiertos
+  document.querySelectorAll('.modal-overlay').forEach(modal => {
+    modal.style.display = 'none';
+  });
+  
+  // Verificar game over
+  for (let k in state.stats) { 
+    if (state.stats[k] <= 0) { 
+      triggerGameOver(k); 
+      return; 
+    } 
+  } 
+  
+  // Verificar eventos especiales según el mes
   const cm = getCalendarData().currentMonthInYear;
   if (cm === 5 && !state.ptuPaid) { 
     showPTU(); 
@@ -684,54 +1408,18 @@ function advanceToNextMonth() {
     nextPhase();
   }
   
+  // Guardar partida
   saveGame();
 }
 
-function showPTU() { document.getElementById('modal-ptu').style.display = 'flex'; }
-function showAguinaldo() { document.getElementById('modal-aguinaldo').style.display = 'flex'; }
-
-function applySpecialEvent(t, oi) { 
-  const mi = t === 'ptu' ? 'modal-ptu' : 'modal-aguinaldo'; 
-  document.getElementById(mi).querySelectorAll('.btn-gold').forEach(b => b.disabled = true); 
-  const ef = SPECIAL_EVENTS[t][oi]; 
-  applyEffects(ef.slice(0, 5)); 
-  const riskGain = ef[5] || 0;
-  if (riskGain > 0) {
-    state.risk = Math.min(100, state.risk + riskGain);
-    state.unethicalDecisions++;
-  }
-  const cd = getCalendarData(); 
-  state.log.push({ 
-    time: `Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`, 
-    title: t === 'ptu' ? "💰 Reparto de Utilidades (PTU)" : "🎄 Pago de Aguinaldo", 
-    decision: `Opción ${['A','B','C'][oi]}`, 
-    wildcard: null, 
-    effects: ef.slice(0,5), 
-    risk: riskGain 
-  }); 
-  renderLog(); 
-  if (t === 'ptu') state.ptuPaid = true; 
-  if (t === 'aguinaldo') state.aguinaldoPaid = true; 
-  
-  document.getElementById(mi).style.display = 'none';
-  
-  for (let k in state.stats) { 
-    if (state.stats[k] <= 0) { 
-      triggerGameOver(k); 
-      return; 
-    } 
-  } 
-  
-  if (t === 'aguinaldo') {
-    showTrimestral();
-  } else {
-    nextPhase();
-  }
-}
+// ==========================================
+// FUNCIÓN DE CIERRE TRIMESTRAL
+// ==========================================
 
 function showTrimestral() { 
   const o = document.getElementById('trimestral-options'); 
   o.innerHTML = '<p><i>Selecciona indicadores en Crítico (1-4) para recuperar (+2). Cuestan -2 de Presupuesto cada uno.</i></p>'; 
+  
   ['P', 'C', 'Pr', 'D', 'T'].forEach(k => { 
     if (k !== 'Pr' && state.stats[k] <= 4 && state.stats.Pr >= 2) { 
       const b = document.createElement('button'); 
@@ -751,12 +1439,14 @@ function showTrimestral() {
       o.appendChild(b); 
     } 
   }); 
-  if (o.children.length === 1) 
-    o.innerHTML += '<p style="color: var(--accent); margin-top:15px;">No hay indicadores en crisis o no tienes presupuesto. ¡Excelente gestión!</p>'; 
+  
+  if (o.children.length === 1) {
+    o.innerHTML += '<p style="color: var(--accent); margin-top:15px;">No hay indicadores en crisis o no tienes presupuesto. ¡Excelente gestión!</p>';
+  }
+  
   document.getElementById('modal-trimestral').style.display = 'flex'; 
 }
 
-// ✅ NUEVA FUNCIÓN: Cierra el modal de cierre trimestral y avanza al siguiente mes
 function closeTrimestralAndAdvance() {
   document.getElementById('modal-trimestral').style.display = 'none';
   nextPhase();
@@ -764,12 +1454,15 @@ function closeTrimestralAndAdvance() {
 
 function nextPhase() { 
   state.month++; 
+  
+  // Resetear flags anuales si es inicio de año
   if (getCalendarData().currentMonthInYear === 1) { 
     state.ptuPaid = false; 
     state.aguinaldoPaid = false; 
     dealWildcards();
     state.risk = Math.max(0, state.risk - 10);
   } 
+  
   updateLowestPoints(); 
   checkStreak(); 
   drawDilema(); 
@@ -805,6 +1498,9 @@ function checkStreak() {
   renderDashboard(); 
 }
 
+// ==========================================
+// FUNCIONES DE FIN DE JUEGO
+// ==========================================
 function triggerGameOver(k) { 
   const cd = getCalendarData(); 
   const rs = { 
@@ -841,6 +1537,7 @@ function generateFeedback(fk) {
   f += `</ul>`;
   f += `<h4 style="margin-top:20px;">⚖️ Análisis Ético:</h4>`;
   f += `<p style="color:#ccc;">Tomaste <b style="color:var(--risk-high);">${state.unethicalDecisions} decisiones cuestionables</b> durante la campaña.</p>`;
+  f += `<p style="color:#ccc;">Sufriste <b style="color:var(--crisis-glow);">${state.crisisCount} crisis corporativas severas</b> por acumulación de riesgo.</p>`;
   const rl = getRiskLevel();
   f += `<p style="color:#ccc;">Tu nivel de riesgo corporativo al colapsar: <b style="color:${rl.color};">${rl.text}</b></p>`;
   if (state.risk >= 50) {
@@ -870,22 +1567,43 @@ function endGame() {
       <p style="color: #ccc; font-size: 0.95em;">${profile.desc}</p>
       <p style="margin-top: 15px; color: #aaa; font-size: 0.85em;">
         Decisiones cuestionables: <b style="color:var(--risk-high);">${state.unethicalDecisions}</b> | 
+        Crisis sufridas: <b style="color:var(--crisis-glow);">${state.crisisCount}</b> |
         Riesgo final: <b style="color:${getRiskLevel().color};">${getRiskLevel().text}</b>
       </p>
     </div>
   `;
   
   const fl = document.getElementById('final-log'); 
-  fl.innerHTML = state.log.map(l => `<div style="margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom:5px;"><b>${l.time}: ${l.title}</b><br><span style="color: var(--accent);">Decisión:</span> ${l.decision}<br>${l.wildcard ? `<span class="log-wc">🃏 Habilidad:</span> ${l.wildcard}<br>` : ''}${l.risk > 0 ? `<span class="log-risk">⚠️ Riesgo +${l.risk}</span>` : ''}</div>`).join(''); 
+  fl.innerHTML = state.log.map(l => {
+    const entryClass = l.isCrisis ? 'log-entry crisis-log' : 'log-entry';
+    return `<div class="${entryClass}" style="margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom:5px;">
+      <b>${l.time}: ${l.title}</b><br>
+      <span style="color: var(--accent);">Decisión:</span> ${l.decision}<br>
+      ${l.wildcard ? `<span class="log-wc">🃏 Habilidad:</span> ${l.wildcard}<br>` : ''}
+      ${l.risk > 0 ? `<span class="log-risk">⚠️ Riesgo +${l.risk}</span>` : ''}
+      ${l.isCrisis ? `<span class="log-crisis">🚨 CRISIS DETONADA</span>` : ''}
+    </div>`;
+  }).join(''); 
+  
   document.getElementById('modal-victory').style.display = 'flex'; 
-  saveHighScore(t, r, state.bestStreak, state.risk, profile.type); 
+  saveHighScore(t, r, state.bestStreak, state.risk, profile.type, state.crisisCount); 
 }
 
 function renderLog() { 
   const c = document.getElementById('log-container'); 
-  c.innerHTML = state.log.map(l => `<div class="log-entry"><h4>${l.time}: ${l.title}</h4><p><b>Decisión:</b> ${l.decision}</p>${l.wildcard ? `<p class="log-wc">🃏 ${l.wildcard}</p>` : ''}${l.risk > 0 ? `<p class="log-risk">⚠️ Riesgo +${l.risk}</p>` : ''}</div>`).reverse().join(''); 
+  c.innerHTML = state.log.map(l => {
+    const entryClass = l.isCrisis ? 'log-entry crisis-log' : 'log-entry';
+    return `<div class="${entryClass}">
+      <h4>${l.time}: ${l.title}</h4>
+      <p><b>Decisión:</b> ${l.decision}</p>
+      ${l.wildcard ? `<p class="log-wc">🃏 ${l.wildcard}</p>` : ''}
+      ${l.risk > 0 ? `<p class="log-risk">⚠️ Riesgo +${l.risk}</p>` : ''}
+      ${l.isCrisis ? `<p class="log-crisis">🚨 CRISIS DETONADA</p>` : ''}
+    </div>`;
+  }).reverse().join(''); 
 }
 
+// Iniciar el juego
 initGame();
 </script>
 </body>
