@@ -11,637 +11,221 @@
     --p: #2196f3; --c: #4caf50; --pr: #ffc107; --d: #ff5722; --t: #9c27b0; 
     --risk-low: #4caf50; --risk-med: #ff9800; --risk-high: #ff5722; --risk-crit: #9c27b0; 
     --paypal: #0070ba; --paypal-hover: #005ea6;
-    --crisis-red: #8b0000; --crisis-glow: #ff0000;
+    --whatsapp-received: #202c33; --whatsapp-border: #2a3942;
   }
-  
   * { box-sizing: border-box; }
-  
-  body { 
-    font-family: 'Segoe UI', system-ui, sans-serif; 
-    background: var(--bg); 
-    color: var(--text); 
-    margin: 0; 
-    padding: 20px; 
-    display: flex; 
-    justify-content: center;
-    transition: background 0.5s;
-  }
-  
-  body.crisis-mode {
-    animation: crisisPulse 0.5s ease-in-out 4;
-  }
-  
-  @keyframes crisisPulse {
-    0%, 100% { background: var(--bg); }
-    50% { background: var(--crisis-red); }
-  }
-  
-  .shake {
-    animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both;
-  }
-  
-  @keyframes shake {
-    10%, 90% { transform: translate3d(-2px, 0, 0); }
-    20%, 80% { transform: translate3d(4px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
-    40%, 60% { transform: translate3d(8px, 0, 0); }
-  }
-  
-  .container { 
-    max-width: 1100px; 
-    width: 100%; 
-    display: grid; 
-    grid-template-columns: 1fr 300px; 
-    gap: 20px; 
-  }
-  
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; transition: background 0.5s; }
+  body.crisis-mode { animation: crisisPulse 0.5s ease-in-out 4; }
+  @keyframes crisisPulse { 0%, 100% { background: var(--bg); } 50% { background: var(--crisis-red); } }
+  .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+  @keyframes shake { 10%, 90% { transform: translate3d(-2px, 0, 0); } 20%, 80% { transform: translate3d(4px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-8px, 0, 0); } 40%, 60% { transform: translate3d(8px, 0, 0); } }
+  .container { max-width: 1100px; width: 100%; display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
   .main-panel { display: flex; flex-direction: column; gap: 20px; }
-  
-  .card { 
-    background: var(--card); 
-    border-radius: 12px; 
-    padding: 20px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
-  }
-  
+  .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
   h1, h2, h3, h4 { margin: 0 0 15px 0; }
-  
-  .header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    background: linear-gradient(90deg, #2a2a35, #1e1e24); 
-    flex-wrap: wrap; 
-    gap: 10px;
-  }
-  
-  .status-badge { 
-    padding: 6px 16px; 
-    border-radius: 20px; 
-    font-weight: bold; 
-    font-size: 0.9em; 
-    color: white; 
-  }
-  
+  .header { display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, #2a2a35, #1e1e24); flex-wrap: wrap; gap: 10px; }
+  .status-badge { padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9em; color: white; }
   .hand-display { display: flex; gap: 5px; flex-wrap: wrap; }
-  
-  .hand-card { 
-    background: #332a00; 
-    border: 1px solid var(--gold); 
-    color: var(--gold); 
-    padding: 4px 8px; 
-    border-radius: 5px; 
-    font-size: 0.75em; 
-    font-weight: bold; 
-  }
-  
+  .hand-card { background: #332a00; border: 1px solid var(--gold); color: var(--gold); padding: 4px 8px; border-radius: 5px; font-size: 0.75em; font-weight: bold; }
   .streak-display { font-size: 0.85em; color: var(--warn); font-weight: bold; margin-top: 5px; }
   .risk-display { font-size: 0.85em; font-weight: bold; margin-top: 5px; }
   .crisis-counter { font-size: 0.85em; color: var(--crisis-glow); font-weight: bold; margin-top: 5px; }
-  
+  .storage-warning { background: rgba(255, 152, 0, 0.2); border: 1px solid var(--warn); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 0.85em; color: var(--warn); display: none; }
+  .storage-warning.show { display: block; }
   .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  
-  .stat { 
-    background: #15151a; 
-    padding: 12px; 
-    border-radius: 8px; 
-    border-left: 5px solid;
-    transition: all 0.3s;
-  }
-  
-  .stat-header { 
-    display: flex; 
-    justify-content: space-between; 
-    font-size: 0.9em; 
-    margin-bottom: 8px; 
-    font-weight: bold; 
-  }
-  
+  .stat { background: #15151a; padding: 12px; border-radius: 8px; border-left: 5px solid; transition: all 0.3s; }
+  .stat-header { display: flex; justify-content: space-between; font-size: 0.9em; margin-bottom: 8px; font-weight: bold; }
   .bar-bg { height: 12px; background: #333; border-radius: 6px; overflow: hidden; }
-  
-  .bar-fill { 
-    height: 100%; 
-    transition: width 0.6s ease, background 0.6s ease; 
-    border-radius: 6px; 
-  }
-  
-  .scenario { 
-    font-size: 1.05em; 
-    line-height: 1.6; 
-    margin-bottom: 20px; 
-    padding: 15px; 
-    background: #15151a; 
-    border-radius: 8px; 
-    border-left: 4px solid var(--info); 
-  }
-  
-  .scenario-title { 
-    color: var(--info); 
-    font-weight: bold; 
-    font-size: 1.1em; 
-    display: block; 
-    margin-bottom: 8px; 
-  }
-  
+  .bar-fill { height: 100%; transition: width 0.6s ease, background 0.6s ease; border-radius: 6px; }
+  .scenario { font-size: 1.05em; line-height: 1.6; margin-bottom: 20px; padding: 15px; background: #15151a; border-radius: 8px; border-left: 4px solid var(--info); }
+  .scenario-title { color: var(--info); font-weight: bold; font-size: 1.1em; display: block; margin-bottom: 8px; }
   .options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
-  
-  .decision-card { 
-    background: #252530; 
-    border: 2px solid #333; 
-    border-radius: 10px; 
-    padding: 15px; 
-    cursor: pointer; 
-    transition: all 0.2s; 
-  }
-  
-  .decision-card:hover { 
-    border-color: var(--accent); 
-    transform: translateX(5px); 
-    background: #2a2a35; 
-  }
-  
-  .decision-card.selected { 
-    border-color: var(--accent); 
-    background: #1e3a1e; 
-    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); 
-  }
-  
-  .card-label { 
-    font-weight: bold; 
-    font-size: 1.2em; 
-    color: var(--accent); 
-    margin-right: 10px; 
-  }
-  
+  .decision-card { background: #252530; border: 2px solid #333; border-radius: 10px; padding: 15px; cursor: pointer; transition: all 0.2s; }
+  .decision-card:hover { border-color: var(--accent); transform: translateX(5px); background: #2a2a35; }
+  .decision-card.selected { border-color: var(--accent); background: #1e3a1e; box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+  .card-label { font-weight: bold; font-size: 1.2em; color: var(--accent); margin-right: 10px; }
   .card-text { font-size: 0.95em; line-height: 1.4; }
-  
-  .btn { 
-    padding: 12px; 
-    border: none; 
-    border-radius: 8px; 
-    cursor: pointer; 
-    font-size: 1em; 
-    font-weight: bold; 
-    transition: all 0.2s; 
-    width: 100%; 
-    text-decoration: none; 
-    display: inline-flex; 
-    align-items: center; 
-    justify-content: center; 
-    gap: 8px; 
-  }
-  
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { background: #45a049; }
-  .btn-danger { background: var(--danger); color: white; }
-  .btn-danger:hover { background: #d32f2f; }
-  .btn-info { background: var(--info); color: white; }
-  .btn-info:hover { background: #1976d2; }
+  .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: bold; transition: all 0.2s; width: 100%; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-primary { background: var(--accent); color: white; } .btn-primary:hover { background: #45a049; }
+  .btn-danger { background: var(--danger); color: white; } .btn-danger:hover { background: #d32f2f; }
+  .btn-info { background: var(--info); color: white; } .btn-info:hover { background: #1976d2; }
   .btn-gold { background: var(--gold); color: #111; border: 1px solid #b89a00; }
   .btn-gold:hover:not(:disabled) { background: #e6c200; box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
   .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; background: #555; color: #999; }
-  .btn-paypal { background: var(--paypal); color: white; margin-top: 10px; }
-  .btn-paypal:hover { background: var(--paypal-hover); }
+  .btn-paypal { background: var(--paypal); color: white; margin-top: 10px; } .btn-paypal:hover { background: var(--paypal-hover); }
   .btn-wc { font-size: 0.85em; padding: 8px 12px; width: auto; margin: 5px; }
   .btn-small { padding: 8px 12px; font-size: 0.85em; width: auto; }
-  
   .save-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
   .save-controls .btn { flex: 1; min-width: 120px; }
-  
-  .log-panel { 
-    background: var(--card); 
-    border-radius: 12px; 
-    padding: 15px; 
-    height: fit-content; 
-    max-height: 85vh; 
-    overflow-y: auto; 
-    position: sticky; 
-    top: 20px; 
-  }
-  
-  .log-entry { 
-    background: #15151a; 
-    padding: 10px; 
-    border-radius: 8px; 
-    margin-bottom: 10px; 
-    font-size: 0.85em; 
-    border-left: 3px solid var(--accent); 
-  }
-  
-  .log-entry.crisis-log {
-    border-left: 3px solid var(--crisis-glow);
-    background: #2a0000;
-  }
-  
+  .log-panel { background: var(--card); border-radius: 12px; padding: 15px; height: fit-content; max-height: 85vh; overflow-y: auto; position: sticky; top: 20px; }
+  .log-entry { background: #15151a; padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85em; border-left: 3px solid var(--accent); }
+  .log-entry.crisis-log { border-left: 3px solid var(--crisis-glow); background: #2a0000; }
   .log-entry h4 { margin: 0 0 5px 0; color: var(--accent); font-size: 0.9em; }
   .log-entry p { margin: 2px 0; color: #aaa; }
   .log-wc { color: var(--gold); font-weight: bold; font-size: 0.8em; }
   .log-risk { color: var(--risk-high); font-weight: bold; font-size: 0.8em; }
   .log-crisis { color: var(--crisis-glow); font-weight: bold; font-size: 0.9em; }
-  
-  .modal-overlay { 
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.85); 
-    justify-content: center; 
-    align-items: center; 
-    z-index: 100; 
-  }
-  
-  .modal { 
-    background: var(--card); 
-    padding: 30px; 
-    border-radius: 15px; 
-    max-width: 600px; 
-    width: 90%; 
-    text-align: center; 
-    border-top: 5px solid var(--accent); 
-    max-height: 90vh; 
-    overflow-y: auto; 
-  }
-  
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 100; }
+  .modal { background: var(--card); padding: 30px; border-radius: 15px; max-width: 600px; width: 90%; text-align: center; border-top: 5px solid var(--accent); max-height: 90vh; overflow-y: auto; }
   .modal h2 { color: var(--accent); margin-bottom: 10px; }
-  .modal.danger { border-top-color: var(--danger); }
-  .modal.danger h2 { color: var(--danger); }
-  .modal.info { border-top-color: var(--info); }
-  .modal.info h2 { color: var(--info); }
-  .modal.warn { border-top-color: var(--warn); }
-  .modal.warn h2 { color: var(--warn); }
-  .modal.special { border-top-color: var(--gold); }
-  .modal.special h2 { color: var(--gold); }
-  .modal.risk { border-top-color: var(--risk-crit); }
-  .modal.risk h2 { color: var(--risk-crit); }
-  
-  .modal.crisis-modal {
-    border-top-color: var(--crisis-glow);
-    background: linear-gradient(180deg, #1a0000 0%, #2a0000 100%);
-    box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
-    animation: crisisGlow 1s ease-in-out infinite alternate;
-  }
-  
-  .modal.crisis-modal h2 {
-    color: var(--crisis-glow);
-    font-size: 1.8em;
-    text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-    animation: textPulse 1s ease-in-out infinite alternate;
-  }
-  
-  @keyframes crisisGlow {
-    from { box-shadow: 0 0 30px rgba(255, 0, 0, 0.3); }
-    to { box-shadow: 0 0 60px rgba(255, 0, 0, 0.7); }
-  }
-  
-  @keyframes textPulse {
-    from { opacity: 0.8; }
-    to { opacity: 1; }
-  }
-  
-  .crisis-icon {
-    font-size: 4em;
-    margin: 10px 0;
-    animation: iconShake 0.5s ease-in-out infinite;
-  }
-  
-  @keyframes iconShake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-5deg); }
-    75% { transform: rotate(5deg); }
-  }
-  
-  .crisis-penalties {
-    background: rgba(139, 0, 0, 0.3);
-    border: 2px solid var(--crisis-glow);
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px 0;
-    text-align: left;
-  }
-  
-  .crisis-penalties h4 {
-    color: var(--crisis-glow);
-    margin-bottom: 10px;
-    text-align: center;
-  }
-  
-  .penalty-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 10px;
-    margin: 3px 0;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    color: #ff8888;
-    font-weight: bold;
-  }
-  
-  .fired-director {
-    background: rgba(255, 0, 0, 0.2);
-    border: 1px solid var(--crisis-glow);
-    border-radius: 8px;
-    padding: 15px;
-    margin: 15px 0;
-    text-align: center;
-  }
-  
-  .fired-director h4 {
-    color: var(--crisis-glow);
-    margin: 0 0 10px 0;
-  }
-  
-  .fired-director .director-name {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: white;
-    margin: 10px 0;
-  }
-  
-  .fired-director .director-reason {
-    font-size: 0.9em;
-    color: #ffaaaa;
-    font-style: italic;
-  }
-  
+  .modal.danger { border-top-color: var(--danger); } .modal.danger h2 { color: var(--danger); }
+  .modal.info { border-top-color: var(--info); } .modal.info h2 { color: var(--info); }
+  .modal.warn { border-top-color: var(--warn); } .modal.warn h2 { color: var(--warn); }
+  .modal.special { border-top-color: var(--gold); } .modal.special h2 { color: var(--gold); }
+  .modal.risk { border-top-color: var(--risk-crit); } .modal.risk h2 { color: var(--risk-crit); }
+  .crisis-penalties { background: rgba(139, 0, 0, 0.3); border: 2px solid var(--crisis-glow); border-radius: 8px; padding: 15px; margin: 15px 0; text-align: left; }
+  .crisis-penalties h4 { color: var(--crisis-glow); margin-bottom: 10px; text-align: center; }
+  .penalty-item { display: flex; justify-content: space-between; padding: 5px 10px; margin: 3px 0; background: rgba(0,0,0,0.3); border-radius: 4px; color: #ff8888; font-weight: bold; }
+  .fired-director { background: rgba(255, 0, 0, 0.2); border: 1px solid var(--crisis-glow); border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center; }
+  .fired-director h4 { color: var(--crisis-glow); margin: 0 0 10px 0; }
+  .fired-director .director-name { font-size: 1.3em; font-weight: bold; color: white; margin: 10px 0; }
+  .fired-director .director-reason { font-size: 0.9em; color: #ffaaaa; font-style: italic; }
   .effects { display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
-  
-  .effect-tag { 
-    padding: 6px 12px; 
-    border-radius: 6px; 
-    font-weight: bold; 
-    font-size: 0.9em; 
-  }
-  
+  .effect-tag { padding: 6px 12px; border-radius: 6px; font-weight: bold; font-size: 0.9em; }
   .pos { background: #1e3a1e; color: #8f8; border: 1px solid #4caf50; }
   .neg { background: #3a1e1e; color: #f88; border: 1px solid #f44336; }
   .neu { background: #333; color: #ccc; border: 1px solid #555; }
   .risk-tag { background: #3a1e3a; color: #f8f; border: 1px solid #9c27b0; }
-  .crisis-tag { background: #4a0000; color: #ff4444; border: 2px solid var(--crisis-glow); font-size: 1.1em; }
-  
   .special-options { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
   .wc-zone { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
-  
-  .narrative-box { 
-    background: #15151a; 
-    padding: 15px; 
-    border-radius: 8px; 
-    margin: 15px 0; 
-    text-align: left; 
-    font-style: italic; 
-    color: #ccc; 
-    line-height: 1.5; 
-  }
-  
-  .feedback-box { 
-    background: #15151a; 
-    padding: 20px; 
-    border-radius: 8px; 
-    margin-top: 20px; 
-    text-align: left; 
-    border-left: 5px solid var(--warn); 
-  }
-  
+  .narrative-box { background: #15151a; padding: 15px; border-radius: 8px; margin: 15px 0; text-align: left; font-style: italic; color: #ccc; line-height: 1.5; }
+  .feedback-box { background: #15151a; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: left; border-left: 5px solid var(--warn); }
   .feedback-box h4 { color: var(--warn); margin-bottom: 10px; }
   .feedback-box ul { padding-left: 20px; color: #aaa; font-size: 0.9em; }
   .feedback-box li { margin-bottom: 5px; }
-  
-  .ceo-profile { 
-    background: #15151a; 
-    padding: 20px; 
-    border-radius: 8px; 
-    margin-top: 20px; 
-    text-align: center; 
-    border: 2px solid var(--gold); 
-  }
-  
+  .ceo-profile { background: #15151a; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center; border: 2px solid var(--gold); }
   .ceo-profile h3 { color: var(--gold); margin-bottom: 10px; }
   .ceo-profile .ceo-type { font-size: 1.3em; font-weight: bold; margin: 10px 0; }
-  
-  .dice-icon { 
-    font-size: 4em; 
-    margin: 10px 0; 
-    display: inline-block; 
-    animation: rollDice 0.5s ease-out; 
-  }
-  
-  @keyframes rollDice { 
-    0% { transform: rotate(0deg) scale(0.5); } 
-    100% { transform: rotate(360deg) scale(1); } 
-  }
-  
+  .dice-icon { font-size: 4em; margin: 10px 0; display: inline-block; animation: rollDice 0.5s ease-out; }
+  @keyframes rollDice { 0% { transform: rotate(0deg) scale(0.5); } 100% { transform: rotate(360deg) scale(1); } }
   .donate-message { font-size: 0.9em; color: #aaa; margin-top: 20px; margin-bottom: 5px; font-style: italic; }
   .donate-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--gold); }
   .donate-section h4 { color: var(--gold); margin-bottom: 10px; }
-  
-  .visitor-counter { 
-    position: fixed; 
-    bottom: 10px; right: 10px; 
-    background: rgba(30, 30, 36, 0.9); 
-    padding: 8px 12px; 
-    border-radius: 8px; 
-    font-size: 0.85em; 
-    color: var(--gold); 
-    z-index: 1000; 
-    border: 1px solid var(--gold); 
-    opacity: 0.8; 
-    transition: opacity 0.3s; 
-  }
-  
+  .visitor-counter { position: fixed; bottom: 10px; right: 10px; background: rgba(30,30,36,0.9); padding: 8px 12px; border-radius: 8px; font-size: 0.85em; color: var(--gold); z-index: 1000; border: 1px solid var(--gold); opacity: 0.8; transition: opacity 0.3s; }
   .visitor-counter:hover { opacity: 1; }
-  
   .highscore-table { width: 100%; margin-top: 20px; border-collapse: collapse; }
   .highscore-table th, .highscore-table td { padding: 10px; text-align: left; border-bottom: 1px solid #333; }
   .highscore-table th { color: var(--gold); font-weight: bold; }
   .highscore-table td { color: #ccc; }
-  
-  @media (max-width: 768px) { 
-    .container { grid-template-columns: 1fr; } 
-    .log-panel { position: static; max-height: 300px; } 
-    .visitor-counter { bottom: 5px; right: 5px; font-size: 0.75em; padding: 6px 10px; } 
-  }
+  .notification-container { position: fixed; top: 20px; right: 20px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; max-width: 340px; pointer-events: none; }
+  .whatsapp-notification { background: var(--whatsapp-received); border-radius: 8px; padding: 10px 12px 8px 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.5); animation: whatsappSlideIn 0.4s cubic-bezier(0.16,1,0.3,1); display: flex; gap: 10px; align-items: flex-start; pointer-events: auto; cursor: pointer; position: relative; max-width: 320px; border: 1px solid var(--whatsapp-border); }
+  .whatsapp-notification::before { content: ''; position: absolute; top: 0; left: -8px; width: 0; height: 0; border-top: 8px solid var(--whatsapp-received); border-left: 8px solid transparent; }
+  .whatsapp-notification:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+  .whatsapp-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; color: white; flex-shrink: 0; }
+  .whatsapp-content { flex: 1; min-width: 0; }
+  .whatsapp-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+  .whatsapp-sender { font-weight: bold; font-size: 0.85em; color: #e9edef; }
+  .whatsapp-time { font-size: 0.7em; color: #8696a0; flex-shrink: 0; margin-left: 8px; }
+  .whatsapp-message { font-size: 0.82em; color: #e9edef; line-height: 1.35; word-wrap: break-word; }
+  .whatsapp-recommendation { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--whatsapp-border); font-size: 0.75em; color: #8696a0; font-style: italic; line-height: 1.3; }
+  .whatsapp-check { color: #53bdeb; font-size: 0.7em; margin-left: 4px; }
+  @keyframes whatsappSlideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes whatsappSlideOut { from { transform: translateX(0); opacity: 1; max-height: 200px; } to { transform: translateX(120%); opacity: 0; max-height: 0; padding: 0; margin: 0; } }
+  .whatsapp-notification.removing { animation: whatsappSlideOut 0.3s ease-in forwards; }
+  @media (max-width: 768px) { .container { grid-template-columns: 1fr; } .log-panel { position: static; max-height: 300px; } .visitor-counter { bottom: 5px; right: 5px; font-size: 0.75em; padding: 6px 10px; } .notification-container { max-width: 90%; right: 5%; } }
 </style>
 </head>
 <body>
-
 <div class="container">
   <div class="main-panel">
     <div class="card header">
       <div>
         <h2>🏢 Simulador Gerencial (5 Años)</h2>
         <div id="month-display">Año 1 | Mes 1 | Trimestre 1</div>
-        <div class="streak-display">🔥 Racha Actual: <span id="current-streak">0</span> meses | 🏆 Mejor Racha: <span id="best-streak">0</span> meses</div>
-        <div class="risk-display">⚖️ Riesgo Corporativo: <span id="risk-level">🟢 Bajo</span></div>
-        <div class="crisis-counter">🚨 Crisis Acumuladas: <span id="crisis-count">0</span></div>
+        <div class="streak-display">🔥 Racha: <span id="current-streak">0</span> | 🏆 Mejor: <span id="best-streak">0</span></div>
+        <div class="risk-display">⚖️ Riesgo: <span id="risk-level">🟢 Bajo</span></div>
+        <div class="crisis-counter">🚨 Crisis: <span id="crisis-count">0</span></div>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
-        <div id="status-badge" class="status-badge" style="background: var(--accent);">Estado: Óptimo</div>
+        <div id="status-badge" class="status-badge" style="background: var(--accent);">Óptimo</div>
         <div style="font-size: 0.75em; color: var(--gold);">🃏 Comodines:</div>
         <div id="hand-display" class="hand-display"></div>
       </div>
     </div>
-    <div class="card">
-      <h3>📊 Motor de Indicadores (KPIs)</h3>
-      <div class="dashboard" id="dashboard"></div>
-    </div>
+    <div id="storage-warning" class="storage-warning">⚠️ Almacenamiento no disponible.</div>
+    <div class="card"><h3>📊 KPIs</h3><div class="dashboard" id="dashboard"></div></div>
     <div class="card" id="game-zone">
       <h3 id="phase-title">🎲 Fase 1: Análisis del Dilema</h3>
-      <div id="scenario-text" class="scenario">Cargando escenario...</div>
+      <div id="scenario-text" class="scenario">Cargando...</div>
       <div id="options-container" class="options"></div>
       <div class="save-controls">
-        <button class="btn btn-info btn-small" onclick="saveGame()">💾 Guardar Partida</button>
-        <button class="btn btn-info btn-small" onclick="showHighScores()">🏆 Mejores Puntuaciones</button>
-        <button class="btn btn-danger btn-small" onclick="confirmNewGame()">🔄 Nueva Partida</button>
+        <button class="btn btn-info btn-small" onclick="saveGame()">💾 Guardar</button>
+        <button class="btn btn-info btn-small" onclick="showHighScores()">🏆 Récords</button>
+        <button class="btn btn-danger btn-small" onclick="confirmNewGame()">🔄 Nueva</button>
       </div>
     </div>
   </div>
-  <div class="log-panel">
-    <h3>📜 Bitácora Ejecutiva</h3>
-    <div id="log-container"></div>
-  </div>
+  <div class="log-panel"><h3>📜 Bitácora</h3><div id="log-container"></div></div>
 </div>
+<div class="notification-container" id="notification-container"></div>
 <div class="visitor-counter"><script type="text/javascript" src="https://contador.websiteout.com/js/7/8/0/0"></script></div>
 
-<!-- Modales -->
-<div class="modal-overlay" id="modal-decision">
-  <div class="modal info">
-    <h2>💡 Impacto de tu Decisión</h2>
-    <p style="color: #ccc;">Has elegido: <b id="modal-decision-text" style="color: var(--info);"></b></p>
-    <div id="decision-effects" class="effects"></div>
-    <div class="wc-zone">
-      <h4 style="color: var(--gold); margin-bottom: 5px;">🃏 ¿Aplicar un Comodín de Liderazgo?</h4>
-      <div id="wildcard-buttons"></div>
-    </div>
-    <button class="btn btn-info" style="margin-top:20px;" onclick="closeDecisionModal()">Entendido, Tirar Dado del Entorno</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-dice">
-  <div class="modal info">
-    <h2>🎲 El Dado del Entorno</h2>
-    <div id="dice-icon-display" class="dice-icon">🎲</div>
-    <p id="dice-result" style="font-size: 1.5em; color: var(--info); margin: 10px 0; font-weight: bold;"></p>
-    <p id="dice-message" style="color: #ccc;"></p>
-    <button class="btn btn-info" id="dice-next-btn" style="margin-top:20px;">Continuar</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-consecuencia">
-  <div class="modal warn">
-    <h2>⚠️ Realidad Organizacional</h2>
-    <p id="cons-title" style="font-weight: bold; color: var(--warn); margin-bottom: 5px;"></p>
-    <div id="cons-narrative" class="narrative-box"></div>
-    <div id="cons-effects" class="effects"></div>
-    <button class="btn btn-primary" onclick="closeConsecuencia()">Siguiente Mes ➔</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-crisis">
-  <div class="modal crisis-modal" id="crisis-modal-content">
-    <div class="crisis-icon">🚨</div>
-    <h2>¡CRISIS CORPORATIVA DETONADA!</h2>
-    <p id="crisis-title" style="font-size: 1.2em; color: #ff8888; font-weight: bold; margin: 10px 0;"></p>
-    <div id="crisis-narrative" class="narrative-box" style="background: rgba(0,0,0,0.5); color: #ffcccc;"></div>
-    <div class="crisis-penalties">
-      <h4>💥 PENALIZACIONES MASIVAS APLICADAS</h4>
-      <div id="crisis-penalties-list"></div>
-    </div>
-    <div id="fired-director-container"></div>
-    <button class="btn btn-danger" style="margin-top:20px;" onclick="closeCrisisModal()">Asumir Consecuencias</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-trimestral">
-  <div class="modal">
-    <h2>📅 Cierre de Trimestre</h2>
-    <p>Inyecta recursos de emergencia. Sacrifica <b>Presupuesto</b> para recuperar indicadores en crisis.</p>
-    <div id="trimestral-options"></div>
-    <button class="btn btn-primary" style="margin-top:20px;" onclick="closeTrimestralAndAdvance()">Siguiente Mes ➔</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-ptu">
-  <div class="modal special">
-    <h2>💰 Evento Anual: Reparto de Utilidades (PTU)</h2>
-    <p style="color: #ccc;">Es el mes 5. La ley exige repartir el 10% de las utilidades. ¿Cuál es tu estrategia?</p>
-    <div class="special-options" id="ptu-options">
-      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 0)">A) Pagar el mínimo legal estricto</button>
-      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 1)">B) Pagar un bono extra del 5% por encima de la ley</button>
-      <button class="btn btn-gold" onclick="applySpecialEvent('ptu', 2)">C) Diferir el pago con trucos contables (Riesgo legal)</button>
-    </div>
-    <div class="donate-section">
-      <h4>🎁 ¿Quieres apoyar al desarrollador?</h4>
-      <p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu PTU es bienvenida para seguir mejorando este simulador</p>
-      <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar PTU al desarrollador</a>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-aguinaldo">
-  <div class="modal special">
-    <h2>🎄 Evento Anual: Pago de Aguinaldo</h2>
-    <p style="color: #ccc;">Llegó el fin de año (Mes 12). Es momento de pagar el aguinaldo. ¿Cómo cerrarás el año fiscal?</p>
-    <div class="special-options" id="aguinaldo-options">
-      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 0)">A) Pagar los 15 días de ley (Mínimo)</button>
-      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 1)">B) Pagar aguinaldo premium (30 días) por lealtad</button>
-      <button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo', 2)">C) Pagar en especie (vales y despensas) para ahorrar flujo</button>
-    </div>
-    <div class="donate-section">
-      <h4>🎁 ¿Quieres apoyar al desarrollador?</h4>
-      <p style="color: #aaa; font-size: 0.9em; margin-bottom: 10px;">Tu aguinaldo es muy apreciado para continuar el desarrollo</p>
-      <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar Aguinaldo al desarrollador</a>
-    </div>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-gameover">
-  <div class="modal danger">
-    <h2>💀 COLAPSO ORGANIZACIONAL</h2>
-    <p id="gameover-reason" style="font-size: 1.1em;"></p>
-    <div id="gameover-feedback" class="feedback-box"></div>
-    <button class="btn btn-danger" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button>
-    <p class="donate-message">¿Te gustó esta experiencia educativa? Apoya el desarrollo de este proyecto académico:</p>
-    <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar vía PayPal</a>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-victory">
-  <div class="modal">
-    <h2>🏆 Fin de la Década (5 Años)</h2>
-    <p id="victory-score" style="font-size: 1.2em;"></p>
-    <p id="victory-rank" style="font-size: 1.3em; font-weight: bold; margin: 20px 0; color: var(--accent);"></p>
-    <p style="color: var(--warn); font-weight: bold;">🔥 Tu Mejor Racha de Estabilidad: <span id="final-streak">0</span> meses consecutivos.</p>
-    <div id="ceo-profile-display"></div>
-    <h3>Resumen de tu Legado:</h3>
-    <div id="final-log" style="text-align: left; max-height: 200px; overflow-y: auto; background: #15151a; padding: 10px; border-radius: 8px; font-size: 0.8em;"></div>
-    <button class="btn btn-primary" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button>
-    <p class="donate-message">¿Disfrutaste el simulador? Tu apoyo nos ayuda a seguir creando herramientas de aprendizaje innovadoras:</p>
-    <a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar vía PayPal</a>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-highscores">
-  <div class="modal">
-    <h2>🏆 Mejores Puntuaciones</h2>
-    <div id="highscores-content"></div>
-    <button class="btn btn-primary" style="margin-top:20px;" onclick="closeHighScores()">Cerrar</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="modal-confirm">
-  <div class="modal">
-    <h2 id="confirm-title">Confirmar</h2>
-    <p id="confirm-message" style="color: #ccc; margin: 20px 0;"></p>
-    <div style="display: flex; gap: 10px; margin-top: 20px;">
-      <button class="btn btn-danger" id="confirm-yes">Sí</button>
-      <button class="btn btn-primary" id="confirm-no">No</button>
-    </div>
-  </div>
-</div>
+<div class="modal-overlay" id="modal-decision"><div class="modal info"><h2>💡 Impacto de tu Decisión</h2><p style="color:#ccc;">Has elegido: <b id="modal-decision-text" style="color:var(--info);"></b></p><div id="decision-effects" class="effects"></div><div class="wc-zone"><h4 style="color:var(--gold);margin-bottom:5px;">🃏 ¿Aplicar Comodín?</h4><div id="wildcard-buttons"></div></div><button class="btn btn-info" style="margin-top:20px;" onclick="closeDecisionModal()">Entendido, Tirar Dado</button></div></div>
+<div class="modal-overlay" id="modal-dice"><div class="modal info"><h2>🎲 Dado del Entorno</h2><div id="dice-icon-display" class="dice-icon">🎲</div><p id="dice-result" style="font-size:1.5em;color:var(--info);margin:10px 0;font-weight:bold;"></p><p id="dice-message" style="color:#ccc;"></p><button class="btn btn-info" id="dice-next-btn" style="margin-top:20px;">Continuar</button></div></div>
+<div class="modal-overlay" id="modal-consecuencia"><div class="modal warn"><h2>⚠️ Realidad Organizacional</h2><p id="cons-title" style="font-weight:bold;color:var(--warn);margin-bottom:5px;"></p><div id="cons-narrative" class="narrative-box"></div><div id="cons-effects" class="effects"></div><button class="btn btn-primary" onclick="closeConsecuencia()">Siguiente Mes ➔</button></div></div>
+<div class="modal-overlay" id="modal-crisis"><div class="modal crisis-modal"><div class="crisis-icon">🚨</div><h2>¡CRISIS DETONADA!</h2><p id="crisis-title" style="font-size:1.2em;color:#ff8888;font-weight:bold;margin:10px 0;"></p><div id="crisis-narrative" class="narrative-box" style="background:rgba(0,0,0,0.5);color:#ffcccc;"></div><div class="crisis-penalties"><h4>💥 PENALIZACIONES</h4><div id="crisis-penalties-list"></div></div><div id="fired-director-container"></div><button class="btn btn-danger" style="margin-top:20px;" onclick="closeCrisisModal()">Asumir Consecuencias</button></div></div>
+<div class="modal-overlay" id="modal-trimestral"><div class="modal"><h2>📅 Cierre de Trimestre</h2><p>Sacrifica <b>Presupuesto</b> para recuperar indicadores en crisis.</p><div id="trimestral-options"></div><button class="btn btn-primary" style="margin-top:20px;" onclick="closeTrimestralAndAdvance()">Siguiente Mes ➔</button></div></div>
+<div class="modal-overlay" id="modal-ptu"><div class="modal special"><h2>💰 Reparto de Utilidades (PTU)</h2><p style="color:#ccc;">Mes 5. La ley exige repartir el 10% de utilidades.</p><div class="special-options" id="ptu-options"><button class="btn btn-gold" onclick="applySpecialEvent('ptu',0)">A) Pagar mínimo legal</button><button class="btn btn-gold" onclick="applySpecialEvent('ptu',1)">B) Pagar bono extra 5%</button><button class="btn btn-gold" onclick="applySpecialEvent('ptu',2)">C) Diferir con trucos contables</button></div><div class="donate-section"><h4>🎁 Apoya al desarrollador</h4><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar PTU al desarrollador</a></div></div></div>
+<div class="modal-overlay" id="modal-aguinaldo"><div class="modal special"><h2>🎄 Pago de Aguinaldo</h2><p style="color:#ccc;">Mes 12. Momento de pagar aguinaldo.</p><div class="special-options" id="aguinaldo-options"><button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo',0)">A) 15 días de ley</button><button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo',1)">B) Aguinaldo premium 30 días</button><button class="btn btn-gold" onclick="applySpecialEvent('aguinaldo',2)">C) Pagar en especie</button></div><div class="donate-section"><h4>🎁 Apoya al desarrollador</h4><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Dar Aguinaldo al desarrollador</a></div></div></div>
+<div class="modal-overlay" id="modal-gameover"><div class="modal danger"><h2>💀 COLAPSO</h2><p id="gameover-reason" style="font-size:1.1em;"></p><div id="gameover-feedback" class="feedback-box"></div><button class="btn btn-danger" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button><p class="donate-message">¿Te gustó? Apoya el proyecto:</p><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar</a></div></div>
+<div class="modal-overlay" id="modal-victory"><div class="modal"><h2>🏆 Fin de la Década</h2><p id="victory-score" style="font-size:1.2em;"></p><p id="victory-rank" style="font-size:1.3em;font-weight:bold;margin:20px 0;color:var(--accent);"></p><p style="color:var(--warn);font-weight:bold;">🔥 Mejor Racha: <span id="final-streak">0</span> meses</p><div id="ceo-profile-display"></div><h3>Legado:</h3><div id="final-log" style="text-align:left;max-height:200px;overflow-y:auto;background:#15151a;padding:10px;border-radius:8px;font-size:0.8em;"></div><button class="btn btn-primary" style="margin-top:20px;" onclick="startFreshGame()">Nueva Campaña</button><p class="donate-message">¿Disfrutaste? Apoya el proyecto:</p><a href="https://www.paypal.com/donate/?hosted_button_id=WVJTSZGXAYBS4" target="_blank" class="btn btn-paypal">💳 Donar</a></div></div>
+<div class="modal-overlay" id="modal-highscores"><div class="modal"><h2>🏆 Récords</h2><div id="highscores-content"></div><button class="btn btn-primary" style="margin-top:20px;" onclick="closeHighScores()">Cerrar</button></div></div>
+<div class="modal-overlay" id="modal-confirm"><div class="modal"><h2 id="confirm-title">Confirmar</h2><p id="confirm-message" style="color:#ccc;margin:20px 0;"></p><div style="display:flex;gap:10px;margin-top:20px;"><button class="btn btn-danger" id="confirm-yes">Sí</button><button class="btn btn-primary" id="confirm-no">No</button></div></div></div>
 
 <script>
-// ==========================================
-// DATOS DEL JUEGO (60 DILEMAS, 60 CONSECUENCIAS, 8 CRISIS)
-// ==========================================
+const StorageManager = {
+  isAvailable: false,
+  checkAvailability: function() { try { const t='__t__'; localStorage.setItem(t,t); localStorage.removeItem(t); this.isAvailable=true; return true; } catch(e) { this.isAvailable=false; return false; } },
+  save: function(k,d) { if(!this.isAvailable) return false; try { localStorage.setItem(k,JSON.stringify(d)); return true; } catch(e) { return false; } },
+  load: function(k) { if(!this.isAvailable) return null; try { const s=localStorage.getItem(k); return s?JSON.parse(s):null; } catch(e) { return null; } },
+  remove: function(k) { if(!this.isAvailable) return false; try { localStorage.removeItem(k); return true; } catch(e) { return false; } }
+};
+
+const NotificationSystem = {
+  alertDatabase: {
+    P: { sender:'Ing. Roberto Méndez', role:'Dir. Operaciones', avatarColor:'#2196f3', messages:['Jefe, productividad cayendo en líneas 3 y 4. ¿Revisamos?','Los números de producción no cuadran. Necesitamos actuar ya.','Productividad en niveles críticos. Necesitamos un plan urgente.'] },
+    C: { sender:'Lic. María Fernández', role:'Dir. Recursos Humanos', avatarColor:'#4caf50', messages:['Jefe, muchas quejas de clima laboral. Necesitamos hablar.','El clima laboral está muy deteriorado. Varios empleados piden citas conmigo.','El ambiente en planta está muy pesado. Las quejas suben.'] },
+    Pr: { sender:'C.P. Carlos Hernández', role:'Dir. Finanzas', avatarColor:'#ff9800', messages:['Jefe, el presupuesto está en niveles críticos. Hay que recortar ya.','El flujo de caja está comprometido. Reunión urgente de finanzas.','Las finanzas están en rojo. Necesitamos actuar ya.'] },
+    D: { sender:'Ing. Laura Ramírez', role:'Dir. Calidad', avatarColor:'#ff5722', messages:['Jefe, incumplimientos graves en normativas. Auditores encima.','Varias irregularidades en cumplimiento. Hay que actuar antes de inspección.','Situación de cumplimiento crítica. Protocolos no se siguen.'] },
+    T: { sender:'Lic. María Fernández', role:'Dir. Recursos Humanos', avatarColor:'#4caf50', messages:['Jefe, se me van los mejores. Tres clave renunciaron esta semana.','Rotación de personal clave fuera de control. Perdemos talento.','Los mejores se van. Necesitamos plan de retención urgente.'] }
+  },
+  eventReminders: {
+    ptu: { sender:'C.P. Carlos Hernández', role:'Dir. Finanzas', avatarColor:'#ff9800', message:'Jefe, casi es mes 5. Hay que preparar PTU. La ley obliga a repartir 10% de utilidades.' },
+    aguinaldo: { sender:'Lic. María Fernández', role:'Dir. RH', avatarColor:'#4caf50', message:'Jefe, casi es diciembre. Hay que preparar aguinaldo antes del 20 de diciembre.' }
+  },
+  show: function(type) {
+    const container = document.getElementById('notification-container');
+    const data = this.alertDatabase[type];
+    if (!data) return;
+    const msg = data.messages[Math.floor(Math.random() * data.messages.length)];
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const initials = data.sender.split(' ').map(n=>n[0]).join('');
+    const n = document.createElement('div');
+    n.className = 'whatsapp-notification';
+    n.innerHTML = `<div class="whatsapp-avatar" style="background:${data.avatarColor};">${initials}</div><div class="whatsapp-content"><div class="whatsapp-header"><span class="whatsapp-sender">${data.sender}</span><span class="whatsapp-time">${timeStr}</span></div><div class="whatsapp-message">${msg}</div><div class="whatsapp-recommendation">⚠️ Revisa este indicador urgente <span class="whatsapp-check">✓✓</span></div></div>`;
+    container.appendChild(n);
+    setTimeout(() => { n.classList.add('removing'); setTimeout(() => { if(n.parentNode) n.parentNode.removeChild(n); }, 300); }, 8000);
+    n.onclick = () => { n.classList.add('removing'); setTimeout(() => { if(n.parentNode) n.parentNode.removeChild(n); }, 300); };
+  },
+  showEventReminder: function(eventType) {
+    const container = document.getElementById('notification-container');
+    const data = this.eventReminders[eventType];
+    if (!data) return;
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+    const initials = data.sender.split(' ').map(n=>n[0]).join('');
+    const n = document.createElement('div');
+    n.className = 'whatsapp-notification';
+    n.innerHTML = `<div class="whatsapp-avatar" style="background:${data.avatarColor};">${initials}</div><div class="whatsapp-content"><div class="whatsapp-header"><span class="whatsapp-sender">${data.sender}</span><span class="whatsapp-time">${timeStr}</span></div><div class="whatsapp-message">${data.message}</div><div class="whatsapp-recommendation">📋 Revisa tu estrategia <span class="whatsapp-check">✓✓</span></div></div>`;
+    container.appendChild(n);
+    setTimeout(() => { n.classList.add('removing'); setTimeout(() => { if(n.parentNode) n.parentNode.removeChild(n); }, 300); }, 8000);
+    n.onclick = () => { n.classList.add('removing'); setTimeout(() => { if(n.parentNode) n.parentNode.removeChild(n); }, 300); };
+  },
+  checkKPIs: function(stats) { for (let kpi in stats) { if (stats[kpi] <= 3 && stats[kpi] > 0) { this.show(kpi); break; } } },
+  showPTU: function() { this.showEventReminder('ptu'); },
+  showAguinaldo: function() { this.showEventReminder('aguinaldo'); }
+};
 
 const DILEMAS = [
   ["El Operador Estrella Tóxico","Tu mejor operador cumple el 120% de la meta mensual, pero intimida sistemáticamente a los nuevos ingresos y se niega a seguir la metodología 5S en su estación de trabajo. Los demás operadores temen confrontarlo por su rendimiento.",["Despedirlo aplicando el reglamento interno por faltas repetidas a la disciplina, asumiendo el costo de liquidación y reclutamiento.",[-2,2,-1,2,-1],0],["Asignarle un mentor senior y diseñar un plan de mejora conductual con metas semanales, invirtiendo tiempo de supervisión para recuperar su actitud.",[1,1,-1,0,2],0],["Mantenerlo en su puesto sin intervenir directamente por sus resultados, asumiendo el costo del deterioro del clima como un mal necesario para cumplir la meta.",[2,-2,0,-2,0],5]],
@@ -653,58 +237,58 @@ const DILEMAS = [
   ["El Cuello de Botella Humano","Solo un técnico sabe reparar un equipo crítico importado. Está saturado, trabajando 12 horas diarias, y retrasando toda la planta. Si renuncia, la operación se detiene por meses.",["Contratar a un externo caro temporalmente para aliviar la carga, sacrificando presupuesto pero ganando tiempo para capacitar al equipo interno.",[1,0,-2,0,0],0],["Obligar al técnico a capacitar a otros (bajando su producción temporalmente), invirtiendo en la redundancia de habilidades aunque eso signifique perder productividad hoy.",[-1,1,0,1,2],0],["Ignorar el riesgo y dejar que el técnico trabaje al 150%, asumiendo que eventualmente se quemará o renunciará, pero maximizando la producción a corto plazo.",[2,-2,0,0,-2],6]],
   ["Horas Extra vs. Fatiga del Equipo","Para cumplir la meta mensual, necesitas 40 horas extra. El equipo está agotado, los errores de calidad han subido un 5% y tres operadores han pedido días libres por estrés.",["Exigir las horas extra obligatorias para cumplir la meta, asumiendo el deterioro del clima y el aumento de errores como costos inevitables.",[1,-2,-1,0,-1],4],["Renegociar la fecha de entrega con el cliente, priorizando la salud del equipo y la calidad sobre el cumplimiento estricto del cronograma.",[-1,2,0,1,0],0],["Subcontratar una parte del proceso a un tercero, sacrificando margen de ganancia pero manteniendo al equipo fresco y la calidad alta.",[1,1,-2,0,0],0]],
   ["Cambios de Diseño en Plena Producción","Ingeniería lanza un cambio de diseño a mitad de un lote grande de 5,000 piezas. Detener la línea cuesta $50,000 en tiempo perdido, pero seguir genera inventario obsoleto que deberá venderse con 40% de descuento.",["Detener y aplicar el cambio inmediatamente, asumiendo el costo del paro pero evitando la obsolescencia y protegiendo la reputación de calidad.",[-1,0,-1,1,0],0],["Terminar el lote con el diseño viejo y venderlo con descuento, sacrificando margen pero manteniendo el flujo de producción sin interrupciones.",[1,0,1,0,0],0],["Hacer el cambio manualmente en el producto terminado (retrabajo), sacrificando tiempo, calidad y moral del equipo para evitar el paro de línea.",[-2,-1,-2,0,-1],0]],
-  ["La Meta Imposible","Dirección fija una meta de producción 20% mayor sin dar más recursos ni personal. Tu equipo está desmotivado y sabe que es matemáticamente imposible sin comprometer calidad o seguridad.",["Aceptar la meta y exprimir al equipo con horas extra y presión, asumiendo el deterioro del clima y el riesgo de accidentes como costos del cumplimiento.",[1,-2,-1,-1,-2],5],["Presentar un contrapropósito técnico con datos, argumentando que la meta es inviable y proponiendo alternativas realistas, aunque eso signifique enfrentar la ira de dirección.",[0,1,0,2,1],0],["Fingir que se cumple y alterar los reportes, sacrificando la ética y la transparencia para mantener las apariencias y evitar el conflicto con dirección.",[2,-1,2,-2,-2],15]],
+  ["La Meta Imposible","Dirección fija una meta de producción 20% mayor sin dar más recursos ni personal. Tu equipo está desmotivado y sabe que es matemáticamente imposible sin comprometer calidad o seguridad.",["Aceptar la meta y exprimir al equipo con horas extra y presión, asumiendo el deterioro del clima y el riesgo de accidentes como costos del cumplimiento.",[1,-2,-1,-1,-2],5],["Presentar un contrapropósito técnico con datos, argumentando que la meta es inviable y proponiendo alternativas realistas, aunque eso signifique enfrentar la ira de dirección.",[0,1,0,2,1],0],["Fingir que se cumple y alterar los reportes, sacrificando la ética y la transparencia para mantener las apariencias y evitar el conflicto con dirección.",[1,-1,0,-2,-2],15]],
   ["Recorte en Capacitación","Finanzas exige recortar un 30% el presupuesto de capacitación anual para salvar la utilidad del trimestre. La capacitación es clave para la certificación ISO que se renovará en 6 meses.",["Cancelar toda la capacitación, sacrificando el desarrollo del personal y arriesgando la certificación ISO, pero salvando la utilidad trimestral.",[-2,-2,2,0,-2],3],["Cambiar cursos presenciales por e-learning gratuito de menor calidad, manteniendo algo de capacitación pero reduciendo su impacto real.",[-1,-1,1,0,-1],0],["Negociar con Finanzas mantener el presupuesto usando fondos de contingencia, protegiendo la capacitación pero agotando las reservas para emergencias.",[0,1,-1,1,1],0]],
   ["Multa por Retraso vs. Envío Aéreo","Un error logístico retrasará un envío por tierra 5 días. El cliente aplicará una multa del 10% del valor del pedido. Enviar por avión cuesta el 25% del valor del pedido pero cumple a tiempo.",["Aceptar la multa y enviar por tierra, sacrificando margen pero manteniendo el costo bajo, asumiendo que el cliente entenderá el retraso.",[0,-1,1,0,0],0],["Pagar el envío aéreo, sacrificando un cuarto del valor del pedido pero cumpliendo a tiempo y protegiendo la relación comercial a largo plazo.",[1,1,-2,1,0],0],["Negociar con el cliente un descuento a futuro (15%) en el próximo pedido, manteniendo el envío por tierra pero ofreciendo una compensación comercial.",[0,2,0,1,1],0]],
-  ["Compra a Granel vs. Flujo de Efectivo","Tu proveedor ofrece un 20% de descuento si compras el material de todo el año por adelantado, pero esto consumirá el 80% de tu flujo de caja, dejando a la empresa vulnerable ante imprevistos.",["Comprar a granel, asegurando el descuento y la disponibilidad de material, pero descapitalizando la empresa y arriesgando la insolvencia ante emergencias.",[0,0,2,0,0],0],["Mantener compras mensuales al precio normal, preservando el flujo de caja pero pagando 20% más por el material durante todo el año.",[0,0,-1,0,0],0],["Negociar un 10% de descuento pagando trimestralmente, encontrando un punto medio que preserve algo de flujo pero obtenga un descuento parcial.",[0,0,1,1,0],0]],
+  ["Compra a Granel vs. Flujo de Efectivo","Tu proveedor ofrece un 20% de descuento si compras el material de todo el año por adelantado, pero esto consumirá el 80% de tu flujo de caja, dejando a la empresa vulnerable ante imprevistos.",["Comprar a granel, asegurando el descuento y la disponibilidad de material, pero descapitalizando la empresa y arriesgando la insolvencia ante emergencias.",[0,0,2,0,0],0],["Mantener compras mensuales al precio normal, preservando el flujo de caja pero pagando 20% más por el material durante todo el año.",[0,0,0,0,0],0],["Negociar un 10% de descuento pagando trimestralmente, encontrando un punto medio que preserve algo de flujo pero obtenga un descuento parcial.",[0,0,1,1,0],0]],
   ["Inversión en Automatización","Tienes presupuesto para automatizar un proceso (reduce 5 puestos operativos) o para dar bonos de retención a la plantilla actual (30 personas). No alcanza para ambas cosas.",["Automatizar y reubicar al personal en otras áreas (si es posible), modernizando la planta pero generando incertidumbre y resistencia al cambio.",[2,-1,-2,1,-1],0],["Automatizar y despedir al personal excedente, maximizando la eficiencia pero destruyendo el clima laboral y la lealtad del equipo restante.",[2,-2,2,-1,-2],4],["Dar los bonos y mantener el proceso manual, priorizando la moral del equipo pero perdiendo la oportunidad de modernización y eficiencia a largo plazo.",[-1,2,-2,0,1],0]],
   ["Reducción de Costos en Insumos","Compras un lubricante para máquinas un 15% más barato, pero el fabricante no especifica si es biodegradable y no tiene certificaciones ambientales. El actual es costoso pero certificado.",["Comprar el barato, ahorrando 15% en costos pero arriesgando multas ambientales y daño a la reputación si el producto no cumple normativas.",[1,-1,2,-1,0],10],["Mantener el costoso y certificado, protegiendo el cumplimiento ambiental y la reputación, pero pagando 15% más durante todo el año.",[0,1,-1,1,0],0],["Pedir una muestra y probarlo antes de decidir, invirtiendo tiempo en validación pero obteniendo información clave antes de comprometer el presupuesto.",[0,0,0,2,1],0]],
-  ["El Accidente Menor No Reportado","Un operador se hace un corte leve en la mano. Te pide no reportarlo para no afectar el bono de seguridad del equipo (que todos esperan). El corte es superficial y ya está controlado.",["No reportarlo para proteger el bono del equipo, priorizando la moral inmediata sobre el cumplimiento legal y la cultura de seguridad a largo plazo.",[1,1,1,-2,-1],12],["Reportarlo y aplicar el protocolo de seguridad, cumpliendo la ley y reforzando la cultura de reporte, aunque eso signifique perder el bono y enfrentar el enojo del equipo.",[-1,-1,-1,2,0],0],["Curarlo en el momento y registrar como 'casi accidente', encontrando un punto medio que protege el bono pero documenta el incidente para análisis futuro.",[0,0,0,-1,1],3]],
+  ["El Accidente Menor No Reportado","Un operador se hace un corte leve en la mano. Te pide no reportarlo para no afectar el bono de seguridad del equipo (que todos esperan). El corte es superficial y ya está controlado.",["No reportarlo para proteger el bono del equipo, priorizando la moral inmediata sobre el cumplimiento legal y la cultura de seguridad a largo plazo.",[1,1,0,-2,-1],12],["Reportarlo y aplicar el protocolo de seguridad, cumpliendo la ley y reforzando la cultura de reporte, aunque eso signifique perder el bono y enfrentar el enojo del equipo.",[-1,-1,0,2,0],0],["Curarlo en el momento y registrar como 'casi accidente', encontrando un punto medio que protege el bono pero documenta el incidente para análisis futuro.",[0,0,0,0,1],3]],
   ["El Cliente Pide Saltarse una Prueba","Tu cliente más grande te pide que omitas una prueba de calidad destructiva porque 'urge' el producto, ofreciéndote firmar una exención de responsabilidad. La prueba cuesta $20,000 y tarda 2 días.",["Omitir la prueba y confiar en el proceso, ahorrando tiempo y dinero pero arriesgando un defecto no detectado que podría dañar la reputación y generar demandas.",[2,0,1,-2,-1],15],["Negarte y arriesgar perder el pedido, protegiendo la integridad del producto y el cumplimiento normativo, aunque eso signifique enfrentar la ira del cliente.",[-1,1,-1,2,1],0],["Hacer la prueba a una muestra reducida (riesgo estadístico), encontrando un punto medio que reduce el costo y tiempo pero mantiene algo de validación.",[1,0,0,-1,0],5]],
-  ["Fatiga en el Turno Nocturno","Notas que los operadores del turno nocturno cometen errores por fatiga, pero no hay presupuesto para contratar un relevo. Los errores están generando merma y reprocesos.",["Implementar pausas activas obligatorias cada hora, sacrificando algo de productividad pero reduciendo errores y mejorando la salud del equipo.",[-1,1,0,1,1],0],["Aumentar la iluminación y poner café gratis, una solución de bajo costo que mitiga la fatiga pero no la elimina, arriesgando que los errores continúen.",[0,2,-1,0,0],0],["Rotar al personal diurno para cubrir algunas noches, distribuyendo la carga pero generando resentimiento y fatiga en ambos turnos.",[-1,-1,-1,1,-1],0]],
-  ["Proveedor con Desviaciones Leves","Tu proveedor principal de empaques tiene desviaciones de color leves. No afecta la función del producto, pero el cliente podría quejarse y dañar la percepción de calidad.",["Rechazar el lote y parar la línea, protegiendo la calidad percibida pero sacrificando producción y generando un conflicto con el proveedor.",[-2,0,-1,1,0],0],["Aceptar el lote y pedir plan de acción correctivo, manteniendo la producción pero arriesgando quejas del cliente y deterioro de la reputación.",[1,0,0,-1,1],0],["Mezclar el lote nuevo con inventario viejo para disimular, una solución creativa pero poco ética que arriesga la confianza del cliente si se descubre.",[2,-1,1,-2,-1],10]],
+  ["Fatiga en el Turno Nocturno","Notas que los operadores del turno nocturno cometen errores por fatiga, pero no hay presupuesto para contratar un relevo. Los errores están generando merma y reprocesos.",["Implementar pausas activas obligatorias cada hora, sacrificando algo de productividad pero reduciendo errores y mejorando la salud del equipo.",[-1,1,0,1,1],0],["Aumentar la iluminación y poner café gratis, una solución de bajo costo que mitiga la fatiga pero no la elimina, arriesgando que los errores continúen.",[0,2,-1,0,0],0],["Rotar al personal diurno para cubrir algunas noches, distribuyendo la carga pero generando resentimiento y fatiga en ambos turnos.",[-1,-1,0,1,-1],0]],
+  ["Proveedor con Desviaciones Leves","Tu proveedor principal de empaques tiene desviaciones de color leves. No afecta la función del producto, pero el cliente podría quejarse y dañar la percepción de calidad.",["Rechazar el lote y parar la línea, protegiendo la calidad percibida pero sacrificando producción y generando un conflicto con el proveedor.",[-2,0,-1,1,0],0],["Aceptar el lote y pedir plan de acción correctivo, manteniendo la producción pero arriesgando quejas del cliente y deterioro de la reputación.",[1,0,0,-1,1],0],["Mezclar el lote nuevo con inventario viejo para disimular, una solución creativa pero poco ética que arriesga la confianza del cliente si se descubre.",[2,-1,0,-2,-1],10]],
   ["EPP Incómodo vs. EPP Seguro","Los nuevos guantes de seguridad son ergonómicos pero reducen la sensibilidad táctil, bajando la productividad un 5%. Los viejos son inseguros pero permiten trabajar más rápido.",["Exigir los nuevos guantes (seguridad primero), priorizando la protección del personal sobre la productividad, aunque eso signifique perder 5% de eficiencia.",[-1,-1,0,2,0],0],["Dejar elegir al operador, respetando la autonomía individual pero creando un estándar dual que complica la supervisión y arriesga accidentes.",[0,1,0,-2,0],3],["Buscar un tercer proveedor más caro que cumpla ambos requisitos (seguridad y ergonomía), sacrificando presupuesto pero obteniendo la solución ideal.",[1,2,-2,1,1],0]],
   ["El Proveedor Único Sube Precios","Tu único proveedor de un componente crítico te notifica un aumento del 20% para el próximo mes. No hay proveedores alternativos calificados y el cambio tardaría 2 meses.",["Aceptar el aumento para no parar, absorbiendo el costo y reduciendo el margen, pero manteniendo la operación estable y la relación con el proveedor.",[0,0,-2,0,-1],0],["Rechazar y buscar un proveedor alternativo (tardará 2 meses), arriesgando un paro temporal pero ganando poder de negociación y redundancia a largo plazo.",[-2,-1,-1,1,1],0],["Amenazar con cancelar y negociar a un 10%, usando tácticas agresivas para reducir el impacto pero arriesgando dañar la relación comercial.",[-1,-1,0,1,0],2]],
-  ["Retraso en Aduanas","La materia prima está retenida en aduanas por un error documental. El cliente final exige la entrega para el viernes o cancelará el contrato. Tienes 3 días para resolver.",["Pagar un despachante urgente (costo altísimo), sacrificando presupuesto pero garantizando la entrega y protegiendo el contrato.",[2,1,-2,1,0],0],["Avisar al cliente del retraso y ofrecer descuento, siendo transparente pero arriesgando la cancelación del contrato y el daño a la relación comercial.",[-1,2,1,1,1],0],["Tomar prestado material de la competencia (alianza temporal), una solución creativa que preserva la entrega pero genera una deuda con un competidor.",[1,0,0,-1,2],0]],
-  ["Inventario Fantasma","El sistema dice que hay 1,000 piezas, pero en el almacén solo hay 800. Las ventas dependen de ese inventario para cumplir pedidos esta semana. Alguien firmó una salida no registrada.",["Vender las 800 y cancelar el resto de pedidos, siendo transparente con los clientes pero perdiendo ventas y dañando la reputación de cumplimiento.",[-1,-1,0,1,0],0],["Ajustar el sistema y comprar de emergencia, sacrificando presupuesto para cubrir el faltante pero manteniendo el cumplimiento con los clientes.",[0,0,-2,2,1],0],["Ocultar el error y esperar que el proveedor reponga rápido, una apuesta arriesgada que preserva las ventas pero arriesga el incumplimiento si el proveedor falla.",[1,-1,1,-2,-2],8]],
+  ["Retraso en Aduanas","La materia prima está retenida en aduanas por un error documental. El cliente final exige la entrega para el viernes o cancelará el contrato. Tienes 3 días para resolver.",["Pagar un despachante urgente (costo altísimo), sacrificando presupuesto pero garantizando la entrega y protegiendo el contrato.",[2,1,-2,1,0],0],["Avisar al cliente del retraso y ofrecer descuento, siendo transparente pero arriesgando la cancelación del contrato y el daño a la relación comercial.",[-1,2,0,1,1],0],["Tomar prestado material de la competencia (alianza temporal), una solución creativa que preserva la entrega pero genera una deuda con un competidor.",[1,0,0,-1,2],0]],
+  ["Inventario Fantasma","El sistema dice que hay 1,000 piezas, pero en el almacén solo hay 800. Las ventas dependen de ese inventario para cumplir pedidos esta semana. Alguien firmó una salida no registrada.",["Vender las 800 y cancelar el resto de pedidos, siendo transparente con los clientes pero perdiendo ventas y dañando la reputación de cumplimiento.",[-1,-1,0,1,0],0],["Ajustar el sistema y comprar de emergencia, sacrificando presupuesto para cubrir el faltante pero manteniendo el cumplimiento con los clientes.",[0,0,-2,2,1],0],["Ocultar el error y esperar que el proveedor reponga rápido, una apuesta arriesgada que preserva las ventas pero arriesga el incumplimiento si el proveedor falla.",[1,-1,0,-2,-2],8]],
   ["Outsourcing vs. Flota Propia","Tus camiones propios se están averiando mucho, generando retrasos y costos de mantenimiento. Una empresa logística ofrece externalizar todo por un costo fijo mensual 15% mayor que tu costo actual.",["Externalizar (Outsourcing), sacrificando control directo y pagando 15% más, pero eliminando los dolores de cabeza del mantenimiento y garantizando cumplimiento.",[1,1,-1,0,-1],0],["Vender los camiones y comprar nuevos, invirtiendo capital fuerte pero renovando la flota y manteniendo el control interno de la logística.",[-1,0,-2,1,0],0],["Mantener los propios y contratar un mecánico interno, invirtiendo en capacidad interna pero asumiendo el riesgo de que las averías continúen.",[0,-1,-1,1,1],0]],
-  ["Error de Etiquetado Masivo","Descubres que 5,000 productos ya están en el almacén del cliente con la etiqueta de ingredientes en otro idioma por un error de impresión. El cliente exige solución inmediata.",["Ir a re-etiquetar todo con tu equipo (costo de viáticos y horas extra), sacrificando presupuesto pero corrigiendo el error y protegiendo la relación comercial.",[-1,2,-2,1,0],0],["Enviar un instructivo digital al cliente, una solución de bajo costo pero que traslada el problema al cliente y arriesga su insatisfacción.",[1,-2,1,-1,-1],3],["Asumir la pérdida y destruir el lote, sacrificando el valor del producto pero evitando el riesgo de que el producto llegue al mercado con etiquetas incorrectas.",[-2,-1,-2,2,0],0]],
+  ["Error de Etiquetado Masivo","Descubres que 5,000 productos ya están en el almacén del cliente con la etiqueta de ingredientes en otro idioma por un error de impresión. El cliente exige solución inmediata.",["Ir a re-etiquetar todo con tu equipo (costo de viáticos y horas extra), sacrificando presupuesto pero corrigiendo el error y protegiendo la relación comercial.",[-1,2,-2,1,0],0],["Enviar un instructivo digital al cliente, una solución de bajo costo pero que traslada el problema al cliente y arriesga su insatisfacción.",[1,-2,0,-1,-1],3],["Asumir la pérdida y destruir el lote, sacrificando el valor del producto pero evitando el riesgo de que el producto llegue al mercado con etiquetas incorrectas.",[-2,-1,-2,2,0],0]],
   ["Denuncia Anónima de Acoso","Recibes un buzón anónimo acusando a tu gerente de área de tratos humillantes. No hay pruebas físicas, pero el clima está tenso y varios empleados han pedido transferencia.",["Ignorarlo por falta de pruebas formales, priorizando la estabilidad del gerente pero arriesgando que el acoso continúe y el clima se deteriore.",[1,-2,0,-2,-1],12],["Iniciar una investigación de clima y entrevistas confidenciales, invirtiendo tiempo y recursos en validar la denuncia pero protegiendo al personal.",[-1,2,-1,2,1],0],["Cambiar al acusado de área 'para evitar problemas', una solución política que protege al acusado pero no aborda la raíz del problema y genera precedentes peligrosos.",[0,-1,0,-1,0],5]],
-  ["La Idea del Pasante vs. Burocracia","Un pasante propone una idea que ahorra un 10% en costos, pero requiere saltarse 3 niveles de aprobación jerárquica. La idea es brillante pero rompe el conducto regular.",["Rechazarla por no seguir el conducto regular, protegiendo la jerarquía pero perdiendo una oportunidad de ahorro y desmotivando al talento joven.",[0,-1,0,1,-2],0],["Apadrinar la idea y presentarla tú a la dirección, usando tu influencia para saltar la burocracia y capitalizar la idea, aunque eso genere resentimiento en los niveles intermedios.",[2,2,2,-1,2],0],["Decirle al pasante que la defienda él solo en el comité, empoderándolo pero arriesgando que la idea sea rechazada por falta de respaldo gerencial.",[1,1,2,1,-1],0]],
-  ["Conflicto de Interés","Descubres que el encargado de compras está adjudicando contratos a una empresa que es propiedad de su cuñado. Los precios son competitivos, pero viola el código de ética.",["No hacer nada, ya que los precios son buenos, priorizando el ahorro pero ignorando una violación ética que podría escalar y dañar la reputación.",[1,-1,1,-2,-1],10],["Confrontarlo y exigir la declaración de conflicto, abordando el problema de frente pero arriesgando perder al encargado de compras y generar tensión.",[0,-2,0,2,0],0],["Reportarlo anónimamente a auditoría interna, protegiendo tu posición pero delegando la responsabilidad y arriesgando que la investigación sea lenta o inefectiva.",[0,-1,0,2,1],0]],
-  ["Uso de Redes Sociales en Horas Laborales","La productividad bajó un 8% este mes. Notas que el equipo pasa mucho tiempo en redes sociales, pero cumplen sus metas individuales. No hay quejas de clientes.",["Bloquear el acceso a internet en la planta, recuperando el enfoque pero generando resentimiento y tratando a los empleados como niños.",[1,-2,0,2,-1],0],["Establecer políticas claras de uso de celular, creando reglas que respeten la autonomía pero establecen límites, aunque eso requiera supervisión adicional.",[0,1,0,1,0],0],["No intervenir, ya que cumplen sus objetivos, priorizando los resultados sobre el proceso pero arriesgando que la distracción escale y afecte la calidad.",[1,1,0,-1,1],0]],
-  ["Rumores de Reestructuración","Circula el rumor de que la empresa va a despedir al 20% del personal. Tu equipo está nervioso, buscando otro empleo y la productividad ha caído. No hay información oficial.",["Negar todo rotundamente para calmar los ánimos, protegiendo la moral inmediata pero arriesgando que la verdad salga a la luz y destruya tu credibilidad.",[1,-1,0,-1,-1],8],["Ser transparente y decir que 'se están evaluando opciones', siendo honesto pero generando más incertidumbre y acelerando la fuga de talento.",[-1,-2,0,1,-1],0],["Organizar una junta para escuchar sus preocupaciones sin dar cifras, validando sus emociones y manteniendo la comunicación abierta sin comprometer información confidencial.",[0,2,0,2,2],0]],
-  ["Cliente VIP Exige Saltar Control de Calidad","Tu cliente más grande pide saltar la inspección final para recibir el lote hoy, asumiendo el riesgo por escrito. La inspección tarda 1 día y es clave para detectar defectos.",["Saltar la inspección y enviar, priorizando la relación comercial y el cumplimiento inmediato, pero arriesgando que un defecto llegue al cliente final.",[2,0,1,-2,-1],12],["Negarse y retrasar el envío 1 día, protegiendo la integridad del producto pero arriesgando que el cliente cancele el pedido o busque otro proveedor.",[-1,1,0,2,1],0],["Hacer una inspección express (al 50%), encontrando un punto medio que reduce el tiempo pero mantiene algo de validación, aunque con menor rigor.",[1,-1,0,-1,0],3]],
-  ["Guerra de Presupuestos entre Áreas","Producción y Ventas pelean por el mismo fondo de contingencia ($100,000). Producción necesita mantenimiento urgente; Ventas necesita viáticos para cerrar un contrato clave. Ambos tienen argumentos válidos.",["Darlo a Producción (Mantenimiento), priorizando la operación interna pero arriesgando perder el contrato de ventas que podría generar millones.",[1,-1,-1,1,0],0],["Darlo a Ventas (Viáticos y cenas), priorizando el ingreso comercial pero arriesgando una falla en producción que podría detener la planta.",[-1,1,-1,-1,1],0],["Dividirlo 50/50 y que se arreglen, una solución salomónica que deja a ambos insatisfechos pero evita tomar una decisión impopular.",[0,0,-2,-1,0],0]],
-  ["El Regalo del Proveedor","Un proveedor clave te envía un reloj de lujo (valor $5,000) como 'regalo de fin de año'. Es costumbre en el sector, pero viola el código de ética de la empresa.",["Quedárselo y no decir nada, beneficiándote personalmente pero violando el código de ética y arriesgando tu credibilidad si se descubre.",[1,-1,1,-2,-1],15],["Devolverlo y citar el código de ética, protegiendo tu integridad pero arriesgando dañar la relación con el proveedor y perder futuros beneficios.",[0,1,0,2,1],0],["Donarlo a una rifa del equipo, una solución creativa que evita el beneficio personal pero mantiene la relación con el proveedor y genera buena voluntad.",[0,2,0,1,1],0]],
+  ["La Idea del Pasante vs. Burocracia","Un pasante propone una idea que ahorra un 10% en costos, pero requiere saltarse 3 niveles de aprobación jerárquica. La idea es brillante pero rompe el conducto regular.",["Rechazarla por no seguir el conducto regular, protegiendo la jerarquía pero perdiendo una oportunidad de ahorro y desmotivando al talento joven.",[0,-1,0,1,-2],0],["Apadrinar la idea y presentarla tú a la dirección, usando tu influencia para saltar la burocracia y capitalizar la idea, aunque eso genere resentimiento en los niveles intermedios.",[2,2,1,-1,2],0],["Decirle al pasante que la defienda él solo en el comité, empoderándolo pero arriesgando que la idea sea rechazada por falta de respaldo gerencial.",[1,1,1,1,-1],0]],
+  ["Conflicto de Interés","Descubres que el encargado de compras está adjudicando contratos a una empresa que es propiedad de su cuñado. Los precios son competitivos, pero viola el código de ética.",["No hacer nada, ya que los precios son buenos, priorizando el ahorro pero ignorando una violación ética que podría escalar y dañar la reputación.",[0,-1,0,-2,-1],10],["Confrontarlo y exigir la declaración de conflicto, abordando el problema de frente pero arriesgando perder al encargado de compras y generar tensión.",[0,-2,0,2,0],0],["Reportarlo anónimamente a auditoría interna, protegiendo tu posición pero delegando la responsabilidad y arriesgando que la investigación sea lenta o inefectiva.",[0,-1,0,2,1],0]],
+  ["Uso de Redes Sociales en Horas Laborales","La productividad bajó un 8% este mes. Notas que el equipo pasa mucho tiempo en redes sociales, pero cumplen sus metas individuales. No hay quejas de clientes.",["Bloquear el acceso a internet en la planta, recuperando el enfoque pero generando resentimiento y tratando a los empleados como niños.",[1,-2,0,2,-1],0],["Establecer políticas claras de uso de celular, creando reglas que respeten la autonomía pero establecen límites, aunque eso requiera supervisión adicional.",[0,1,0,1,0],0],["No intervenir, ya que cumplen sus objetivos, priorizando los resultados sobre el proceso pero arriesgando que la distracción escale y afecte la calidad.",[0,1,0,-1,1],0]],
+  ["Rumores de Reestructuración","Circula el rumor de que la empresa va a despedir al 20% del personal. Tu equipo está nervioso, buscando otro empleo y la productividad ha caído. No hay información oficial.",["Negar todo rotundamente para calmar los ánimos, protegiendo la moral inmediata pero arriesgando que la verdad salga a la luz y destruya tu credibilidad.",[0,-1,0,-1,-1],0],["Ser transparente y decir que 'se están evaluando opciones', siendo honesto pero generando más incertidumbre y acelerando la fuga de talento.",[-1,-2,0,1,-1],0],["Organizar una junta para escuchar sus preocupaciones sin dar cifras, validando sus emociones y manteniendo la comunicación abierta sin comprometer información confidencial.",[0,2,0,2,2],0]],
+  ["Cliente VIP Exige Saltar Control de Calidad","Tu cliente más grande pide saltar la inspección final para recibir el lote hoy, asumiendo el riesgo por escrito. La inspección tarda 1 día y es clave para detectar defectos.",["Saltar la inspección y enviar, priorizando la relación comercial y el cumplimiento inmediato, pero arriesgando que un defecto llegue al cliente final.",[2,0,0,-2,-1],12],["Negarse y retrasar el envío 1 día, protegiendo la integridad del producto pero arriesgando que el cliente cancele el pedido o busque otro proveedor.",[-1,1,0,2,1],0],["Hacer una inspección express (al 50%), encontrando un punto medio que reduce el tiempo pero mantiene algo de validación, aunque con menor rigor.",[1,-1,0,-1,0],3]],
+  ["Guerra de Presupuestos entre Áreas","Producción y Ventas pelean por el mismo fondo de contingencia ($100,000). Producción necesita mantenimiento urgente; Ventas necesita viáticos para cerrar un contrato clave. Ambos tienen argumentos válidos.",["Darlo a Producción (Mantenimiento), priorizando la operación interna pero arriesgando perder el contrato de ventas que podría generar millones.",[1,-1,-1,1,0],0],["Darlo a Ventas (Viáticos y cenas), priorizando el ingreso comercial pero arriesgando una falla en producción que podría detener la planta.",[-1,1,-1,-1,1],0],["Dividirlo 50/50 y que se arreglen, una solución salomónica que deja a ambos insatisfechos pero evita tomar una decisión impopular.",[0,0,-1,-1,0],0]],
+  ["El Regalo del Proveedor","Un proveedor clave te envía un reloj de lujo (valor $5,000) como 'regalo de fin de año'. Es costumbre en el sector, pero viola el código de ética de la empresa.",["Quedárselo y no decir nada, beneficiándote personalmente pero violando el código de ética y arriesgando tu credibilidad si se descubre.",[1,-1,0,-2,-1],15],["Devolverlo y citar el código de ética, protegiendo tu integridad pero arriesgando dañar la relación con el proveedor y perder futuros beneficios.",[0,1,0,2,1],0],["Donarlo a una rifa del equipo, una solución creativa que evita el beneficio personal pero mantiene la relación con el proveedor y genera buena voluntad.",[0,2,0,1,1],0]],
   ["Licencia de Maternidad/Paternidad Larga","Tu único analista de programación se va 3 meses por licencia. No hay presupuesto para un temporal senior. Su trabajo es crítico para el sistema ERP.",["Repartir su carga y pagar horas extra al equipo, sacrificando el presupuesto y la moral pero manteniendo la operación.",[0,-2,-1,0,-1],0],["Contratar a un junior barato y capacitarlo, invirtiendo tiempo en formación pero arriesgando errores durante la curva de aprendizaje.",[-1,0,-1,0,1],0],["Hacer tú mismo su trabajo (Microgestión), sacrificando tu tiempo estratégico pero garantizando que el trabajo se haga correctamente.",[-2,-1,0,1,-2],0]],
   ["Fuga de Información Confidencial","Un empleado renunciado se llevó en un USB los manuales de procesos internos. Amenaza con venderlos a la competencia si no le pagas una 'compensación'.",["Demandarlo (Gasto legal alto), protegiendo la propiedad intelectual pero sacrificando presupuesto y tiempo en un proceso legal incierto.",[0,-1,-2,1,0],0],["Negociar un acuerdo de confidencialidad, pagando algo pero evitando el litigio y protegiendo la información de forma rápida.",[0,0,-1,1,1],0],["Ignorarlo y cambiar las contraseñas internas, asumiendo el riesgo pero evitando el costo legal y la confrontación.",[-1,0,0,2,0],5]],
-  ["Promoción Interna vs. Talento Externo","Vacante de supervisor. Tienes a un operador leal (10 años) pero sin habilidades de liderazgo, o un externo caro pero experto en gestión de equipos.",["Promover al operador leal, premiando la lealtad pero arriesgando que no tenga las habilidades para liderar y genere resentimiento en el equipo.",[0,2,-1,1,-1],0],["Contratar al externo caro, trayendo experiencia pero arriesgando el resentimiento del equipo interno y el costo de adaptación.",[-1,-1,-2,1,2],0],["Hacer un concurso interno abierto, dando oportunidad a todos pero generando incertidumbre y posible resentimiento entre los que no sean seleccionados.",[-1,1,-1,2,1],0]],
-  ["Subida de Licencias de Software","El ERP y el software de diseño aumentan su suscripción anual un 40%. Sin ellos, la operación se detiene. El presupuesto no alcanza para cubrir el aumento.",["Pagar y recortar otros gastos, asegurando la continuidad pero sacrificando otras áreas críticas como mantenimiento o capacitación.",[0,-1,-2,1,0],0],["Buscar alternativas Open Source (Curva lenta), ahorrando a largo plazo pero arriesgando la productividad durante la transición y la resistencia del equipo.",[-2,0,1,1,1],0],["Negociar reducir usuarios (Riesgo de cuellos), bajando el costo pero arriesgando que algunos empleados no tengan acceso y se generen cuellos de botella.",[-1,0,-1,-1,-1],0]],
-  ["Queja en LinkedIn de un Ex-empleado","Un ex-colaborador publica un hilo viral criticando la cultura tóxica de tu planta. Tiene 10,000 seguidores y el post está ganando tracción. Afecta la contratación de talento.",["Demandarlo por difamación, protegiendo la reputación pero gastando en abogados y generando más publicidad negativa.",[0,-2,-2,1,-1],3],["Responder corporativamente con empatía, abordando las preocupaciones públicamente y mostrando transparencia, aunque eso signifique admitir fallas.",[0,1,-1,1,1],0],["Ignorar y bloquear la cuenta, evitando la confrontación pero arriesgando que el post escale y dañe la marca empleadora.",[-1,-1,0,-1,-2],0]],
+  ["Promoción Interna vs. Talento Externo","Vacante de supervisor. Tienes a un operador leal (10 años) pero sin habilidades de liderazgo, o un externo caro pero experto en gestión de equipos.",["Promover al operador leal, premiando la lealtad pero arriesgando que no tenga las habilidades para liderar y genere resentimiento en el equipo.",[0,2,-1,1,-1],0],["Contratar al externo caro, trayendo experiencia pero arriesgando el resentimiento del equipo interno y el costo de adaptación.",[-1,-1,-2,1,2],0],["Hacer un concurso interno abierto, dando oportunidad a todos pero generando incertidumbre y posible resentimiento entre los que no sean seleccionados.",[-1,1,0,2,1],0]],
+  ["Subida de Licencias de Software","El ERP y el software de diseño aumentan su suscripción anual un 40%. Sin ellos, la operación se detiene. El presupuesto no alcanza para cubrir el aumento.",["Pagar y recortar otros gastos, asegurando la continuidad pero sacrificando otras áreas críticas como mantenimiento o capacitación.",[0,-1,-2,1,0],0],["Buscar alternativas Open Source (Curva lenta), ahorrando a largo plazo pero arriesgando la productividad durante la transición y la resistencia del equipo.",[-2,0,1,1,1],0],["Negociar reducir usuarios (Riesgo de cuellos), bajando el costo pero arriesgando que algunos empleados no tengan acceso y se generen cuellos de botella.",[-1,0,1,-1,-1],0]],
+  ["Queja en LinkedIn de un Ex-empleado","Un ex-colaborador publica un hilo viral criticando la cultura tóxica de tu planta. Tiene 10,000 seguidores y el post está ganando tracción. Afecta la contratación de talento.",["Demandarlo por difamación, protegiendo la reputación pero gastando en abogados y generando más publicidad negativa.",[0,-2,-2,1,-1],3],["Responder corporativamente con empatía, abordando las preocupaciones públicamente y mostrando transparencia, aunque eso signifique admitir fallas.",[0,1,0,1,1],0],["Ignorar y bloquear la cuenta, evitando la confrontación pero arriesgando que el post escale y dañe la marca empleadora.",[-1,-1,0,-1,-2],0]],
   ["Protesta Ecológica en las Puertas","Activistas bloquean la entrada principal exigiendo cambios en tus emisiones. Retrasan los camiones y generan mala publicidad. La policía no actuará sin una orden judicial.",["Llamar a la policía para desalojar, recuperando el acceso pero generando confrontación y más publicidad negativa.",[1,-2,0,2,-1],5],["Salir a negociar y escuchar sus demandas, mostrando apertura pero arriesgando ceder ante presiones y sentar un precedente.",[-1,2,0,1,1],0],["Desviar los camiones por la bodega trasera, una solución logística que evita la confrontación pero incrementa costos y tiempos de entrega.",[0,-1,-1,0,0],0]],
-  ["Refacciones Falsificadas","Descubres que el almacén compró rodamientos 'alternativos' que resultaron ser falsificaciones chinas de mala calidad. Ya están instalados en 3 máquinas críticas.",["Parar y tirar todo el lote, protegiendo la calidad pero sacrificando producción y tiempo para conseguir refacciones originales.",[-2,0,-2,2,0],0],["Usarlos hasta que fallen (Riesgo), maximizando la producción a corto plazo pero arriesgando fallas catastróficas y daños mayores.",[2,0,1,-2,-1],15],["Exigir reembolso al proveedor (Tarda meses), recuperando el dinero pero asumiendo el riesgo de las refacciones falsas durante el proceso.",[-1,0,-1,1,1],0]],
+  ["Refacciones Falsificadas","Descubres que el almacén compró rodamientos 'alternativos' que resultaron ser falsificaciones chinas de mala calidad. Ya están instalados en 3 máquinas críticas.",["Parar y tirar todo el lote, protegiendo la calidad pero sacrificando producción y tiempo para conseguir refacciones originales.",[-2,0,-2,2,0],0],["Usarlos hasta que fallen (Riesgo), maximizando la producción a corto plazo pero arriesgando fallas catastróficas y daños mayores.",[2,0,0,-2,-1],15],["Exigir reembolso al proveedor (Tarda meses), recuperando el dinero pero asumiendo el riesgo de las refacciones falsas durante el proceso.",[-1,0,0,1,1],0]],
   ["El Proyecto de Innovación vs. Operación Diaria","Tu mejor ingeniero quiere dedicar 1 mes a un proyecto de mejora que ahorrará $500,000 al año. Pero la operación diaria lo necesita ya para resolver problemas urgentes.",["Dejarlo en el proyecto de innovación, sacrificando la operación a corto plazo pero ganando una mejora estructural a largo plazo.",[-2,1,0,1,2],0],["Negarle el proyecto y mantenerlo en operación, priorizando el día a día pero perdiendo la oportunidad de innovación y ahorro.",[1,-1,0,0,-2],0],["Darle solo los viernes (Riesgo de burnout), encontrando un punto medio pero arriesgando que el ingeniero se agote y no termine ni el proyecto ni la operación.",[0,0,0,1,-1],0]],
-  ["Brote de Enfermedad en Planta","15 operadores faltan por un virus estomacal. La línea está al 50% de capacidad. Los pedidos urgentes no pueden esperar.",["Obligar a los sanos a hacer dobles turnos, sacrificando su salud y moral pero manteniendo la producción.",[-1,-2,-1,1,-1],3],["Cerrar líneas no críticas y concentrar personal, priorizando los pedidos clave pero incumpliendo con otros clientes.",[0,1,0,2,0],0],["Pagar horas extra triple a voluntarios, incentivando con dinero pero sacrificando el presupuesto y arriesgando que nadie acepte por miedo al contagio.",[1,-1,-2,0,1],0]],
+  ["Brote de Enfermedad en Planta","15 operadores faltan por un virus estomacal. La línea está al 50% de capacidad. Los pedidos urgentes no pueden esperar.",["Obligar a los sanos a hacer dobles turnos, sacrificando su salud y moral pero manteniendo la producción.",[-1,-2,-1,1,-1],0],["Cerrar líneas no críticas y concentrar personal, priorizando los pedidos clave pero incumpliendo con otros clientes.",[0,1,0,2,0],0],["Pagar horas extra triple a voluntarios, incentivando con dinero pero sacrificando el presupuesto y arriesgando que nadie acepte por miedo al contagio.",[1,-1,-2,0,1],0]],
   ["Reestructuración Global (Layoff)","Corporativo ordena reducir la plantilla un 10% para salvar la rentabilidad anual. Tienes 1 semana para ejecutarlo.",["Ejecutar despidos secos (Alto impacto), cumpliendo la orden pero destruyendo la moral del equipo restante y generando miedo.",[1,-2,1,-1,-2],5],["Ofrecer retiros voluntarios incentivados, dando opción al personal pero arriesgando que no se alcance el 10% y tengas que hacer despidos forzosos después.",[0,1,-2,1,0],0],["Reducir jornada laboral y sueldos temporalmente, evitando despidos pero generando insatisfacción y posible fuga de talento clave.",[-2,-1,1,2,1],0]],
   ["El Sindicato Pide 'Cuota Extra'","El líder sindical ofrece paz laboral por 2 años si la empresa aumenta un 5% la cuota sindical opcional. Es ilegal, pero garantiza estabilidad.",["Aceptar para evitar huelgas, comprando paz pero violando la ley y arriesgando sanciones si se descubre.",[1,1,-1,-2,0],15],["Negarme y preparar plan de contingencia, protegiendo el cumplimiento pero arriesgando una huelga que podría detener la planta.",[-1,-1,0,2,1],0],["Sobornar al líder por fuera (Ilegal), una solución corrupta que garantiza paz pero te hace vulnerable a extorsiones futuras.",[0,-2,-1,-2,-1],20]],
-  ["Garantía vs. Servicio Técnico Lento","La máquina principal falla. La garantía cubre todo, pero el técnico oficial tarda 3 semanas en llegar. Cada día de paro cuesta $20,000.",["Esperar al técnico oficial (Paro parcial), cumpliendo la garantía pero sacrificando $420,000 en producción perdida.",[-2,0,-1,1,0],0],["Pagar a un técnico local (Pierdes garantía), recuperando la operación rápidamente pero asumiendo el costo del servicio y perdiendo la cobertura futura.",[1,0,-2,0,1],0],["Intentar repararla con tu equipo (Riesgo), ahorrando dinero pero arriesgando dañar más el equipo y perder la garantía.",[0,-1,0,-1,-1],3]],
-  ["Ventas Promete lo Imposible","El gerente de ventas cerró un trato con entrega en 3 días. Producción necesita 7 días mínimo. El contrato ya está firmado.",["Acelerar línea y pagar horas extra masivas, cumpliendo el compromiso pero sacrificando presupuesto y la salud del equipo.",[1,-2,-2,0,-1],0],["Hablar con el cliente y renegociar a 7 días, siendo honesto pero arriesgando que el cliente cancele y demande por incumplimiento.",[-1,1,1,1,1],0],["Entregar un lote parcial en 3 días (Costo logístico), cumpliendo parcialmente pero generando costos adicionales de envío fraccionado.",[0,0,-1,1,0],0]],
-  ["Denuncia de Discriminación","Un empleado acusa a su jefe de asignarle las peores tareas por su origen regional. No hay testigos, pero el empleado está documentando todo y amenaza con ir a la CONAPRED.",["Suspender al jefe preventivamente, protegiendo al empleado pero arriesgando que la acusación sea falsa y pierdas a un gerente valioso.",[-1,1,0,2,-1],0],["Mediar y rotar al empleado de área, resolviendo el conflicto inmediato pero sin abordar la raíz del problema ni castigar al jefe.",[0,0,0,1,0],0],["Ignorar por falta de pruebas (Riesgo legal), evitando el conflicto interno pero arriesgando una demanda legal y daño reputacional.",[1,-2,1,-2,-1],12]],
-  ["Inspección Sorpresa de la Secretaría","Llegan inspectores federales. Todo está bien, pero requieren que detengas la línea 4 horas para revisar documentos. Eso retrasa los pedidos del día.",["Cooperar y detener la línea, cumpliendo la ley pero sacrificando producción y arriesgando multas por retraso a clientes.",[-2,0,-1,2,0],0],["Pedir prórroga legal (Genera fricción), intentando minimizar el impacto pero arriesgando que los inspectores se molesten y sean más estrictos.",[0,-1,0,-1,1],0],["Sobornar para agilizar (Delito), una solución corrupta que acelera el proceso pero te hace vulnerable a extorsiones y violas la ley.",[1,0,-2,-2,-1],20]],
+  ["Garantía vs. Servicio Técnico Lento","La máquina principal falla. La garantía cubre todo, pero el técnico oficial tarda 3 semanas en llegar. Cada día de paro cuesta $20,000.",["Esperar al técnico oficial (Paro parcial), cumpliendo la garantía pero sacrificando $420,000 en producción perdida.",[-2,0,0,1,0],0],["Pagar a un técnico local (Pierdes garantía), recuperando la operación rápidamente pero asumiendo el costo del servicio y perdiendo la cobertura futura.",[1,0,-2,0,1],0],["Intentar repararla con tu equipo (Riesgo), ahorrando dinero pero arriesgando dañar más el equipo y perder la garantía.",[0,-1,0,-1,-1],3]],
+  ["Ventas Promete lo Imposible","El gerente de ventas cerró un trato con entrega en 3 días. Producción necesita 7 días mínimo. El contrato ya está firmado.",["Acelerar línea y pagar horas extra masivas, cumpliendo el compromiso pero sacrificando presupuesto y la salud del equipo.",[1,-2,-2,0,-1],0],["Hablar con el cliente y renegociar a 7 días, siendo honesto pero arriesgando que el cliente cancele y demande por incumplimiento.",[-1,1,0,1,1],0],["Entregar un lote parcial en 3 días (Costo logístico), cumpliendo parcialmente pero generando costos adicionales de envío fraccionado.",[0,0,-1,1,0],0]],
+  ["Denuncia de Discriminación","Un empleado acusa a su jefe de asignarle las peores tareas por su origen regional. No hay testigos, pero el empleado está documentando todo y amenaza con ir a la CONAPRED.",["Suspender al jefe preventivamente, protegiendo al empleado pero arriesgando que la acusación sea falsa y pierdas a un gerente valioso.",[-1,1,0,2,-1],0],["Mediar y rotar al empleado de área, resolviendo el conflicto inmediato pero sin abordar la raíz del problema ni castigar al jefe.",[0,0,0,1,0],0],["Ignorar por falta de pruebas (Riesgo legal), evitando el conflicto interno pero arriesgando una demanda legal y daño reputacional.",[1,-2,0,-2,-1],12]],
+  ["Inspección Sorpresa de la Secretaría","Llegan inspectores federales. Todo está bien, pero requieren que detengas la línea 4 horas para revisar documentos. Eso retrasa los pedidos del día.",["Cooperar y detener la línea, cumpliendo la ley pero sacrificando producción y arriesgando multas por retraso a clientes.",[-2,0,0,2,0],0],["Pedir prórroga legal (Genera fricción), intentando minimizar el impacto pero arriesgando que los inspectores se molesten y sean más estrictos.",[-1,-1,0,-1,1],0],["Sobornar para agilizar (Delito), una solución corrupta que acelera el proceso pero te hace vulnerable a extorsiones y violas la ley.",[1,0,-2,-2,-1],20]],
   ["El Ingeniero Clave es Contrataban","Tu mejor talento recibe una oferta por el doble de su sueldo. No hay presupuesto para igualar. Si se va, el proyecto crítico se detiene.",["Dejarlo ir y darle una carta de recomendación, aceptando la pérdida pero manteniendo una relación positiva que podría traer beneficios futuros.",[0,1,0,1,-2],0],["Ofrecerle acciones o bonos a largo plazo (Deuda futura), reteniendo al talento pero comprometiendo finanzas futuras y creando precedentes.",[1,1,-2,1,1],0],["Asignarle un proyecto 'estrella' para retarlo, motivándolo con un desafío profesional pero arriesgando que acepte la otra oferta de todos modos.",[-1,2,0,0,2],0]],
   ["Se Rompe el Molde Único","El único molde de tu producto más rentable se fractura. Fabricar uno nuevo cuesta un 30% del presupuesto mensual y tarda 3 semanas.",["Fabricar nuevo (Quedas sin flujo), invirtiendo fuerte pero asegurando la continuidad del producto estrella a largo plazo.",[0,0,-2,1,0],0],["Reparar con soldadura especial (Calidad dudosa), una solución rápida pero que arriesga defectos en el producto y quejas de clientes.",[1,-1,-1,-1,0],8],["Subcontratar a la competencia (Revelas tu diseño), obteniendo producción inmediata pero compartiendo tu propiedad intelectual con un rival.",[-1,0,-1,1,-1],5]],
   ["Quejas del Comedor","Los empleados amenazan con no comer y salir de la planta si no se cambia al proveedor de la fonda, que es amigo del director. La calidad de la comida es mala.",["Cambiar al proveedor (Enfado del Director), priorizando al personal pero arriesgando el conflicto con tu jefe y posible represalia.",[-1,2,0,-1,1],0],["Mantener al proveedor y mejorar menús, una solución intermedia que no contenta a nadie pero evita el conflicto con el director.",[0,-1,-1,1,0],0],["Hacer una encuesta anónima para decidir, democratizando la decisión pero arriesgando que el resultado sea cambiar al proveedor y enfadar al director.",[0,1,0,2,1],0]],
-  ["El Soborno en Licitación","Un proveedor te ofrece un 10% de 'comisión' personal si lo eliges en la licitación de fin de año. Son $50,000. Su propuesta es técnicamente aceptable.",["Rechazar y reportarlo, protegiendo tu integridad pero perdiendo la oportunidad de dinero fácil y arriesgando que el proveedor se vengue.",[0,1,0,2,1],0],["Elegirlo pero sin tomar la comisión (Ético gris), beneficiando al proveedor sin beneficio personal, pero violando el proceso de licitación.",[1,0,0,-1,0],5],["Tomar la comisión para el fondo de fiesta del área, una solución 'Robin Hood' que beneficia al equipo pero te hace cómplice de corrupción.",[0,2,1,-2,-1],15]],
-  ["Reloj Biométrico vs. Privacidad","La dirección instala lectores de huella para control de asistencia. Los empleados argumentan que es invasivo y riesgoso para su salud (preocupación por datos biométricos).",["Obligar a usarlo (Disciplina), cumpliendo la directriz pero generando resentimiento y posible resistencia pasiva del personal.",[1,-2,0,2,-1],0],["Hacerlo opcional con tarjeta (Doble trabajo), respetando la autonomía pero duplicando el trabajo administrativo y arriesgando inconsistencias.",[0,0,-1,1,0],0],["Retrasar la implementación y buscar alternativas, ganando tiempo para negociar pero arriesgando el enojo de la dirección por incumplimiento.",[0,1,-1,0,1],0]],
+  ["El Soborno en Licitación","Un proveedor te ofrece un 10% de 'comisión' personal si lo eliges en la licitación de fin de año. Son $50,000. Su propuesta es técnicamente aceptable.",["Rechazar y reportarlo, protegiendo tu integridad pero perdiendo la oportunidad de dinero fácil y arriesgando que el proveedor se vengue.",[0,1,0,2,1],0],["Elegirlo pero sin tomar la comisión (Ético gris), beneficiando al proveedor sin beneficio personal, pero violando el proceso de licitación.",[0,0,0,-1,0],5],["Tomar la comisión para el fondo de fiesta del área, una solución 'Robin Hood' que beneficia al equipo pero te hace cómplice de corrupción.",[0,2,1,-2,-1],15]],
+  ["Reloj Biométrico vs. Privacidad","La dirección instala lectores de huella para control de asistencia. Los empleados argumentan que es invasivo y riesgoso para su salud (preocupación por datos biométricos).",["Obligar a usarlo (Disciplina), cumpliendo la directriz pero generando resentimiento y posible resistencia pasiva del personal.",[0,-2,0,2,-1],0],["Hacerlo opcional con tarjeta (Doble trabajo), respetando la autonomía pero duplicando el trabajo administrativo y arriesgando inconsistencias.",[0,0,0,1,0],0],["Retrasar la implementación y buscar alternativas, ganando tiempo para negociar pero arriesgando el enojo de la dirección por incumplimiento.",[0,1,0,0,1],0]],
   ["Maquinaria vs. Bonos de Fin de Año","Tienes un excedente presupuestal de $200,000. ¿Lo usas para la máquina nueva que urge (aumenta 20% la productividad) o para el bono de productividad (mejora el clima)?",["Comprar la máquina (Inversión), priorizando la eficiencia a largo plazo pero sacrificando la moral inmediata del equipo.",[2,0,-2,1,-1],0],["Dar el bono (Motivación), priorizando el clima laboral pero perdiendo la oportunidad de modernización y eficiencia.",[-1,2,-2,0,2],0],["Guardar el excedente para el próximo año (Austeridad), siendo conservador pero perdiendo oportunidades tanto de inversión como de motivación.",[0,0,0,2,0],0]],
   ["Cliente Devuelve Lote 'Subjetivo'","Un cliente devuelve 10,000 piezas alegando que 'no se sienten como antes'. Técnicamente cumplen la norma, pero el cliente está insatisfecho y amenaza con irse.",["Aceptar la devolución y perder el dinero, protegiendo la relación comercial pero sacrificando $150,000 en producto perfectamente bueno.",[-1,1,-2,1,0],0],["Negarse y exigir prueba de laboratorio, defendiendo tu producto pero arriesgando perder al cliente y generar un conflicto legal.",[1,-1,-1,-1,-1],0],["Ofrecer descuento del 50% para no perder al cliente, encontrando un punto medio que preserva la relación pero reduce el margen.",[0,0,-1,1,1],0]],
-  ["Faltante Físico vs. Sistema","El ERP dice que hay acero, pero el almacén está vacío. Alguien firmó una salida fantasma. Necesitas el acero para producir hoy.",["Iniciar auditoría forense (Paro parcial), investigando el faltante pero deteniendo la producción y arriesgando incumplir pedidos.",[-2,0,-1,2,0],0],["Comprar de emergencia (Costo alto), resolviendo el problema inmediato pero sacrificando presupuesto y sin abordar la causa raíz.",[1,0,-2,0,-1],0],["Cubrir el faltante con chatarra (Riesgo calidad), produciendo hoy pero arriesgando defectos y quejas de clientes.",[0,-1,0,-2,-1],10]],
-  ["Guerra de Egos entre Gerentes","El gerente de Calidad y el de Producción se niegan a hablarse. Los equipos están replicando el conflicto y la colaboración se ha roto.",["Despedir a uno de los dos (Injusto), resolviendo el conflicto pero generando miedo e injusticia percibida en el equipo.",[-1,-1,0,1,-1],3],["Encerrarlos en una sala hasta que acuerden un SLA, forzando la resolución pero arriesgando que el resentimiento escale.",[0,1,0,2,0],0],["Ignorar y dejar que RRHH lo maneje, delegando la responsabilidad pero arriesgando que el conflicto escale y afecte la operación.",[-1,-2,0,-1,-1],0]],
-  ["Negocio Paralelo con Recursos de la Empresa","Descubres que un empleado usa la impresora 3D y material de la empresa los fines de semana para su emprendimiento personal. Es creativo, pero es robo de recursos.",["Despedirlo por robo de recursos, aplicando el reglamento pero perdiendo a un empleado creativo y generando miedo en el equipo.",[1,-1,0,2,-1],0],["Proponerle un convenio de incubadora interna, capitalizando su emprendimiento pero creando un precedente que otros podrían querer replicar.",[0,2,1,1,2],0],["Confiscar su equipo y amonestarlo, deteniendo el abuso pero arriesgando que el empleado se resienta y busque venganza.",[0,-1,0,1,0],2]],
-  ["Just in Time en Zona de Riesgo","La dirección exige implementar 'Just in Time' para bajar inventarios. Pero tus proveedores locales fallan mucho y un paro de proveedores detendría la planta.",["Implementar a la fuerza (Riesgo de paro), cumpliendo la directriz pero arriesgando que una falla de proveedor detenga toda la operación.",[1,-1,0,-1,-1],5],["Negociar un inventario de seguridad mínimo, encontrando un punto medio que reduce inventarios pero mantiene algo de colchón para emergencias.",[0,1,-1,1,0],0],["Falsificar los reportes de inventario (Peligroso), aparentando cumplimiento pero arriesgando una auditoría que descubra el fraude.",[2,0,1,-2,-2],15]],
-  ["Accidente con Acuerdo por lo Civil","Un operador pierde un dedo. Su familia pide una suma de dinero por fuera para no ir a la STPS. Es más barato que el proceso legal, pero es ilegal.",["Pagar por fuera (Ilegal y extorsión), resolviendo rápido pero violando la ley y arriesgando que la familia pida más dinero después.",[0,-1,-2,-2,-1],20],["Negarse y enfrentar el proceso legal formal, cumpliendo la ley pero arriesgando un proceso largo y costoso que podría generar mala publicidad.",[-1,0,-1,2,0],0],["Ofrecer un paquete de compensación corporativo real, siendo justo y legal pero sacrificando más dinero que el acuerdo por fuera.",[0,1,-2,1,1],0]],
-  ["Reorganización del Taller","Mantenimiento pide parar 2 días completos para reorganizar el taller y ganar eficiencia a largo plazo (20% de mejora). Pero hay pedidos urgentes que no pueden esperar.",["Autorizar el paro (Pierdes 2 días de meta), invirtiendo en eficiencia futura pero incumpliendo pedidos actuales y arriesgando multas.",[-2,1,-1,1,1],0],["Negarlo y pedir que lo hagan en fines de semana (H.E.), manteniendo la producción pero sacrificando presupuesto en horas extra y la moral del equipo.",[1,-2,-2,0,-1],0],["Autorizar solo 1 día (Trabajo a medias), encontrando un punto medio pero arriesgando que la reorganización quede incompleta y no genere el 20% de mejora.",[-1,0,-1,1,0],0]]
+  ["Faltante Físico vs. Sistema","El ERP dice que hay acero, pero el almacén está vacío. Alguien firmó una salida fantasma. Necesitas el acero para producir hoy.",["Iniciar auditoría forense (Paro parcial), investigando el faltante pero deteniendo la producción y arriesgando incumplir pedidos.",[-2,0,-1,2,0],0],["Comprar de emergencia (Costo alto), resolviendo el problema inmediato pero sacrificando presupuesto y sin abordar la causa raíz.",[1,0,-2,0,-1],0],["Cubrir el faltante con chatarra (Riesgo calidad), produciendo hoy pero arriesgando defectos y quejas de clientes.",[0,-1,0,-2,-1],8]],
+  ["Guerra de Egos entre Gerentes","El gerente de Calidad y el de Producción se niegan a hablarse. Los equipos están replicando el conflicto y la colaboración se ha roto.",["Despedir a uno de los dos (Injusto), resolviendo el conflicto pero generando miedo e injusticia percibida en el equipo.",[-1,-1,-1,1,-1],3],["Encerrarlos en una sala hasta que acuerden un SLA, forzando la resolución pero arriesgando que el resentimiento escale.",[0,1,0,2,0],0],["Ignorar y dejar que RRHH lo maneje, delegando la responsabilidad pero arriesgando que el conflicto escale y afecte la operación.",[-1,-2,0,-1,-1],0]],
+  ["Negocio Paralelo con Recursos de la Empresa","Descubres que un empleado usa la impresora 3D y material de la empresa los fines de semana para su emprendimiento personal. Es creativo, pero es robo de recursos.",["Despedirlo por robo de recursos, aplicando el reglamento pero perdiendo a un empleado creativo y generando miedo en el equipo.",[1,-1,0,2,-1],0],["Proponerle un convenio de incubadora interna, capitalizando su emprendimiento pero creando un precedente que otros podrían querer replicar.",[0,2,0,1,2],0],["Confiscar su equipo y amonestarlo, deteniendo el abuso pero arriesgando que el empleado se resienta y busque venganza.",[0,-1,0,1,0],5]],
+  ["Just in Time en Zona de Riesgo","La dirección exige implementar 'Just in Time' para bajar inventarios. Pero tus proveedores locales fallan mucho y un paro de proveedores detendría la planta.",["Implementar a la fuerza (Riesgo de paro), cumpliendo la directriz pero arriesgando que una falla de proveedor detenga toda la operación.",[1,-1,0,-1,-1],5],["Negociar un inventario de seguridad mínimo, encontrando un punto medio que reduce inventarios pero mantiene algo de colchón para emergencias.",[0,1,-1,1,0],0],["Falsificar los reportes de inventario (Peligroso), aparentando cumplimiento pero arriesgando una auditoría que descubra el fraude.",[2,0,0,-2,-2],15]],
+  ["Accidente con Acuerdo por lo Civil","Un operador pierde un dedo. Su familia pide una suma de dinero por fuera para no ir a la STPS. Es más barato que el proceso legal, pero es ilegal.",["Pagar por fuera (Ilegal y extorsión), resolviendo rápido pero violando la ley y arriesgando que la familia pida más dinero después.",[0,-1,-2,-2,-1],20],["Negarse y enfrentar el proceso legal formal, cumpliendo la ley pero arriesgando un proceso largo y costoso que podría generar mala publicidad.",[-1,0,-2,2,0],0],["Ofrecer un paquete de compensación corporativo real, siendo justo y legal pero sacrificando más dinero que el acuerdo por fuera.",[0,1,-2,1,1],0]],
+  ["Reorganización del Taller","Mantenimiento pide parar 2 días completos para reorganizar el taller y ganar eficiencia a largo plazo (20% de mejora). Pero hay pedidos urgentes que no pueden esperar.",["Autorizar el paro (Pierdes 2 días de meta), invirtiendo en eficiencia futura pero incumpliendo pedidos actuales y arriesgando multas.",[-2,1,0,1,1],0],["Negarlo y pedir que lo hagan en fines de semana (H.E.), manteniendo la producción pero sacrificando presupuesto en horas extra y la moral del equipo.",[1,-2,-2,0,-1],0],["Autorizar solo 1 día (Trabajo a medias), encontrando un punto medio pero arriesgando que la reorganización quede incompleta y no genere el 20% de mejora.",[-1,0,0,1,0],0]]
 ];
 
 const CONSECUENCIAS = [
@@ -771,839 +355,186 @@ const CONSECUENCIAS = [
 ];
 
 const CONSECUENCIAS_RIESGO = [
-  {
-    title: "🚨 ESCÁNDALO DE CORRUPCIÓN DESTAPADO",
-    narrative: "La auditoría interna descubre un esquema de sobornos sistemático en el departamento de compras. Las autoridades inician una investigación penal. El Director de Compras es arrestado y la empresa enfrenta multas millonarias. La reputación está destruida.",
-    penalties: { P: -3, C: -4, Pr: -5, D: -5, T: -3 },
-    fired: { position: "Director de Compras", reason: "Arrestado por corrupción y sobornos" },
-    severity: "catastrophic"
-  },
-  {
-    title: "💥 DEMANDA COLECTIVA DE EMPLEADOS",
-    narrative: "50 empleados presentan una demanda colectiva por acoso laboral, horas extra no pagadas y condiciones inseguras. Los medios de comunicación cubren el caso. La empresa enfrenta una crisis de reputación y costos legales millonarios.",
-    penalties: { P: -2, C: -5, Pr: -4, D: -4, T: -4 },
-    fired: { position: "Director de Recursos Humanos", reason: "Negligencia en protección de empleados" },
-    severity: "catastrophic"
-  },
-  {
-    title: "🔥 ACCIDENTE INDUSTRIAL FATAL",
-    narrative: "Un accidente en la línea de producción resulta en la muerte de un operador. Las autoridades clausuran la planta por 2 semanas. La investigación revela múltiples violaciones de seguridad. La empresa enfrenta cargos penales.",
-    penalties: { P: -5, C: -4, Pr: -5, D: -5, T: -3 },
-    fired: { position: "Director de Operaciones", reason: "Negligencia en seguridad industrial" },
-    severity: "catastrophic"
-  },
-  {
-    title: "💸 FRAUDE FINANCIERO DETECTADO",
-    narrative: "La auditoría externa descubre que los estados financieros de los últimos 3 años fueron manipulados. La bolsa de valores suspende las acciones. Los inversionistas demandan a la empresa. El Director Financiero es destituido.",
-    penalties: { P: -3, C: -3, Pr: -5, D: -5, T: -2 },
-    fired: { position: "Director Financiero", reason: "Fraude financiero y manipulación de estados financieros" },
-    severity: "catastrophic"
-  },
-  {
-    title: "🌐 CRISIS DE REPUTACIÓN EN REDES",
-    narrative: "Un video de un directivo haciendo comentarios discriminatorios se vuelve viral. Los clientes cancelan contratos masivamente. Los empleados renuncian en masa. La empresa pierde el 40% de sus ingresos en un mes.",
-    penalties: { P: -4, C: -5, Pr: -4, D: -4, T: -5 },
-    fired: { position: "Director General", reason: "Daño irreparable a la reputación corporativa" },
-    severity: "catastrophic"
-  },
-  {
-    title: "⚖️ SANCIÓN REGULADORA MASIVA",
-    narrative: "Las autoridades ambientales imponen una multa de $10 millones por violaciones repetidas a las normas de emisiones. La planta debe detener operaciones hasta cumplir con las regulaciones. El Director de Operaciones es destituido.",
-    penalties: { P: -4, C: -2, Pr: -5, D: -5, T: -2 },
-    fired: { position: "Director de Operaciones", reason: "Incumplimiento repetido de normativas ambientales" },
-    severity: "severe"
-  },
-  {
-    title: "🏭 SABOTAJE INDUSTRIAL",
-    narrative: "Un empleado descontento sabotea la línea de producción principal, causando daños por $5 millones. La producción se detiene por 3 semanas. Se descubre que el sabotaje fue posible por negligencia en los controles de seguridad.",
-    penalties: { P: -5, C: -3, Pr: -4, D: -4, T: -3 },
-    fired: { position: "Gerente de Seguridad Industrial", reason: "Negligencia en controles de seguridad" },
-    severity: "severe"
-  },
-  {
-    title: "💼 FUGA MASIVA DE TALENTO",
-    narrative: "15 ejecutivos clave renuncian simultáneamente para unirse a la competencia. Se llevan consigo clientes, proyectos y conocimiento crítico. La empresa pierde el 60% de su capacidad operativa en un mes.",
-    penalties: { P: -4, C: -4, Pr: -3, D: -3, T: -5 },
-    fired: { position: "Director de Recursos Humanos", reason: "Incapacidad para retener talento clave" },
-    severity: "severe"
-  }
+  { title:"🚨 ESCÁNDALO DE CORRUPCIÓN DESTAPADO", narrative:"Auditoría interna descubre un esquema de sobornos sistemático en el departamento de compras. Las autoridades inician una investigación penal. El Director de Compras es arrestado y la empresa enfrenta multas millonarias.", penalties:{P:-3,C:-4,Pr:-5,D:-5,T:-3}, fired:{position:"Director de Compras",reason:"Arrestado por corrupción y sobornos"} },
+  { title:"💥 DEMANDA COLECTIVA DE EMPLEADOS", narrative:"50 empleados presentan una demanda colectiva por acoso laboral y condiciones inseguras. Los medios de comunicación cubren el caso ampliamente.", penalties:{P:-2,C:-5,Pr:-4,D:-4,T:-4}, fired:{position:"Director de Recursos Humanos",reason:"Negligencia en protección de empleados"} },
+  { title:"🔥 ACCIDENTE INDUSTRIAL FATAL", narrative:"Un accidente en la línea de producción resulta en la muerte de un operador. Las autoridades clausuran la planta por 2 semanas mientras investigan.", penalties:{P:-5,C:-4,Pr:-5,D:-5,T:-3}, fired:{position:"Director de Operaciones",reason:"Negligencia en seguridad industrial"} },
+  { title:"💸 FRAUDE FINANCIERO DETECTADO", narrative:"Una auditoría externa descubre que los estados financieros de los últimos 3 años fueron manipulados. La bolsa suspende las acciones de la empresa.", penalties:{P:-3,C:-3,Pr:-5,D:-5,T:-2}, fired:{position:"Director Financiero",reason:"Fraude financiero y manipulación de estados financieros"} },
+  { title:"🌐 CRISIS DE REPUTACIÓN EN REDES", narrative:"Un video de un directivo haciendo comentarios discriminatorios se vuelve viral. Los clientes cancelan contratos masivamente y la reputación de la empresa queda destruida.", penalties:{P:-4,C:-5,Pr:-4,D:-4,T:-5}, fired:{position:"Director General",reason:"Daño irreparable a la reputación corporativa"} },
+  { title:"⚖️ SANCIÓN REGULADORA MASIVA", narrative:"Las autoridades ambientales imponen una multa de $10 millones por violaciones repetidas a las normas de emisiones. La empresa debe detener operaciones hasta cumplir.", penalties:{P:-4,C:-2,Pr:-5,D:-5,T:-2}, fired:{position:"Director de Operaciones",reason:"Incumplimiento repetido de normativas ambientales"} },
+  { title:"🏭 SABOTAJE INDUSTRIAL", narrative:"Un empleado descontento sabotea la línea de producción principal, causando daños por $5 millones. La operación se detiene completamente.", penalties:{P:-5,C:-3,Pr:-4,D:-4,T:-3}, fired:{position:"Gerente de Seguridad Industrial",reason:"Negligencia en controles de seguridad"} },
+  { title:"💼 FUGA MASIVA DE TALENTO", narrative:"15 ejecutivos clave renuncian simultáneamente para unirse a la competencia. Se llevan consigo clientes, proyectos y conocimiento crítico de la empresa.", penalties:{P:-4,C:-4,Pr:-3,D:-3,T:-5}, fired:{position:"Director de Recursos Humanos",reason:"Incapacidad para retener talento clave"} }
 ];
 
 const SPECIAL_EVENTS = { 
-  ptu: [[-1, -2, 0, 1, -1, 0], [-3, 2, 0, 0, 2, 0], [2, -3, -2, -2, -1, 15]], 
-  aguinaldo: [[-2, 0, 0, 1, 0, 0], [-4, 3, 0, 0, 3, 0], [-1, -2, 0, -1, -1, 10]] 
+  ptu: [[-1,-2,0,1,-1,0],[-3,2,0,0,2,0],[2,-3,-2,-2,-1,15]], 
+  aguinaldo: [[-2,0,0,1,0,0],[-4,3,0,0,3,0],[-1,-2,0,-1,-1,10]] 
 };
 
 const WILDCARDS = [
-  { id: 'negociacion', name: '🗣️ Negociación', desc: 'Mitiga hasta -2 en Clima (C) o Talento (T).', apply: (eff) => { if(eff[1] < 0) eff[1] = Math.min(0, eff[1]+2); if(eff[4] < 0) eff[4] = Math.min(0, eff[4]+2); } },
-  { id: 'vision', name: '📊 Visión Financiera', desc: 'Mitiga hasta -2 en Presupuesto (Pr).', apply: (eff) => { if(eff[2] < 0) eff[2] = Math.min(0, eff[2]+2); } },
-  { id: 'etica', name: '🛡️ Ética Corporativa', desc: 'Anula penalizaciones de Disciplina (D) y reduce riesgo.', apply: (eff) => { if(eff[3] < 0) eff[3] = 0; } },
-  { id: 'resolucion', name: '🧠 Resolución de Problemas', desc: 'Convierte una penalización de Productividad (P) en neutra.', apply: (eff) => { if(eff[0] < 0) eff[0] = 0; } },
-  { id: 'comunicacion', name: '🤝 Comunicación Asertiva', desc: 'Mitiga -1 en cualquier indicador afectado negativamente.', apply: (eff) => { for(let i=0; i<5; i++) if(eff[i]<0) eff[i] += 1; } }
+  { id:'negociacion', name:'🗣️ Negociación', desc:'Mitiga -2 en Clima o Talento.', apply:(e)=>{ if(e[1]<0) e[1]=Math.min(0,e[1]+2); if(e[4]<0) e[4]=Math.min(0,e[4]+2); } },
+  { id:'vision', name:'📊 Visión Financiera', desc:'Mitiga -2 en Presupuesto.', apply:(e)=>{ if(e[2]<0) e[2]=Math.min(0,e[2]+2); } },
+  { id:'etica', name:'🛡️ Ética Corporativa', desc:'Anula penalizaciones de Disciplina.', apply:(e)=>{ if(e[3]<0) e[3]=0; } },
+  { id:'resolucion', name:'🧠 Resolución de Problemas', desc:'Anula penalización de Productividad.', apply:(e)=>{ if(e[0]<0) e[0]=0; } },
+  { id:'comunicacion', name:'🤝 Comunicación Asertiva', desc:'Mitiga -1 en cualquier indicador negativo.', apply:(e)=>{ for(let i=0;i<5;i++) if(e[i]<0) e[i]+=1; } }
 ];
 
-// ==========================================
-// ESTADO DEL JUEGO
-// ==========================================
 function getInitialState() {
-  return {
-    month: 1, 
-    stats: { P: 10, C: 10, Pr: 10, D: 10, T: 10 }, 
-    risk: 0, 
-    unethicalDecisions: 0,
-    crisisCount: 0,
-    lowestPoints: { P: 10, C: 10, Pr: 10, D: 10, T: 10 }, 
-    currentStreak: 0, 
-    bestStreak: 0, 
-    currentDilema: null, 
-    currentOptions: [], 
-    selectedOptText: "", 
-    selectedOptEffects: [], 
-    selectedRisk: 0, 
-    log: [], 
-    deckD: [], 
-    deckC: [], 
-    hand: [], 
-    ptuPaid: false, 
-    aguinaldoPaid: false 
-  };
+  return { month:1, stats:{P:10,C:10,Pr:10,D:10,T:10}, risk:0, unethicalDecisions:0, crisisCount:0, lowestPoints:{P:10,C:10,Pr:10,D:10,T:10}, currentStreak:0, bestStreak:0, currentDilema:null, currentOptions:[], selectedOptText:"", selectedOptEffects:[], selectedRisk:0, log:[], deckD:[], deckC:[], hand:[], ptuPaid:false, aguinaldoPaid:false };
 }
 
 let state = getInitialState();
-const STAT_NAMES = { P: "Productividad", C: "Clima", Pr: "Presupuesto", D: "Disciplina", T: "Talento" };
-const STAT_COLORS = { P: "var(--p)", C: "var(--c)", Pr: "var(--pr)", D: "var(--d)", T: "var(--t)" };
+const STAT_NAMES = {P:"Productividad",C:"Clima",Pr:"Presupuesto",D:"Disciplina",T:"Talento"};
+const STAT_COLORS = {P:"var(--p)",C:"var(--c)",Pr:"var(--pr)",D:"var(--d)",T:"var(--t)"};
 
-// ==========================================
-// FUNCIONES AUXILIARES
-// ==========================================
-function getRiskLevel() {
-  if (state.risk < 20) return { text: '🟢 Bajo', color: 'var(--risk-low)' };
-  if (state.risk < 45) return { text: '🟡 Creciente', color: 'var(--risk-med)' };
-  if (state.risk < 70) return { text: '🟠 Elevado', color: 'var(--risk-high)' };
-  return { text: '🔴 Crítico', color: 'var(--risk-crit)' };
+function getRiskLevel() { if(state.risk<20) return {text:'🟢 Bajo',color:'var(--risk-low)'}; if(state.risk<45) return {text:'🟡 Creciente',color:'var(--risk-med)'}; if(state.risk<70) return {text:'🟠 Elevado',color:'var(--risk-high)'}; return {text:'🔴 Crítico',color:'var(--risk-crit)'}; }
+function getCEOProfile(s,r,u) { if(s>=40&&r<20) return {type:'🏆 CEO Ético Ejemplar',desc:'Lideraste con integridad.',color:'var(--accent)'}; if(s>=40&&r>=70) return {type:'⚠️ CEO Pragmático',desc:'Éxito con decisiones cuestionables.',color:'var(--warn)'}; if(s>=30&&r<30) return {type:'✅ Director Competente',desc:'Gestión equilibrada.',color:'var(--info)'}; if(s>=30&&r>=50) return {type:'🎲 CEO Arriesgado',desc:'Apostaste fuerte.',color:'var(--risk-high)'}; if(r>=70) return {type:'💀 CEO Corrupto',desc:'Decisiones poco éticas.',color:'var(--risk-crit)'}; return {type:'📉 Gerente en Crisis',desc:'Resultados insuficientes.',color:'var(--danger)'}; }
+
+function saveGame() { StorageManager.save('simGerencial_save',{state,timestamp:new Date().toISOString()}); }
+function loadGame() { const d=StorageManager.load('simGerencial_save'); if(d){try{state=d.state;if(!state.risk)state.risk=0;if(!state.unethicalDecisions)state.unethicalDecisions=0;if(!state.crisisCount)state.crisisCount=0;if(!state.stats)state.stats={P:10,C:10,Pr:10,D:10,T:10};if(!state.lowestPoints)state.lowestPoints={P:10,C:10,Pr:10,D:10,T:10};if(!state.log)state.log=[];if(!state.deckD)state.deckD=[];if(!state.deckC)state.deckC=[];if(!state.hand)state.hand=[];return true;}catch(e){return false;}} return false; }
+function clearSave() { StorageManager.remove('simGerencial_save'); }
+function startFreshGame() { clearSave(); state=getInitialState(); document.querySelectorAll('.modal-overlay').forEach(m=>{m.style.display='none';}); state.deckD=shuffle([...Array(DILEMAS.length).keys()]); state.deckC=shuffle([...Array(CONSECUENCIAS.length).keys()]); dealWildcards(); renderDashboard(); renderLog(); drawDilema(); window.scrollTo(0,0); }
+function confirmNewGame() { showConfirm('Nueva Partida','¿Estás seguro? Se perderá el progreso.',()=>{startFreshGame();}); }
+function saveHighScore(s,r,b,rk,ct,cc) { let hs=StorageManager.load('simGerencial_hs')||[]; if(!Array.isArray(hs))hs=[]; hs.push({score:s,rank:r,bestStreak:b,risk:rk,ceoType:ct,crisisCount:cc,date:new Date().toLocaleDateString('es-MX')}); hs.sort((a,b)=>b.score-a.score); hs=hs.slice(0,10); StorageManager.save('simGerencial_hs',hs); }
+function showHighScores() { const hs=StorageManager.load('simGerencial_hs')||[]; const c=document.getElementById('highscores-content'); if(!Array.isArray(hs)||hs.length===0){c.innerHTML='<p style="color:#aaa;">Sin puntuaciones aún.</p>';}else{let h='<table class="highscore-table"><thead><tr><th>#</th><th>Punt.</th><th>Riesgo</th><th>Crisis</th><th>Perfil</th><th>Racha</th><th>Fecha</th></tr></thead><tbody>'; hs.forEach((s,i)=>{h+=`<tr><td>${i+1}</td><td style="color:var(--gold);font-weight:bold;">${s.score}/50</td><td>${s.risk||0}</td><td style="color:var(--crisis-glow);">${s.crisisCount||0}</td><td style="font-size:0.8em;">${s.ceoType||'-'}</td><td>🔥 ${s.bestStreak}</td><td>${s.date}</td></tr>`;}); h+='</tbody></table>'; c.innerHTML=h;} document.getElementById('modal-highscores').style.display='flex'; }
+function closeHighScores() { document.getElementById('modal-highscores').style.display='none'; }
+function showConfirm(t,m,y) { document.getElementById('confirm-title').innerText=t; document.getElementById('confirm-message').innerText=m; document.getElementById('modal-confirm').style.display='flex'; document.getElementById('confirm-yes').onclick=()=>{document.getElementById('modal-confirm').style.display='none';y();}; document.getElementById('confirm-no').onclick=()=>{document.getElementById('modal-confirm').style.display='none';}; }
+
+function initGame() { StorageManager.checkAvailability(); if(loadGame()){console.log('Partida cargada');}else{state.deckD=shuffle([...Array(DILEMAS.length).keys()]);state.deckC=shuffle([...Array(CONSECUENCIAS.length).keys()]);dealWildcards();} renderDashboard(); drawDilema(); }
+function shuffle(a) { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function dealWildcards() { state.hand=[]; let av=[...WILDCARDS]; for(let i=0;i<3;i++){const r=Math.floor(Math.random()*av.length);state.hand.push(av[r]);av.splice(r,1);} renderHandUI(); }
+function renderHandUI() { const h=document.getElementById('hand-display'); h.innerHTML=state.hand.length===0?'<span style="color:#666;font-size:0.8em;">Sin comodines</span>':state.hand.map(w=>`<span class="hand-card" title="${w.desc}">${w.name}</span>`).join(''); }
+function getCalendarData() { return {currentYear:Math.ceil(state.month/12),currentMonthInYear:((state.month-1)%12)+1,currentQuarter:Math.ceil((((state.month-1)%12)+1)/3)}; }
+
+function renderDashboard() {
+  const db=document.getElementById('dashboard'); db.innerHTML=''; let os="Óptimo",sc="var(--accent)";
+  for(let k in state.stats){const v=state.stats[k];if(v<=0){sc="black";os="COLAPSO";}else if(v<=4){sc="var(--danger)";os="Crítico";}else if(v<=8){if(sc!=="var(--danger)"){sc="var(--warn)";os="Estable";}} const d=document.createElement('div');d.className='stat';d.style.borderColor=STAT_COLORS[k];d.innerHTML=`<div class="stat-header"><span>${STAT_NAMES[k]} (${k})</span><span>${v}/10</span></div><div class="bar-bg"><div class="bar-fill" style="width:${v*10}%;background:${v<=4?'var(--danger)':v<=8?'var(--warn)':'var(--accent)'}"></div></div>`;db.appendChild(d);}
+  const b=document.getElementById('status-badge');b.innerText=`Estado: ${os}`;b.style.background=sc;if(os==="COLAPSO")b.style.color="white";
+  const rl=getRiskLevel();document.getElementById('risk-level').innerText=rl.text;document.getElementById('risk-level').style.color=rl.color;
+  document.getElementById('crisis-count').innerText=state.crisisCount;
+  const cd=getCalendarData();document.getElementById('month-display').innerText=`Año ${cd.currentYear} | Mes ${cd.currentMonthInYear} | Trimestre ${cd.currentQuarter} (Ronda ${state.month}/60)`;
+  document.getElementById('current-streak').innerText=state.currentStreak;document.getElementById('best-streak').innerText=state.bestStreak;
 }
 
-function getCEOProfile(score, risk, unethicalDecisions) {
-  if (score >= 40 && risk < 20) return { type: '🏆 CEO Ético Ejemplar', desc: 'Lideraste con integridad. La empresa prosperó sin comprometer valores. Tu reputación es intachable.', color: 'var(--accent)' };
-  if (score >= 40 && risk >= 70) return { type: '⚠️ CEO Pragmático Exitoso', desc: 'Alcanzaste el éxito financiero, pero con decisiones cuestionables. El riesgo acumulado podría estallar en cualquier momento.', color: 'var(--warn)' };
-  if (score >= 30 && risk < 30) return { type: '✅ Director Competente', desc: 'Gestión equilibrada y sostenible. La empresa se mantiene sólida con principios claros.', color: 'var(--info)' };
-  if (score >= 30 && risk >= 50) return { type: '🎲 CEO Arriesgado', desc: 'Apostaste fuerte y ganaste, pero al borde del abismo. Tu estilo genera resultados pero también vulnerabilidad.', color: 'var(--risk-high)' };
-  if (risk >= 70) return { type: '💀 CEO Corrupto', desc: 'Las decisiones poco éticas se acumularon. Aunque la empresa sobrevivió, tu reputación está destruida y el riesgo legal es inminente.', color: 'var(--risk-crit)' };
-  return { type: '📉 Gerente en Crisis', desc: 'Los resultados no fueron suficientes. Se requiere un cambio de estrategia y liderazgo.', color: 'var(--danger)' };
+function drawDilema() {
+  if(state.month>60){endGame();return;}
+  document.getElementById('phase-title').innerText="🎲 Fase 1: Análisis del Dilema";
+  document.getElementById('options-container').style.display='flex';
+  const idx=state.deckD.pop();state.currentDilema=DILEMAS[idx];const d=state.currentDilema;
+  let oa=[d[2],d[3],d[4]];for(let i=oa.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[oa[i],oa[j]]=[oa[j],oa[i]];}
+  state.currentOptions=oa;
+  document.getElementById('scenario-text').innerHTML=`<span class="scenario-title">📌 ${d[0]}</span>${d[1]}`;
+  const o=document.getElementById('options-container');o.innerHTML='';const lb=['A','B','C'];
+  for(let i=0;i<3;i++){const optionData=state.currentOptions[i];const optText=optionData[0];const c=document.createElement('div');c.className='decision-card';c.innerHTML=`<span class="card-label">${lb[i]}.</span><span class="card-text">${optText}</span>`;c.onclick=()=>selectOption(i,c);o.appendChild(c);}
 }
 
-// ==========================================
-// FUNCIONES DE PERSISTENCIA
-// ==========================================
-function saveGame() { 
-  try { 
-    localStorage.setItem('simGerencial_save', JSON.stringify({ state, timestamp: new Date().toISOString() })); 
-  } catch (e) { 
-    console.error('Error al guardar:', e);
-  } 
+function selectOption(index,ce) {
+  document.querySelectorAll('.decision-card').forEach(c=>c.classList.remove('selected'));ce.classList.add('selected');
+  const optionData=state.currentOptions[index];state.selectedOptText=optionData[0];state.selectedOptEffects=[...optionData[1]];state.selectedRisk=optionData[2]||0;
+  const cd=getCalendarData();state.log.push({time:`Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,title:state.currentDilema[0],decision:state.selectedOptText.substring(0,80)+(state.selectedOptText.length>80?'...':''),wildcard:null,effects:state.selectedOptEffects,risk:state.selectedRisk});
+  renderLog();document.getElementById('modal-decision-text').innerText=state.selectedOptText.substring(0,100)+(state.selectedOptText.length>100?'...':'');
+  renderEffects('decision-effects',state.selectedOptEffects,state.selectedRisk);renderWildcards();document.getElementById('modal-decision').style.display='flex';
 }
 
-function loadGame() { 
-  try { 
-    const d = localStorage.getItem('simGerencial_save'); 
-    if (d) { 
-      const data = JSON.parse(d);
-      state = data.state;
-      if (state.risk === undefined) state.risk = 0;
-      if (state.unethicalDecisions === undefined) state.unethicalDecisions = 0;
-      if (state.crisisCount === undefined) state.crisisCount = 0;
-      return true; 
-    } 
-    return false; 
-  } catch (e) { 
-    console.error('Error al cargar:', e);
-    return false; 
-  } 
+function renderWildcards() { const c=document.getElementById('wildcard-buttons');c.innerHTML='';if(state.hand.length===0){c.innerHTML='<p style="color:#666;font-size:0.8em;">Sin comodines este año.</p>';return;} state.hand.forEach((w,i)=>{const b=document.createElement('button');b.className='btn btn-gold btn-wc';b.innerText=w.name;b.title=w.desc;b.onclick=()=>applyWildcard(i);c.appendChild(b);}); }
+function applyWildcard(i) { const w=state.hand[i];w.apply(state.selectedOptEffects);state.hand.splice(i,1);state.log[state.log.length-1].wildcard=w.name;state.log[state.log.length-1].effects=state.selectedOptEffects;renderEffects('decision-effects',state.selectedOptEffects,state.selectedRisk);renderWildcards();renderHandUI();renderLog(); }
+function closeDecisionModal() { document.getElementById('modal-decision').style.display='none';applyEffects(state.selectedOptEffects);if(state.selectedRisk>0){state.risk=Math.min(100,state.risk+state.selectedRisk);state.unethicalDecisions++;} rollEnvironmentDice(); }
+
+function rollEnvironmentDice() {
+  const r=Math.floor(Math.random()*6)+1;const ie=r%2===0;const dm=document.getElementById('modal-dice');
+  document.getElementById('dice-icon-display').innerText='🎲';document.getElementById('dice-result').innerText=`Salió un ${r} (${ie?'Par':'Impar'})`;
+  if(ie){document.getElementById('dice-message').innerText="¡Entorno volátil! Una consecuencia afecta a la empresa.";document.getElementById('dice-next-btn').innerText="Revelar Consecuencia";document.getElementById('dice-next-btn').onclick=()=>{dm.style.display='none';drawConsecuencia();};}
+  else{document.getElementById('dice-message').innerText="Entorno estable este mes.";document.getElementById('dice-next-btn').innerText="Siguiente Mes ➔";document.getElementById('dice-next-btn').onclick=()=>{dm.style.display='none';advanceToNextMonth();};}
+  dm.style.display='flex';
 }
 
-function clearSave() { 
-  try {
-    localStorage.removeItem('simGerencial_save');
-  } catch(e) {
-    console.error('Error al limpiar:', e);
-  }
-}
-
-function startFreshGame() {
-  clearSave();
-  state = getInitialState();
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    modal.style.display = 'none';
-  });
-  state.deckD = shuffle([...Array(DILEMAS.length).keys()]);
-  state.deckC = shuffle([...Array(CONSECUENCIAS.length).keys()]);
-  dealWildcards();
-  renderDashboard();
-  renderLog();
-  drawDilema();
-  window.scrollTo(0, 0);
-}
-
-function confirmNewGame() { 
-  showConfirm('Nueva Partida', '¿Estás seguro? Se perderá el progreso actual.', () => { 
-    startFreshGame();
-  }); 
-}
-
-function saveHighScore(score, rank, bestStreak, risk, ceoType, crisisCount) { 
-  try { 
-    let hs = JSON.parse(localStorage.getItem('simGerencial_hs') || '[]'); 
-    hs.push({ score, rank, bestStreak, risk, ceoType, crisisCount, date: new Date().toLocaleDateString('es-MX') }); 
-    hs.sort((a, b) => b.score - a.score); 
-    localStorage.setItem('simGerencial_hs', JSON.stringify(hs.slice(0, 10))); 
-  } catch (e) {
-    console.error('Error al guardar high score:', e);
-  }
-}
-
-function showHighScores() { 
-  const hs = JSON.parse(localStorage.getItem('simGerencial_hs') || '[]'); 
-  const c = document.getElementById('highscores-content'); 
-  if (hs.length === 0) { 
-    c.innerHTML = '<p style="color: #aaa;">Aún no hay puntuaciones registradas. ¡Completa una campaña para aparecer aquí!</p>'; 
-  } else { 
-    let h = '<table class="highscore-table"><thead><tr><th>#</th><th>Punt.</th><th>Riesgo</th><th>Crisis</th><th>Perfil CEO</th><th>Racha</th><th>Fecha</th></tr></thead><tbody>'; 
-    hs.forEach((s, i) => { 
-      h += `<tr><td>${i + 1}</td><td style="color: var(--gold); font-weight: bold;">${s.score}/50</td><td>${s.risk || 0}</td><td style="color: var(--crisis-glow);">${s.crisisCount || 0}</td><td style="font-size: 0.8em;">${s.ceoType || '-'}</td><td>🔥 ${s.bestStreak}</td><td>${s.date}</td></tr>`; 
-    }); 
-    h += '</tbody></table>'; 
-    c.innerHTML = h; 
-  } 
-  document.getElementById('modal-highscores').style.display = 'flex'; 
-}
-
-function closeHighScores() { document.getElementById('modal-highscores').style.display = 'none'; }
-
-function showConfirm(t, m, y) { 
-  document.getElementById('confirm-title').innerText = t; 
-  document.getElementById('confirm-message').innerText = m; 
-  document.getElementById('modal-confirm').style.display = 'flex'; 
-  document.getElementById('confirm-yes').onclick = () => { 
-    document.getElementById('modal-confirm').style.display = 'none'; 
-    y(); 
-  }; 
-  document.getElementById('confirm-no').onclick = () => { 
-    document.getElementById('modal-confirm').style.display = 'none'; 
-  }; 
-}
-
-// ==========================================
-// FUNCIONES DE INICIALIZACIÓN
-// ==========================================
-function initGame() { 
-  if (loadGame()) { 
-    console.log('Partida cargada desde LocalStorage');
-  } else { 
-    state.deckD = shuffle([...Array(DILEMAS.length).keys()]); 
-    state.deckC = shuffle([...Array(CONSECUENCIAS.length).keys()]); 
-    dealWildcards(); 
-  } 
-  renderDashboard(); 
-  drawDilema(); 
-}
-
-function shuffle(a) { 
-  for (let i = a.length - 1; i > 0; i--) { 
-    const j = Math.floor(Math.random() * (i + 1)); 
-    [a[i], a[j]] = [a[j], a[i]]; 
-  } 
-  return a; 
-}
-
-function dealWildcards() { 
-  state.hand = []; 
-  let av = [...WILDCARDS]; 
-  for (let i = 0; i < 3; i++) { 
-    const r = Math.floor(Math.random() * av.length); 
-    state.hand.push(av[r]); 
-    av.splice(r, 1); 
-  } 
-  renderHandUI(); 
-}
-
-function renderHandUI() { 
-  const h = document.getElementById('hand-display'); 
-  h.innerHTML = state.hand.length === 0 ? '<span style="color:#666; font-size:0.8em;">Sin comodines</span>' : state.hand.map(w => `<span class="hand-card" title="${w.desc}">${w.name}</span>`).join(''); 
-}
-
-function getCalendarData() { 
-  return { 
-    currentYear: Math.ceil(state.month / 12), 
-    currentMonthInYear: ((state.month - 1) % 12) + 1, 
-    currentQuarter: Math.ceil((((state.month - 1) % 12) + 1) / 3) 
-  }; 
-}
-
-// ==========================================
-// FUNCIONES DE RENDERIZADO
-// ==========================================
-function renderDashboard() { 
-  const db = document.getElementById('dashboard'); 
-  db.innerHTML = ''; 
-  let os = "Óptimo", sc = "var(--accent)"; 
-  for (let k in state.stats) { 
-    const v = state.stats[k]; 
-    if (v <= 0) { sc = "black"; os = "COLAPSO"; } 
-    else if (v <= 4) { sc = "var(--danger)"; os = "Crítico"; } 
-    else if (v <= 8) { if(sc !== "var(--danger)") { sc = "var(--warn)"; os = "Estable"; } } 
-    const d = document.createElement('div'); 
-    d.className = 'stat'; 
-    d.style.borderColor = STAT_COLORS[k]; 
-    d.innerHTML = `<div class="stat-header"><span>${STAT_NAMES[k]} (${k})</span><span>${v}/10</span></div><div class="bar-bg"><div class="bar-fill" style="width: ${v*10}%; background: ${v<=4?'var(--danger)':v<=8?'var(--warn)':'var(--accent)'}"></div></div>`; 
-    db.appendChild(d); 
-  } 
-  const b = document.getElementById('status-badge'); 
-  b.innerText = `Estado: ${os}`; 
-  b.style.background = sc; 
-  if(os === "COLAPSO") b.style.color = "white"; 
-  
-  const rl = getRiskLevel();
-  document.getElementById('risk-level').innerText = rl.text;
-  document.getElementById('risk-level').style.color = rl.color;
-  
-  document.getElementById('crisis-count').innerText = state.crisisCount;
-  
-  const cd = getCalendarData(); 
-  document.getElementById('month-display').innerText = `Año ${cd.currentYear} | Mes ${cd.currentMonthInYear} | Trimestre ${cd.currentQuarter} (Ronda ${state.month}/60)`; 
-  document.getElementById('current-streak').innerText = state.currentStreak; 
-  document.getElementById('best-streak').innerText = state.bestStreak; 
-}
-
-function drawDilema() { 
-  if (state.month > 60) { endGame(); return; } 
-  document.getElementById('phase-title').innerText = "🎲 Fase 1: Análisis del Dilema"; 
-  document.getElementById('options-container').style.display = 'flex'; 
-  const idx = state.deckD.pop(); 
-  state.currentDilema = DILEMAS[idx]; 
-  const d = state.currentDilema; 
-  let oa = [d[2], d[3], d[4]]; 
-  for (let i = oa.length - 1; i > 0; i--) { 
-    const j = Math.floor(Math.random() * (i + 1)); 
-    [oa[i], oa[j]] = [oa[j], oa[i]]; 
-  } 
-  state.currentOptions = oa; 
-  document.getElementById('scenario-text').innerHTML = `<span class="scenario-title">📌 ${d[0]}</span>${d[1]}`; 
-  const o = document.getElementById('options-container'); 
-  o.innerHTML = ''; 
-  const lb = ['A', 'B', 'C']; 
-  for (let i = 0; i < 3; i++) { 
-    const ot = state.currentOptions[i][0]; 
-    const c = document.createElement('div'); 
-    c.className = 'decision-card'; 
-    c.innerHTML = `<span class="card-label">${lb[i]}.</span><span class="card-text">${ot}</span>`; 
-    c.onclick = () => selectOption(ot, c); 
-    o.appendChild(c); 
-  } 
-}
-
-function selectOption(ot, ce) { 
-  document.querySelectorAll('.decision-card').forEach(c => c.classList.remove('selected')); 
-  ce.classList.add('selected'); 
-  state.selectedOptText = ot; 
-  const oi = state.currentOptions.findIndex(o => o[0] === ot); 
-  state.selectedOptEffects = [...state.currentOptions[oi][1]]; 
-  state.selectedRisk = state.currentOptions[oi][2] || 0;
-  const cd = getCalendarData(); 
-  state.log.push({ 
-    time: `Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`, 
-    title: state.currentDilema[0], 
-    decision: state.selectedOptText.substring(0, 80) + (state.selectedOptText.length > 80 ? '...' : ''), 
-    wildcard: null, 
-    effects: state.selectedOptEffects, 
-    risk: state.selectedRisk 
-  }); 
-  renderLog(); 
-  document.getElementById('modal-decision-text').innerText = state.selectedOptText.substring(0, 100) + (state.selectedOptText.length > 100 ? '...' : ''); 
-  renderEffects('decision-effects', state.selectedOptEffects, state.selectedRisk); 
-  renderWildcards(); 
-  document.getElementById('modal-decision').style.display = 'flex'; 
-}
-
-function renderWildcards() { 
-  const c = document.getElementById('wildcard-buttons'); 
-  c.innerHTML = ''; 
-  if (state.hand.length === 0) { 
-    c.innerHTML = '<p style="color:#666; font-size:0.8em;">No te quedan comodines de liderazgo este año.</p>'; 
-    return; 
-  } 
-  state.hand.forEach((w, i) => { 
-    const b = document.createElement('button'); 
-    b.className = 'btn btn-gold btn-wc'; 
-    b.innerText = w.name; 
-    b.title = w.desc; 
-    b.onclick = () => applyWildcard(i); 
-    c.appendChild(b); 
-  }); 
-}
-
-function applyWildcard(i) { 
-  const w = state.hand[i]; 
-  w.apply(state.selectedOptEffects); 
-  state.hand.splice(i, 1); 
-  state.log[state.log.length - 1].wildcard = w.name; 
-  state.log[state.log.length - 1].effects = state.selectedOptEffects; 
-  renderEffects('decision-effects', state.selectedOptEffects, state.selectedRisk); 
-  renderWildcards(); 
-  renderHandUI(); 
-  renderLog(); 
-}
-
-function closeDecisionModal() { 
-  document.getElementById('modal-decision').style.display = 'none'; 
-  applyEffects(state.selectedOptEffects); 
-  if (state.selectedRisk > 0) {
-    state.risk = Math.min(100, state.risk + state.selectedRisk);
-    state.unethicalDecisions++;
-  }
-  rollEnvironmentDice(); 
-}
-
-function rollEnvironmentDice() { 
-  const r = Math.floor(Math.random() * 6) + 1; 
-  const ie = r % 2 === 0; 
-  const dm = document.getElementById('modal-dice'); 
-  document.getElementById('dice-icon-display').innerText = '🎲'; 
-  document.getElementById('dice-result').innerText = `Salió un ${r} (${ie ? 'Par' : 'Impar'})`; 
-  if (ie) { 
-    document.getElementById('dice-message').innerText = "¡El entorno es volátil! Una consecuencia afecta a la empresa."; 
-    document.getElementById('dice-next-btn').innerText = "Revelar Consecuencia"; 
-    document.getElementById('dice-next-btn').onclick = () => { 
-      dm.style.display = 'none'; 
-      drawConsecuencia(); 
-    }; 
-  } else { 
-    document.getElementById('dice-message').innerText = "El entorno se mantiene estable este mes."; 
-    document.getElementById('dice-next-btn').innerText = "Siguiente Mes ➔"; 
-    document.getElementById('dice-next-btn').onclick = () => { 
-      dm.style.display = 'none'; 
-      advanceToNextMonth(); 
-    }; 
-  } 
-  dm.style.display = 'flex'; 
-}
-
-function drawConsecuencia() { 
-  if (state.risk >= 45 && Math.random() < 0.4) {
-    triggerCrisisDetonation();
-    return;
-  }
-  
-  if (state.deckC.length === 0) { 
-    advanceToNextMonth(); 
-    return; 
-  } 
-  const idx = state.deckC.pop(); 
-  const c = CONSECUENCIAS[idx]; 
-  document.getElementById('cons-title').innerText = c[0]; 
-  document.getElementById('cons-narrative').innerText = c[1]; 
-  renderEffects('cons-effects', c[2]); 
-  document.getElementById('modal-consecuencia').style.display = 'flex'; 
-  applyEffects(c[2]); 
+function drawConsecuencia() {
+  if(state.risk>=45&&Math.random()<0.4){triggerCrisisDetonation();return;}
+  if(state.deckC.length===0){advanceToNextMonth();return;}
+  const idx=state.deckC.pop();const c=CONSECUENCIAS[idx];
+  document.getElementById('cons-title').innerText=c[0];document.getElementById('cons-narrative').innerText=c[1];renderEffects('cons-effects',c[2]);
+  document.getElementById('modal-consecuencia').style.display='flex';applyEffects(c[2]);
 }
 
 function triggerCrisisDetonation() {
-  const crisisIdx = Math.floor(Math.random() * CONSECUENCIAS_RIESGO.length);
-  const crisis = CONSECUENCIAS_RIESGO[crisisIdx];
-  
-  state.crisisCount++;
-  
-  const penalties = crisis.penalties;
-  applyEffects([penalties.P, penalties.C, penalties.Pr, penalties.D, penalties.T]);
-  
-  state.risk = Math.max(0, state.risk - 40);
-  
-  const cd = getCalendarData();
-  state.log.push({
-    time: `Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,
-    title: crisis.title,
-    decision: crisis.fired.position + " DESTITUIDO",
-    wildcard: null,
-    effects: [penalties.P, penalties.C, penalties.Pr, penalties.D, penalties.T],
-    risk: 0,
-    isCrisis: true
-  });
-  renderLog();
-  
-  showCrisisModal(crisis);
-  
-  document.body.classList.add('crisis-mode');
-  document.querySelector('.container').classList.add('shake');
-  
-  setTimeout(() => {
-    document.body.classList.remove('crisis-mode');
-    document.querySelector('.container').classList.remove('shake');
-  }, 2500);
+  const crisis=CONSECUENCIAS_RIESGO[Math.floor(Math.random()*CONSECUENCIAS_RIESGO.length)];state.crisisCount++;const p=crisis.penalties;
+  applyEffects([p.P,p.C,p.Pr,p.D,p.T]);state.risk=Math.max(0,state.risk-40);const cd=getCalendarData();
+  state.log.push({time:`Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,title:crisis.title,decision:crisis.fired.position+" DESTITUIDO",wildcard:null,effects:[p.P,p.C,p.Pr,p.D,p.T],risk:0,isCrisis:true});
+  renderLog();document.getElementById('crisis-title').innerText=crisis.title;document.getElementById('crisis-narrative').innerText=crisis.narrative;
+  const pl=document.getElementById('crisis-penalties-list');const keys=['P','C','Pr','D','T'];let h='';keys.forEach((k,i)=>{const v=[p.P,p.C,p.Pr,p.D,p.T][i];if(v!==0)h+=`<div class="penalty-item"><span>${STAT_NAMES[k]}</span><span style="color:#ff4444;">${v}</span></div>`;});
+  pl.innerHTML=h;document.getElementById('fired-director-container').innerHTML=`<div class="fired-director"><h4>🔥 DIRECTIVO DESTITUIDO</h4><div class="director-name">${crisis.fired.position}</div><div class="director-reason">"${crisis.fired.reason}"</div></div>`;
+  document.getElementById('modal-crisis').style.display='flex';document.body.classList.add('crisis-mode');document.querySelector('.container').classList.add('shake');
+  setTimeout(()=>{document.body.classList.remove('crisis-mode');document.querySelector('.container').classList.remove('shake');},2500);
 }
 
-function showCrisisModal(crisis) {
-  document.getElementById('crisis-title').innerText = crisis.title;
-  document.getElementById('crisis-narrative').innerText = crisis.narrative;
-  
-  const penaltiesList = document.getElementById('crisis-penalties-list');
-  const penalties = crisis.penalties;
-  const keys = ['P', 'C', 'Pr', 'D', 'T'];
-  let penaltiesHTML = '';
-  keys.forEach((k, i) => {
-    const val = [penalties.P, penalties.C, penalties.Pr, penalties.D, penalties.T][i];
-    if (val !== 0) {
-      penaltiesHTML += `<div class="penalty-item"><span>${STAT_NAMES[k]}</span><span style="color: #ff4444;">${val}</span></div>`;
-    }
-  });
-  penaltiesList.innerHTML = penaltiesHTML;
-  
-  const firedContainer = document.getElementById('fired-director-container');
-  firedContainer.innerHTML = `
-    <div class="fired-director">
-      <h4>🔥 DIRECTIVO DESTITUIDO</h4>
-      <div class="director-name">${crisis.fired.position}</div>
-      <div class="director-reason">"${crisis.fired.reason}"</div>
-    </div>
-  `;
-  
-  document.getElementById('modal-crisis').style.display = 'flex';
+function closeCrisisModal() { document.getElementById('modal-crisis').style.display='none';advanceToNextMonth(); }
+function renderEffects(ci,ef,risk) { const ed=document.getElementById(ci);ed.innerHTML='';const ks=['P','C','Pr','D','T'];ef.forEach((v,i)=>{const s=document.createElement('span');if(v>0)s.className='effect-tag pos';else if(v<0)s.className='effect-tag neg';else s.className='effect-tag neu';s.innerText=`${ks[i]} ${v>0?'+':''}${v}`;ed.appendChild(s);}); if(risk&&risk>0){const s=document.createElement('span');s.className='effect-tag risk-tag';s.innerText=`⚠️ Riesgo +${risk}`;ed.appendChild(s);} }
+function closeConsecuencia() { document.getElementById('modal-consecuencia').style.display='none';advanceToNextMonth(); }
+function showPTU() { const m=document.getElementById('modal-ptu');m.querySelectorAll('.btn-gold').forEach(b=>{b.disabled=false;b.style.opacity='1';b.style.cursor='pointer';b.style.background='';});m.style.display='flex'; }
+function showAguinaldo() { const m=document.getElementById('modal-aguinaldo');m.querySelectorAll('.btn-gold').forEach(b=>{b.disabled=false;b.style.opacity='1';b.style.cursor='pointer';b.style.background='';});m.style.display='flex'; }
+
+function applySpecialEvent(eventType,optionIndex) {
+  const modalId=eventType==='ptu'?'modal-ptu':'modal-aguinaldo';const effects=SPECIAL_EVENTS[eventType][optionIndex];applyEffects(effects.slice(0,5));
+  const riskGain=effects[5]||0;if(riskGain>0){state.risk=Math.min(100,state.risk+riskGain);state.unethicalDecisions++;}
+  const cd=getCalendarData();state.log.push({time:`Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,title:eventType==='ptu'?"💰 PTU":"🎄 Aguinaldo",decision:`Opción ${['A','B','C'][optionIndex]}`,wildcard:null,effects:effects.slice(0,5),risk:riskGain});
+  renderLog();if(eventType==='ptu')state.ptuPaid=true;if(eventType==='aguinaldo')state.aguinaldoPaid=true;
+  document.getElementById(modalId).style.display='none';
+  for(let k in state.stats){if(state.stats[k]<=0){triggerGameOver(k);return;}}
+  if(eventType==='aguinaldo'){showTrimestral();}else{nextPhase();}
 }
-
-function closeCrisisModal() {
-  document.getElementById('modal-crisis').style.display = 'none';
-  advanceToNextMonth();
-}
-
-function renderEffects(ci, ef, risk) { 
-  const ed = document.getElementById(ci); 
-  ed.innerHTML = ''; 
-  const ks = ['P', 'C', 'Pr', 'D', 'T']; 
-  ef.forEach((v, i) => { 
-    const s = document.createElement('span'); 
-    if (v > 0) s.className = 'effect-tag pos'; 
-    else if (v < 0) s.className = 'effect-tag neg'; 
-    else s.className = 'effect-tag neu'; 
-    s.innerText = `${ks[i]} ${v > 0 ? '+' : ''}${v}`; 
-    ed.appendChild(s); 
-  }); 
-  if (risk && risk > 0) {
-    const s = document.createElement('span');
-    s.className = 'effect-tag risk-tag';
-    s.innerText = `⚠️ Riesgo +${risk}`;
-    s.title = 'Esta decisión acumula riesgo corporativo oculto que podría materializarse en el futuro';
-    ed.appendChild(s);
-  }
-}
-
-function closeConsecuencia() { 
-  document.getElementById('modal-consecuencia').style.display = 'none'; 
-  advanceToNextMonth(); 
-}
-
-// ==========================================
-// FUNCIONES DE EVENTOS ESPECIALES (PTU Y AGUINALDO) - CORREGIDAS
-// ==========================================
-
-function showPTU() {
-  // IMPORTANTE: Resetear estado de los botones ANTES de mostrar el modal
-  const ptuModal = document.getElementById('modal-ptu');
-  const ptuButtons = ptuModal.querySelectorAll('.btn-gold');
-  ptuButtons.forEach(btn => {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-    btn.style.background = ''; // Resetear color de fondo
-  });
-  ptuModal.style.display = 'flex';
-}
-
-function showAguinaldo() {
-  // IMPORTANTE: Resetear estado de los botones ANTES de mostrar el modal
-  const aguinaldoModal = document.getElementById('modal-aguinaldo');
-  const aguinaldoButtons = aguinaldoModal.querySelectorAll('.btn-gold');
-  aguinaldoButtons.forEach(btn => {
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-    btn.style.background = ''; // Resetear color de fondo
-  });
-  aguinaldoModal.style.display = 'flex';
-}
-
-function applySpecialEvent(t, oi) { 
-  const mi = t === 'ptu' ? 'modal-ptu' : 'modal-aguinaldo'; 
-  
-  // Aplicar efectos
-  const ef = SPECIAL_EVENTS[t][oi]; 
-  applyEffects(ef.slice(0, 5)); 
-  
-  // Acumular riesgo si aplica
-  const riskGain = ef[5] || 0;
-  if (riskGain > 0) {
-    state.risk = Math.min(100, state.risk + riskGain);
-    state.unethicalDecisions++;
-  }
-  
-  // Registrar en bitácora
-  const cd = getCalendarData(); 
-  state.log.push({ 
-    time: `Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`, 
-    title: t === 'ptu' ? "💰 Reparto de Utilidades (PTU)" : "🎄 Pago de Aguinaldo", 
-    decision: `Opción ${['A','B','C'][oi]}`, 
-    wildcard: null, 
-    effects: ef.slice(0,5), 
-    risk: riskGain 
-  }); 
-  renderLog(); 
-  
-  // Marcar como pagado
-  if (t === 'ptu') state.ptuPaid = true; 
-  if (t === 'aguinaldo') state.aguinaldoPaid = true; 
-  
-  // Cerrar modal
-  document.getElementById(mi).style.display = 'none';
-  
-  // Verificar game over
-  for (let k in state.stats) { 
-    if (state.stats[k] <= 0) { 
-      triggerGameOver(k); 
-      return; 
-    } 
-  } 
-  
-  // Continuar según el tipo de evento
-  if (t === 'aguinaldo') {
-    showTrimestral();
-  } else {
-    nextPhase();
-  }
-}
-
-// ==========================================
-// FUNCIÓN DE AVANCE AL SIGUIENTE MES
-// ==========================================
 
 function advanceToNextMonth() {
-  // Cerrar todos los modales abiertos
-  document.querySelectorAll('.modal-overlay').forEach(modal => {
-    modal.style.display = 'none';
-  });
-  
-  // Verificar game over
-  for (let k in state.stats) { 
-    if (state.stats[k] <= 0) { 
-      triggerGameOver(k); 
-      return; 
-    } 
-  } 
-  
-  // Verificar eventos especiales según el mes
-  const cm = getCalendarData().currentMonthInYear;
-  if (cm === 5 && !state.ptuPaid) { 
-    showPTU(); 
-  } else if (cm === 12 && !state.aguinaldoPaid) { 
-    showAguinaldo(); 
-  } else if (cm % 3 === 0) { 
-    showTrimestral(); 
-  } else {
-    nextPhase();
-  }
-  
-  // Guardar partida
+  document.querySelectorAll('.modal-overlay').forEach(m=>{m.style.display='none';});
+  for(let k in state.stats){if(state.stats[k]<=0){triggerGameOver(k);return;}}
+  const cm=getCalendarData().currentMonthInYear;
+  NotificationSystem.checkKPIs(state.stats);
+  if(cm===4&&!state.ptuPaid){NotificationSystem.showPTU();setTimeout(()=>nextPhase(),1000);}
+  else if(cm===11&&!state.aguinaldoPaid){NotificationSystem.showAguinaldo();setTimeout(()=>nextPhase(),1000);}
+  else if(cm===5&&!state.ptuPaid){showPTU();}
+  else if(cm===12&&!state.aguinaldoPaid){showAguinaldo();}
+  else if(cm%3===0){showTrimestral();}
+  else{nextPhase();}
   saveGame();
 }
 
-// ==========================================
-// FUNCIÓN DE CIERRE TRIMESTRAL
-// ==========================================
-
-function showTrimestral() { 
-  const o = document.getElementById('trimestral-options'); 
-  o.innerHTML = '<p><i>Selecciona indicadores en Crítico (1-4) para recuperar (+2). Cuestan -2 de Presupuesto cada uno.</i></p>'; 
-  
-  ['P', 'C', 'Pr', 'D', 'T'].forEach(k => { 
-    if (k !== 'Pr' && state.stats[k] <= 4 && state.stats.Pr >= 2) { 
-      const b = document.createElement('button'); 
-      b.className = 'btn btn-primary'; 
-      b.style.margin = '5px'; 
-      b.style.width = 'auto'; 
-      b.style.padding = '10px 15px'; 
-      b.innerText = `Inyectar recursos a ${STAT_NAMES[k]} (Costo: -2 Pr)`; 
-      b.onclick = () => { 
-        state.stats.Pr -= 2; 
-        state.stats[k] = Math.min(10, state.stats[k] + 2); 
-        renderDashboard(); 
-        b.disabled = true; 
-        b.innerText = `✅ ${STAT_NAMES[k]} Recuperado`; 
-        b.style.background = '#555'; 
-      }; 
-      o.appendChild(b); 
-    } 
-  }); 
-  
-  if (o.children.length === 1) {
-    o.innerHTML += '<p style="color: var(--accent); margin-top:15px;">No hay indicadores en crisis o no tienes presupuesto. ¡Excelente gestión!</p>';
-  }
-  
-  document.getElementById('modal-trimestral').style.display = 'flex'; 
+function showTrimestral() {
+  const o=document.getElementById('trimestral-options');o.innerHTML='<p><i>Indicadores en Crítico (1-4): recupera +2 por -2 de Presupuesto.</i></p>';
+  ['P','C','Pr','D','T'].forEach(k=>{if(k!=='Pr'&&state.stats[k]<=4&&state.stats.Pr>=2){const b=document.createElement('button');b.className='btn btn-primary';b.style.margin='5px';b.style.width='auto';b.style.padding='10px 15px';b.innerText=`${STAT_NAMES[k]} (Costo: -2 Pr)`;b.onclick=()=>{state.stats.Pr-=2;state.stats[k]=Math.min(10,state.stats[k]+2);renderDashboard();b.disabled=true;b.innerText=`✅ ${STAT_NAMES[k]}`;b.style.background='#555';};o.appendChild(b);}});
+  if(o.children.length===1)o.innerHTML+='<p style="color:var(--accent);margin-top:15px;">Sin indicadores en crisis. ¡Excelente!</p>';
+  document.getElementById('modal-trimestral').style.display='flex';
 }
 
-function closeTrimestralAndAdvance() {
-  document.getElementById('modal-trimestral').style.display = 'none';
-  nextPhase();
+function closeTrimestralAndAdvance() { document.getElementById('modal-trimestral').style.display='none';nextPhase(); }
+function nextPhase() { state.month++;if(getCalendarData().currentMonthInYear===1){state.ptuPaid=false;state.aguinaldoPaid=false;dealWildcards();state.risk=Math.max(0,state.risk-10);} updateLowestPoints();checkStreak();drawDilema(); }
+function applyEffects(ef) { const ks=['P','C','Pr','D','T'];ef.forEach((v,i)=>{state.stats[ks[i]]=Math.max(0,Math.min(10,state.stats[ks[i]]+v));});renderDashboard(); }
+function updateLowestPoints() { for(let k in state.stats){if(state.stats[k]<state.lowestPoints[k])state.lowestPoints[k]=state.stats[k];} }
+function checkStreak() { let a=true;for(let k in state.stats){if(state.stats[k]<5)a=false;} if(a){state.currentStreak++;if(state.currentStreak>state.bestStreak)state.bestStreak=state.currentStreak;}else{state.currentStreak=0;} renderDashboard(); }
+
+function triggerGameOver(key) {
+  const cd=getCalendarData();const rs={P:"Productividad a 0. Planta inviable.",C:"Clima a 0. Huelga general.",Pr:"Presupuesto a 0. Insolvencia.",D:"Disciplina a 0. Clausura por STPS/SAT.",T:"Talento a 0. Fuga masiva de cerebros."};
+  let extra=state.risk>=70?'<br><br>⚠️ <b>Riesgo corporativo crítico.</b>':'';
+  document.getElementById('gameover-reason').innerHTML=`Colapso en Año ${cd.currentYear}, Mes ${cd.currentMonthInYear}.<br><br><b>${rs[key]}</b>${extra}`;
+  document.getElementById('gameover-feedback').innerHTML=generateFeedback(key);document.getElementById('modal-gameover').style.display='flex';
 }
 
-function nextPhase() { 
-  state.month++; 
-  
-  // Resetear flags anuales si es inicio de año
-  if (getCalendarData().currentMonthInYear === 1) { 
-    state.ptuPaid = false; 
-    state.aguinaldoPaid = false; 
-    dealWildcards();
-    state.risk = Math.max(0, state.risk - 10);
-  } 
-  
-  updateLowestPoints(); 
-  checkStreak(); 
-  drawDilema(); 
+function generateFeedback(fk) {
+  let f=`<h4>💡 Diagnóstico:</h4>`;const ad={P:"Productividad a 0. <b>No sacrifiques capacidad por ganancias cortoplacistas.</b>",C:"Clima colapsó. <b>Prioriza bienestar del equipo.</b>",Pr:"Insolvencia. <b>Falló planeación financiera a largo plazo.</b>",D:"Clausura. <b>Ignoraste normativas y seguridad.</b>",T:"Fuga de Talento. <b>No supiste retener a tu gente.</b>"};
+  f+=`<p style="color:#ccc;">${ad[fk]}</p><h4 style="margin-top:20px;">📉 Vulnerabilidad:</h4><ul>`;
+  for(let k in state.lowestPoints){let c=state.lowestPoints[k]<=4?"var(--danger)":"var(--accent)";f+=`<li><b>${STAT_NAMES[k]}:</b> <span style="color:${c};font-weight:bold;">${state.lowestPoints[k]}/10</span></li>`;}
+  f+=`</ul><p style="margin-top:15px;color:var(--warn);font-weight:bold;">🔥 Mejor racha: ${state.bestStreak} meses.</p>`;return f;
 }
 
-function applyEffects(ef) { 
-  const ks = ['P', 'C', 'Pr', 'D', 'T']; 
-  ef.forEach((v, i) => { 
-    state.stats[ks[i]] = Math.max(0, Math.min(10, state.stats[ks[i]] + v)); 
-  }); 
-  renderDashboard(); 
+function endGame() {
+  let t=0;for(let k in state.stats)t+=state.stats[k];let r="";
+  if(t>=45)r="🏆 CEO Legendario";else if(t>=35)r="✅ Director Competente";else if(t>=25)r="⚠️ Gerente en Observación";else r="❌ Despedido";
+  document.getElementById('victory-score').innerText=`Salud Final: ${t}/50`;document.getElementById('victory-rank').innerText=r;document.getElementById('final-streak').innerText=state.bestStreak;
+  const profile=getCEOProfile(t,state.risk,state.unethicalDecisions);
+  document.getElementById('ceo-profile-display').innerHTML=`<div class="ceo-profile"><h3>⚖️ ¿Qué tipo de CEO fuiste?</h3><div class="ceo-type" style="color:${profile.color};">${profile.type}</div><p style="color:#ccc;font-size:0.95em;">${profile.desc}</p><p style="margin-top:15px;color:#aaa;font-size:0.85em;">Decisiones cuestionables: <b style="color:var(--risk-high);">${state.unethicalDecisions}</b> | Crisis: <b style="color:var(--crisis-glow);">${state.crisisCount}</b> | Riesgo: <b style="color:${getRiskLevel().color};">${getRiskLevel().text}</b></p></div>`;
+  document.getElementById('final-log').innerHTML=state.log.map(l=>{const ec=l.isCrisis?'log-entry crisis-log':'log-entry';return `<div class="${ec}" style="margin-bottom:10px;border-bottom:1px solid #333;padding-bottom:5px;"><b>${l.time}: ${l.title}</b><br><span style="color:var(--accent);">Decisión:</span> ${l.decision}<br>${l.wildcard?`<span class="log-wc">🃏 ${l.wildcard}</span><br>`:''}${l.risk>0?`<span class="log-risk">⚠️ Riesgo +${l.risk}</span>`:''}${l.isCrisis?'<span class="log-crisis">🚨 CRISIS</span>':''}</div>`;}).join('');
+  document.getElementById('modal-victory').style.display='flex';saveHighScore(t,r,state.bestStreak,state.risk,profile.type,state.crisisCount);
 }
 
-function updateLowestPoints() { 
-  for (let k in state.stats) { 
-    if (state.stats[k] < state.lowestPoints[k]) 
-      state.lowestPoints[k] = state.stats[k]; 
-  } 
-}
+function renderLog() { document.getElementById('log-container').innerHTML=state.log.map(l=>{const ec=l.isCrisis?'log-entry crisis-log':'log-entry';return `<div class="${ec}"><h4>${l.time}: ${l.title}</h4><p><b>Decisión:</b> ${l.decision}</p>${l.wildcard?`<p class="log-wc">🃏 ${l.wildcard}</p>`:''}${l.risk>0?`<p class="log-risk">⚠️ Riesgo +${l.risk}</p>`:''}${l.isCrisis?'<p class="log-crisis">🚨 CRISIS</p>':''}</div>`;}).reverse().join(''); }
 
-function checkStreak() { 
-  let as = true; 
-  for (let k in state.stats) { 
-    if (state.stats[k] < 5) as = false; 
-  } 
-  if (as) { 
-    state.currentStreak++; 
-    if (state.currentStreak > state.bestStreak) 
-      state.bestStreak = state.currentStreak; 
-  } else { 
-    state.currentStreak = 0; 
-  } 
-  renderDashboard(); 
-}
-
-// ==========================================
-// FUNCIONES DE FIN DE JUEGO
-// ==========================================
-function triggerGameOver(k) { 
-  const cd = getCalendarData(); 
-  const rs = { 
-    P: "La Productividad cayó a 0. La planta es operativamente inviable.", 
-    C: "El Clima Laboral llegó a 0. Huelga general y sabotaje interno.", 
-    Pr: "El Presupuesto es 0. Insolvencia técnica y embargo de cuentas.", 
-    D: "La Disciplina es 0. Clausura inmediata por autoridades (STPS/SAT).", 
-    T: "El Talento es 0. Fuga masiva de cerebros, la operación colapsa." 
-  }; 
-  let extraMsg = '';
-  if (state.risk >= 70) {
-    extraMsg = '<br><br>⚠️ <b>Además, tu riesgo corporativo era crítico.</b> Las decisiones cuestionables del pasado aceleraron este colapso.';
-  }
-  document.getElementById('gameover-reason').innerHTML = `La empresa colapsó en el Año ${cd.currentYear}, Mes ${cd.currentMonthInYear}.<br><br><b>${rs[k]}</b>${extraMsg}`; 
-  document.getElementById('gameover-feedback').innerHTML = generateFeedback(k); 
-  document.getElementById('modal-gameover').style.display = 'flex'; 
-}
-
-function generateFeedback(fk) { 
-  let f = `<h4>💡 Diagnóstico y Área de Oportunidad:</h4>`; 
-  const ad = { 
-    P: "Tu Productividad cayó a 0. La planta se detuvo. Parece que el desgaste operativo, la falta de mantenimiento o la fatiga del equipo fueron letales. <br><b>Enfoque:</b> No sacrifiques la capacidad instalada por ganancias a corto plazo. Usa el comodín de 'Resolución de Problemas' para proteger tu operación.", 
-    C: "Tu Clima Laboral colapsó (Huelga/Sabotaje). El equipo no soportó más la presión. <br><b>Enfoque:</b> Prioriza el bienestar. Usa comodines de 'Negociación' y 'Comunicación Asertiva'. Evita las opciones que intimiden, agoten o ignoren las necesidades humanas del personal.", 
-    Pr: "Insolvencia Total. El Presupuesto llegó a 0. <br><b>Enfoque:</b> Falló tu planeación financiera a largo plazo. No guardaste flujo para los eventos anuales obligatorios (PTU/Aguinaldo) o gastaste en soluciones reactivas. Usa el comodín de 'Visión Financiera' para blindar tu caja.", 
-    D: "Clausura por autoridades. La Disciplina fue 0. <br><b>Enfoque:</b> Ignoraste normativas, seguridad o ética. Las multas y los riesgos legales te destruyeron. Usa el comodín de 'Ética Corporativa' y nunca subestimes los protocolos de seguridad y cumplimiento.", 
-    T: "Fuga de Talento. Tu Talento llegó a 0. <br><b>Enfoque:</b> No supiste retener a tu gente. Las decisiones frías, la falta de reconocimiento o los entornos tóxicos destruyeron tu capital humano. Usa 'Negociación' para proteger a tu equipo." 
-  }; 
-  f += `<p style="color:#ccc;">${ad[fk]}</p>`; 
-  f += `<h4 style="margin-top:20px;">📉 Análisis de Vulnerabilidad:</h4><ul>`; 
-  for(let k in state.lowestPoints) { 
-    let c = state.lowestPoints[k] <= 4 ? "var(--danger)" : "var(--accent)"; 
-    f += `<li><b>${STAT_NAMES[k]}:</b> <span style="color:${c}; font-weight:bold;">${state.lowestPoints[k]}/10</span></li>`; 
-  } 
-  f += `</ul>`;
-  f += `<h4 style="margin-top:20px;">⚖️ Análisis Ético:</h4>`;
-  f += `<p style="color:#ccc;">Tomaste <b style="color:var(--risk-high);">${state.unethicalDecisions} decisiones cuestionables</b> durante la campaña.</p>`;
-  f += `<p style="color:#ccc;">Sufriste <b style="color:var(--crisis-glow);">${state.crisisCount} crisis corporativas severas</b> por acumulación de riesgo.</p>`;
-  const rl = getRiskLevel();
-  f += `<p style="color:#ccc;">Tu nivel de riesgo corporativo al colapsar: <b style="color:${rl.color};">${rl.text}</b></p>`;
-  if (state.risk >= 50) {
-    f += `<p style="color:var(--risk-high); margin-top:10px;"><b>⚠️ Las decisiones poco éticas tienen consecuencias diferidas.</b> A veces el beneficio inmediato es tentador, pero el riesgo acumulado eventualmente se materializa.</p>`;
-  }
-  f += `<p style="margin-top:15px; color:var(--warn); font-weight:bold;">🔥 Tu mejor racha de estabilidad fue de ${state.bestStreak} meses consecutivos sin entrar en zona crítica.</p>`; 
-  return f; 
-}
-
-function endGame() { 
-  let t = 0; 
-  for (let k in state.stats) t += state.stats[k]; 
-  let r = ""; 
-  if (t >= 45) r = "🏆 CEO Legendario (La empresa es un referente en la industria tras 5 años)"; 
-  else if (t >= 35) r = "✅ Director Competente (La empresa se mantuvo sólida y rentable)"; 
-  else if (t >= 25) r = "⚠️ Gerente en Observación (La junta directiva evalúa tu relevo)"; 
-  else r = "❌ Despedido (La empresa no sobrevivió a la década)"; 
-  document.getElementById('victory-score').innerText = `Salud Final de la Empresa: ${t} / 50`; 
-  document.getElementById('victory-rank').innerText = r; 
-  document.getElementById('final-streak').innerText = state.bestStreak; 
-  
-  const profile = getCEOProfile(t, state.risk, state.unethicalDecisions);
-  document.getElementById('ceo-profile-display').innerHTML = `
-    <div class="ceo-profile">
-      <h3>⚖️ ¿Qué tipo de CEO fuiste?</h3>
-      <div class="ceo-type" style="color: ${profile.color};">${profile.type}</div>
-      <p style="color: #ccc; font-size: 0.95em;">${profile.desc}</p>
-      <p style="margin-top: 15px; color: #aaa; font-size: 0.85em;">
-        Decisiones cuestionables: <b style="color:var(--risk-high);">${state.unethicalDecisions}</b> | 
-        Crisis sufridas: <b style="color:var(--crisis-glow);">${state.crisisCount}</b> |
-        Riesgo final: <b style="color:${getRiskLevel().color};">${getRiskLevel().text}</b>
-      </p>
-    </div>
-  `;
-  
-  const fl = document.getElementById('final-log'); 
-  fl.innerHTML = state.log.map(l => {
-    const entryClass = l.isCrisis ? 'log-entry crisis-log' : 'log-entry';
-    return `<div class="${entryClass}" style="margin-bottom:10px; border-bottom: 1px solid #333; padding-bottom:5px;">
-      <b>${l.time}: ${l.title}</b><br>
-      <span style="color: var(--accent);">Decisión:</span> ${l.decision}<br>
-      ${l.wildcard ? `<span class="log-wc">🃏 Habilidad:</span> ${l.wildcard}<br>` : ''}
-      ${l.risk > 0 ? `<span class="log-risk">⚠️ Riesgo +${l.risk}</span>` : ''}
-      ${l.isCrisis ? `<span class="log-crisis">🚨 CRISIS DETONADA</span>` : ''}
-    </div>`;
-  }).join(''); 
-  
-  document.getElementById('modal-victory').style.display = 'flex'; 
-  saveHighScore(t, r, state.bestStreak, state.risk, profile.type, state.crisisCount); 
-}
-
-function renderLog() { 
-  const c = document.getElementById('log-container'); 
-  c.innerHTML = state.log.map(l => {
-    const entryClass = l.isCrisis ? 'log-entry crisis-log' : 'log-entry';
-    return `<div class="${entryClass}">
-      <h4>${l.time}: ${l.title}</h4>
-      <p><b>Decisión:</b> ${l.decision}</p>
-      ${l.wildcard ? `<p class="log-wc">🃏 ${l.wildcard}</p>` : ''}
-      ${l.risk > 0 ? `<p class="log-risk">⚠️ Riesgo +${l.risk}</p>` : ''}
-      ${l.isCrisis ? `<p class="log-crisis">🚨 CRISIS DETONADA</p>` : ''}
-    </div>`;
-  }).reverse().join(''); 
-}
-
-// Iniciar el juego
 initGame();
 </script>
 </body>
