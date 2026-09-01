@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador Gerencial - Campaña 5 Años</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='15' fill='%231e1e24'/%3E%3Crect x='15' y='60' width='15' height='25' rx='3' fill='%232196f3'/%3E%3Crect x='35' y='45' width='15' height='40' rx='3' fill='%234caf50'/%3E%3Crect x='55' y='50' width='15' height='35' rx='3' fill='%23ffc107'/%3E%3Crect x='75' y='35' width='15' height='50' rx='3' fill='%23ff5722'/%3E%3Ctext x='50' y='25' font-family='Arial' font-size='20' font-weight='bold' fill='%23ffd700' text-anchor='middle'%3E📊%3C/text%3E%3C/svg%3E">
 <style>
 :root{--bg:#121212;--card:#1e1e24;--text:#e0e0e0;--accent:#4caf50;--warn:#ff9800;--danger:#f44336;--info:#2196f3;--gold:#ffd700;--p:#2196f3;--c:#4caf50;--pr:#ffc107;--d:#ff5722;--t:#9c27b0;--risk-low:#4caf50;--risk-med:#ff9800;--risk-high:#ff5722;--risk-crit:#9c27b0;--whatsapp-received:#202c33;--whatsapp-border:#2a3942;}
 *{box-sizing:border-box;}
@@ -60,7 +61,6 @@ h1,h2,h3,h4{margin:0 0 15px 0;}
 .modal.info{border-top-color:var(--info);}.modal.info h2{color:var(--info);}
 .modal.warn{border-top-color:var(--warn);}.modal.warn h2{color:var(--warn);}
 .modal.special{border-top-color:var(--gold);}.modal.special h2{color:var(--gold);}
-.modal.risk{border-top-color:var(--risk-crit);}.modal.risk h2{color:var(--risk-crit);}
 .crisis-penalties{background:rgba(139,0,0,0.3);border:2px solid var(--risk-crit);border-radius:8px;padding:15px;margin:15px 0;text-align:left;}
 .crisis-penalties h4{color:var(--risk-crit);margin-bottom:10px;text-align:center;}
 .penalty-item{display:flex;justify-content:space-between;padding:5px 10px;margin:3px 0;background:rgba(0,0,0,0.3);border-radius:4px;color:#ff8888;font-weight:bold;}
@@ -93,7 +93,8 @@ h1,h2,h3,h4{margin:0 0 15px 0;}
 .visitor-counter:hover{opacity:1;}
 .highscore-table{width:100%;margin-top:20px;border-collapse:collapse;}
 .highscore-table th,.highscore-table td{padding:10px;text-align:left;border-bottom:1px solid #333;}
-.highscore-table th{color:var(--gold);font-weight:bold;}.highscore-table td{color:#ccc;}
+.highscore-table th{color:var(--gold);font-weight:bold;}
+.highscore-table td{color:#ccc;}
 .notification-container{position:fixed;top:20px;right:20px;z-index:2000;display:flex;flex-direction:column;gap:10px;max-width:340px;pointer-events:none;}
 .whatsapp-notification{background:var(--whatsapp-received);border-radius:8px;padding:10px 12px 8px;box-shadow:0 2px 10px rgba(0,0,0,0.5);animation:slideIn 0.4s cubic-bezier(0.16,1,0.3,1);display:flex;gap:10px;align-items:flex-start;pointer-events:auto;cursor:pointer;position:relative;max-width:320px;border:1px solid var(--whatsapp-border);}
 .whatsapp-notification::before{content:'';position:absolute;top:0;left:-8px;width:0;height:0;border-top:8px solid var(--whatsapp-received);border-left:8px solid transparent;}
@@ -185,20 +186,12 @@ function renderEffects(ci,ef,risk){const ed=document.getElementById(ci);ed.inner
 function closeConsecuencia(){document.getElementById('modal-consecuencia').style.display='none';advanceToNextMonth();}
 function showPTU(){const m=document.getElementById('modal-ptu');m.querySelectorAll('.btn-gold').forEach(b=>{b.disabled=false;b.style.opacity='1';b.style.cursor='pointer';b.style.background='';});m.style.display='flex';}
 function showAguinaldo(){const m=document.getElementById('modal-aguinaldo');m.querySelectorAll('.btn-gold').forEach(b=>{b.disabled=false;b.style.opacity='1';b.style.cursor='pointer';b.style.background='';});m.style.display='flex';}
-
-// ✅ CORREGIDO: applySpecialEvent ahora verifica game over después de aplicar efectos
-function applySpecialEvent(et,oi){const mi=et==='ptu'?'modal-ptu':'modal-aguinaldo';const ef=SPECIAL_EVENTS[et][oi];const ks=['P','C','Pr','D','T'];ef.slice(0,5).forEach((v,i)=>{state.stats[ks[i]]=Math.max(0,Math.min(20,state.stats[ks[i]]+v));});renderDashboard();const rg=ef[5]||0;if(rg>0){state.risk=Math.min(100,state.risk+rg);state.unethicalDecisions++;}const cd=getCalendarData();state.log.push({time:`Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,title:et==='ptu'?"💰 PTU":"🎄 Aguinaldo",decision:`Opción ${['A','B','C'][oi]}`,wildcard:null,effects:ef.slice(0,5),risk:rg});renderLog();if(et==='ptu')state.ptuPaid=true;if(et==='aguinaldo')state.aguinaldoPaid=true;document.getElementById(mi).style.display='none';for(let k in state.stats){if(state.stats[k]<=0){triggerGameOver(k);return;}}if(et==='aguinaldo'){showTrimestral();}else{nextPhase();}saveGame();}
-
-// ✅ CORREGIDO: advanceToNextMonth sin setTimeout problemáticos
+function applySpecialEvent(et,oi){const mi=et==='ptu'?'modal-ptu':'modal-aguinaldo';const ef=SPECIAL_EVENTS[et][oi];const ks=['P','C','Pr','D','T'];ef.slice(0,5).forEach((v,i)=>{state.stats[ks[i]]=Math.max(0,Math.min(20,state.stats[ks[i]]+v));});renderDashboard();const rg=ef[5]||0;if(rg>0){state.risk=Math.min(100,state.risk+rg);state.unethicalDecisions++;}const cd=getCalendarData();state.log.push({time:`Año ${cd.currentYear} - Mes ${cd.currentMonthInYear}`,title:et==='ptu'?"💰 PTU":"🎄 Aguinaldo",decision:`Opción ${['A','B','C'][oi]}`,wildcard:null,effects:ef.slice(0,5),risk:rg});renderLog();if(et==='ptu')state.ptuPaid=true;if(et==='aguinaldo')state.aguinaldoPaid=true;document.getElementById(modalId).style.display='none';for(let k in state.stats){if(state.stats[k]<=0){triggerGameOver(k);return;}}if(et==='aguinaldo'){showTrimestral();}else{nextPhase();}saveGame();}
 function advanceToNextMonth(){document.querySelectorAll('.modal-overlay').forEach(m=>{m.style.display='none';});for(let k in state.stats){if(state.stats[k]<=0){triggerGameOver(k);return;}}const cm=getCalendarData().currentMonthInYear;NotificationSystem.checkKPIs(state.stats);if(cm===4&&!state.ptuPaid){NotificationSystem.showPTU();nextPhase();}else if(cm===11&&!state.aguinaldoPaid){NotificationSystem.showAguinaldo();nextPhase();}else if(cm===5&&!state.ptuPaid){showPTU();}else if(cm===12&&!state.aguinaldoPaid){showAguinaldo();}else if(cm%3===0){showTrimestral();}else{nextPhase();}saveGame();}
-
 function showTrimestral(){const o=document.getElementById('trimestral-options');o.innerHTML='<p><i>Indicadores en Crítico (1-7): recupera +3 por -3 Pr.</i></p>';['P','C','Pr','D','T'].forEach(k=>{if(k!=='Pr'&&state.stats[k]<=7&&state.stats.Pr>=3){const b=document.createElement('button');b.className='btn btn-primary';b.style.margin='5px';b.style.width='auto';b.style.padding='10px 15px';b.innerText=`${SN[k]} (Costo: -3 Pr)`;b.onclick=()=>{state.stats.Pr-=3;state.stats[k]=Math.min(20,state.stats[k]+3);renderDashboard();b.disabled=true;b.innerText=`✅ ${STAT_NAMES[k]}`;b.style.background='#555';};o.appendChild(b);}});if(o.children.length===1)o.innerHTML+='<p style="color:var(--accent);margin-top:15px;">Sin crisis. ¡Excelente!</p>';document.getElementById('modal-trimestral').style.display='flex';}
 function closeTrimestralAndAdvance(){document.getElementById('modal-trimestral').style.display='none';nextPhase();}
 function nextPhase(){state.month++;if(getCalendarData().currentMonthInYear===1){state.ptuPaid=false;state.aguinaldoPaid=false;dealWildcards();state.risk=Math.max(0,state.risk-10);}updateLowestPoints();checkStreak();drawDilema();}
-
-// ✅ CORREGIDO: applyEffects ahora verifica game over después de aplicar efectos
 function applyEffects(ef){const ks=['P','C','Pr','D','T'];ef.forEach((v,i)=>{state.stats[ks[i]]=Math.max(0,Math.min(20,state.stats[ks[i]]+v));});renderDashboard();for(let k in state.stats){if(state.stats[k]<=0){triggerGameOver(k);return;}}}
-
 function updateLowestPoints(){for(let k in state.stats){if(state.stats[k]<state.lowestPoints[k])state.lowestPoints[k]=state.stats[k];}}
 function checkStreak(){let a=true;for(let k in state.stats){if(state.stats[k]<10)a=false;}if(a){state.currentStreak++;if(state.currentStreak>state.bestStreak)state.bestStreak=state.currentStreak;}else{state.currentStreak=0;}renderDashboard();}
 function triggerGameOver(key){const cd=getCalendarData();const rs={P:"Productividad a 0. La planta es operativamente inviable.",C:"Clima a 0. Huelga general y sabotaje interno.",Pr:"Presupuesto a 0. Insolvencia técnica y embargo de cuentas.",D:"Disciplina a 0. Clausura inmediata por autoridades (STPS/SAT).",T:"Talento a 0. Fuga masiva de cerebros, la operación colapsa."};let e=state.risk>=70?'<br><br>⚠️ <b>Riesgo corporativo crítico.</b>':'';document.getElementById('gameover-reason').innerHTML=`Colapso en Año ${cd.currentYear}, Mes ${cd.currentMonthInYear}.<br><br><b>${rs[key]}</b>${e}`;document.getElementById('gameover-feedback').innerHTML=generateFeedback(key);document.getElementById('modal-gameover').style.display='flex';}
